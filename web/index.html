@@ -1348,7 +1348,8 @@ function fillSelects(){
   const hOpts  = optGroups(LOG.cols.filter(c=>!c.rc));
   for (const [k,w] of Object.entries(W)){
     $(w.sw).innerHTML=swOpts; $(w.h).innerHTML=hOpts;
-    const savedSw=mstore.get(k+'.sw'), savedH=mstore.get(k+'.h');
+    // Schalter nur pro Modell: der zuletzt bei einem anderen Modell gewählte Schalter passt meist nicht (Lak-17 SC, SB-10 SB)
+    const savedSw=store.get(mkey(k+'.sw')), savedH=mstore.get(k+'.h');
     if (k==='climb' && CH.cur) $(w.sw).querySelector('option').insertAdjacentHTML('afterend',`<option value="${CUR_SW}">${esc(T('{n} (automatisch)',{n:CH.cur.name}))}</option>`);
     let sw = savedSw===CUR_SW && CH.cur ? CUR_SW : (savedSw && colBy(savedSw)) ? savedSw : null;
     if (!sw){ const d=w.def.map(n=>LOG.cols.find(c=>c.name===n)).find(c=>c && c.vals.some(v=>v>0));
