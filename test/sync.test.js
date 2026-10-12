@@ -164,3 +164,23 @@ test('Text als UTF-8 oder Latin-1 lesen', () => {
   const b = Buffer.from('Abc;Höhe;Zeit;ä', 'utf8');
   assert.ok(S.decodeText(b.subarray(0, b.length - 1)).startsWith('Abc;Höhe'));
 });
+
+test('Polaren fürs MacCready-Widget neben die Logs schreiben', async () => {
+  const root = tmp();
+  const txt = '-- Test\nreturn {\n  ["SB-10"] = { a = -0.0072, b = 0.162, c = -1.51, vMin = 6.7, vMax = 18.9 },\n}\n';
+  const dest = await S.writePolars(root, txt);
+  assert.equal(dest, path.join(root, 'scripts', 'maccready', 'polaren.lua'));
+  assert.equal(fs.readFileSync(dest, 'utf8'), txt);
+  await S.writePolars(root, '-- neu\n');              // überschreibt
+  assert.equal(fs.readFileSync(dest, 'utf8'), '-- neu\n');
+  await assert.rejects(S.writePolars(root, 'os.remove("x")'));
+});
+
+test('Watcher merkt sich den Ethos-Ordner für polaren.lua', async () => {
+  const root = tmp(), arc = tmp();
+  put(path.join(root, 'RADIO', 'logs', 'SB-10-2026-10-02-14-39-06.csv'), 'a');
+  const w = new S.SyncWatcher(() => ({ senderPath: 'Radio/logs', archiveDir: arc, autoSync: true }),
+    { volumes: async () => [{ root: path.join(root, 'RADIO'), label: 'RADIO' }] });
+  await w.poll(true);
+  assert.deepEqual(w.ethosRoots, [path.join(root, 'RADIO')]);
+});

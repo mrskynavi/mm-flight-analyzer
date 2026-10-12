@@ -24,4 +24,6 @@ contextBridge.exposeInMainWorld('ethosDesktop', {
   aiCreate: body => ipcRenderer.invoke('ai:create', body),
   mcpInfo: () => ipcRenderer.invoke('mcp:info'),
   copyText: t => ipcRenderer.invoke('clipboard:write', t),
+  polarsTarget: () => ipcRenderer.invoke('sender:polarsTarget'),
+  writePolars: text => ipcRenderer.invoke('sender:polars', text),
 });

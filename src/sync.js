@@ -208,6 +208,17 @@ async function archiveFile(archive, name, data) {
   return { path: dest, existed: false };
 }
 
+// Polaren fürs MacCready-Widget auf den Sender: scripts/maccready/polaren.lua neben dem Widget
+const POLAR_FILE = ['scripts', 'maccready', 'polaren.lua'];
+async function writePolars(root, text) {
+  const s = String(text || '');
+  if (!s.startsWith('--') || s.length > 200000) throw new Error('Ungültiger Inhalt');
+  const dest = path.join(root, ...POLAR_FILE);
+  await fsp.mkdir(path.dirname(dest), { recursive: true });
+  await fsp.writeFile(dest, s, 'utf8');
+  return dest;
+}
+
 // Alle Logs im Archiv (Modell-Ordner und lose CSVs in der Wurzel)
 async function listArchive(archive) {
   const out = [];
@@ -261,6 +272,7 @@ class SyncWatcher extends EventEmitter {
     this.busy = false;
     this.status = { state: 'idle' };
     this.roots = [];        // Laufwerke der zuletzt gefundenen Sender
+    this.ethosRoots = [];   // Ethos: Ordner über logs, dorthin geht scripts/maccready/polaren.lua
     this.paused = false;    // während dem Auswerfen nicht auf den Sender zugreifen
   }
   start() { this.stop(); this.timer = setInterval(() => this.poll(), this.interval); this.poll(); }
@@ -277,6 +289,7 @@ class SyncWatcher extends EventEmitter {
       const jeti = st.jetiSync === false ? [] : (await findJetiDirs(vols, force)).filter(d => !ethos.includes(d));
       const dirs = [...ethos, ...jeti];
       this.roots = [...new Set(dirs.map(d => rootOf(d, vols)))];
+      this.ethosRoots = [...new Set(ethos.map(d => path.dirname(d)))];   // Ordner über logs, dort liegt auch scripts
       for (const d of [...this.synced]) if (!dirs.includes(d)) this.synced.delete(d);
       if (!dirs.length) {
         // Sender abgezogen: das letzte Ergebnis bleibt sichtbar
@@ -313,4 +326,4 @@ class SyncWatcher extends EventEmitter {
   }
 }
 
-module.exports = { denied, modelOf, safeDir, decodeText, volumes, findSenderDirs, findJetiDirs, listCsv, listJeti, syncDir, archiveFile, listArchive, defaultArchive, SyncWatcher };
+module.exports = { denied, modelOf, safeDir, decodeText, volumes, findSenderDirs, findJetiDirs, listCsv, listJeti, syncDir, archiveFile, writePolars, listArchive, defaultArchive, SyncWatcher };

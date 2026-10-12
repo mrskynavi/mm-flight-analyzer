@@ -470,13 +470,21 @@ a { color: var(--acc); }
 <h2>Kennzahlen und Diagramm</h2>
 <ul>
 <li>Oben stehen die <b>beste Gleitzahl</b> und das <b>geringste Sinken</b>, jeweils mit der Geschwindigkeit, bei der sie erreicht werden.</li>
-<li><b>Ansicht:</b> „Sinken“ zeigt das Sinken in m/s über der Fahrt, „Gleitzahl“ die Gleitzahl über der Fahrt.</li>
+<li><b>Ansicht:</b> „Sinken“ zeigt das Vario in m/s über der Fahrt, Sinken negativ wie auf dem Vario (−0,6 m/s = 0,6 m/s Sinken); „Gleitzahl“ zeigt die Gleitzahl über der Fahrt.</li>
 <li><b>Glättung:</b> „Physikalisch“ legt die Kurve Sinken = A·v³ + B/v durch die Mediane, „Median“ zeigt die geglätteten Mediane pro 4-km/h-Klasse, „Aus“ zeichnet keine Kurve.</li>
 <li><b>Punkte</b> zeigt jede gezählte Sekunde, <b>Streuung</b> das Band der mittleren Hälfte der Punkte, <b>Einzel-Logs</b> die Polare jedes Logs zum Vergleich.</li>
 <li><b>Filter anwenden:</b> Es zählen nur Einträge, die bei allen Filtern im Tab Diagramme im Bereich liegen (<a href="#k10">Kapitel 10</a>), und zwar in allen gewählten Logs des Modells. So entsteht z. B. eine Polare nur aus ruhiger Luft oder nur aus einem Höhenbereich. Ändern sich die Filter, rechnet die Polare neu.</li>
 </ul>
 <h2>So wird gerechnet</h2>
 <p>Jeder Punkt ist eine Sekunde Gleitflug: Motor aus (und 15 s danach), geradeaus (Kursänderung unter 8°/s) und ohne starkes Beschleunigen. Die Fahrt ist die TAS, ohne Wind die GPS-Geschwindigkeit; das Sinken kommt vom Vario, korrigiert um Fahrtänderungen. Pro 4-km/h-Klasse zählt der Median. Details stehen im ⓘ neben „Polare“.</p>
+<h2>Für MacCready / Lua-Widget</h2>
+<p>Unter dem Diagramm stehen die Kennzahlen für ein MacCready-Widget auf dem Sender. Die App nähert die physikalische Polare im Fahrtbereich mit Gleitpunkten durch eine Parabel an: <b>Vario = a·v² + b·v + c</b>, Ergebnis in m/s mit Sinken negativ. Mit <span class="btn">m/s</span> oder <span class="btn">km/h</span> wählst Du, für welche Einheit von v die Koeffizienten gelten; jeder Wert hat einen Knopf <span class="btn">Kopieren</span>. Darunter stehen der gültige Bereich, geringstes Sinken und beste Gleitzahl der Parabel, die Abweichung zur Polare und eine 3-Punkte-Polare.</p>
+<ul>
+<li><b>Sollfahrt nach MacCready:</b> Mit den Reglern MC-Wert, Wind (+ Gegenwind), Netto (Steigen der Luft), Ballast (in % des Fluggewichts beim Loggen) und Verschmutzung (Sinken um so viel % grösser) siehst Du die Sollfahrt. Im Diagramm erscheinen die angepasste Polare violett und die Tangente vom Punkt (Gegenwind, −MC) an die Kurve. Die Tabelle zeigt MC 0 bis 3 mit Sollfahrt, Vario und Schnitt; ein Klick auf eine Zeile setzt den MC-Wert. Liegt die Sollfahrt über dem gültigen Bereich, steht dort „über Bereich“, und das Widget sagt die höchste gültige Fahrt an. Die App startet immer mit MC 0, <span class="btn">Alles zurücksetzen</span> stellt alle Regler auf 0.</li>
+<li><b>Auf den Sender:</b> Die Datei <b>polaren.lua</b> enthält alle Ethos-Modelle, deren Polare Du im Tab Polare schon angesehen hast, mit dem Modellnamen wie auf dem Sender. In der Desktop-App schreibt <span class="btn">Auf Sender schreiben</span> sie in den Ordner <b>scripts/maccready</b> des angeschlossenen Senders (neben dem Ordner logs). Mit dem Häkchen „Beim Sync automatisch aktualisieren“ (Standard an) passiert das bei jedem Sync von selbst. In der Web-Version speichert <span class="btn">Datei speichern</span> die Datei, und Du kopierst sie selbst auf den Sender. Jeti-Modelle kommen nicht in die Datei.</li>
+<li><b>Im Widget lesen:</b> Der gezeigte Lua-Code liest polaren.lua neben main.lua des Widgets (Ordner scripts/maccready), sucht das aktive Modell mit model.name() und rechnet mit sollfahrt(mc, netto, wind, ballast, mueck) die Sollfahrt in km/h. <span class="btn">Code kopieren</span> und <span class="btn">Werte als JSON kopieren</span> legen Code oder Werte in die Zwischenablage.</li>
+</ul>
+<div class="tip"><b>Tipp</b>Damit die Kennzahlen erscheinen, braucht es Gleitflug über einen breiten Fahrtbereich, z. B. 30 bis 70 km/h. Liegen alle Gleitpunkte in einem schmalen Bereich, zeigt der Block einen Hinweis statt Werten.</div>
 
 <!-- 12 -->
 <h1 id="k13"><span class="n">13</span>Tab „Karte &amp; Wind“</h1>

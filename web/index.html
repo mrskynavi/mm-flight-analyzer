@@ -246,6 +246,55 @@ section{display:grid;gap:10px}
 .pol-ctrl input{accent-color:var(--accent)}
 .pol-cv{position:relative;height:min(58vh,480px);min-height:300px}
 .pol-empty{display:grid;place-items:center;height:100%;color:var(--muted);text-align:center;padding:20px}
+/* Tab Polare: Block „Für MacCready / Lua-Widget“ (Parabel, Sollfahrt, Datei für den Sender) */
+.mcb{gap:12px;padding:12px 14px}
+.mc-grid{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:16px}
+@media (max-width:820px){.mc-grid{grid-template-columns:1fr}}
+.mc-col{display:grid;gap:10px;min-width:0;align-content:start}
+.mc-sub{font:600 .78rem var(--mono);text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:0}
+.mc-sub span{text-transform:none;letter-spacing:0;font-weight:400}
+.mc-formula{font:500 1rem var(--mono);background:var(--bg);border-radius:8px;padding:10px 12px;overflow-x:auto;white-space:nowrap}
+.mc-formula b{color:var(--ideal)} .mc-formula small{color:var(--muted);font-size:.8rem}
+.mc-coef{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.mc-cf{border:1px solid var(--line);border-radius:8px;padding:8px 10px;display:grid;gap:2px;min-width:0}
+.mc-cf .l{font:600 .8rem var(--mono);color:var(--ideal)}
+.mc-cf .v{font:600 1.05rem var(--mono);font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.mc-cf .u{font:.72rem var(--mono);color:var(--muted)}
+.mc-copy{font:500 .78rem var(--body);border:1px solid var(--line);background:var(--panel);color:var(--accent);border-radius:4px;padding:2px 8px;cursor:pointer;justify-self:start}
+.mc-copy:hover{border-color:var(--accent)}
+dl.mc-facts{display:grid;grid-template-columns:auto 1fr auto;gap:4px 12px;margin:0;font-size:.88rem;align-items:center}
+dl.mc-facts dt{color:var(--muted)} dl.mc-facts dd{margin:0;font:500 .88rem var(--mono);font-variant-numeric:tabular-nums}
+.mc-tw{overflow-x:auto}
+.mc-tab{border-collapse:collapse;width:100%;font-size:.88rem;font-variant-numeric:tabular-nums}
+.mc-tab th,.mc-tab td{padding:4px 8px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
+.mc-tab th{font:500 .72rem var(--mono);color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.mc-tab th:first-child,.mc-tab td:first-child{text-align:left}
+.mc-tab tr[data-mc]{cursor:pointer}
+.mc-tab tr.sel td{background:color-mix(in srgb,var(--ideal) 14%,transparent);font-weight:600}
+.mc-tab tr.out td{color:var(--muted)} .mc-tab tr.out td:last-child{color:var(--warn)}
+.mc-env{display:grid;grid-template-columns:auto minmax(0,1fr) 7.5em;gap:6px 10px;align-items:center;font-size:.88rem}
+.mc-env input{accent-color:var(--ideal);width:100%;min-width:0}
+.mc-env output{font:600 .9rem var(--mono);color:var(--ideal);text-align:right;white-space:nowrap}
+.mc-env output.zero{color:var(--muted);font-weight:400}
+.mc-env small{grid-column:2/4;color:var(--muted);font-size:.76rem;margin-top:-6px}
+.mc-reset{font:500 .8rem var(--body);border:1px solid var(--line);background:var(--panel);color:var(--muted);border-radius:4px;padding:2px 8px;cursor:pointer;justify-self:start}
+.mc-reset:hover{color:var(--accent);border-color:var(--accent)}
+.mc-callout{border-left:3px solid var(--ideal);padding:2px 0 2px 10px;font-size:.88rem;color:var(--muted);margin:0}
+.mc-tx{border:1px solid var(--line);border-radius:10px;padding:10px 12px;display:grid;gap:8px;background:var(--bg)}
+.mc-head{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;justify-content:space-between}
+.mc-state{display:flex;align-items:center;gap:8px;font-size:.88rem;min-width:0}
+.mc-dot{width:10px;height:10px;border-radius:50%;background:var(--muted);flex:none}
+.mc-dot.on{background:var(--good)}
+.mc-path{font:.82rem var(--mono);color:var(--fg);overflow-wrap:anywhere}
+.mc-chk{display:flex;gap:8px;align-items:flex-start;font-size:.88rem;cursor:pointer}
+.mc-chk input{accent-color:var(--accent);width:16px;height:16px;margin-top:3px}
+.mc-chk small{display:block;color:var(--muted);font-size:.8rem}
+.mc-res b{color:var(--good)} .mc-res .err{color:var(--bad)}
+.mc-btns{display:flex;gap:8px;flex-wrap:wrap}
+details.mc-code summary{cursor:pointer;font:600 .78rem var(--mono);text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+details.mc-code[open] summary{margin-bottom:8px}
+pre.mc-lua{font:.78rem/1.5 var(--mono);background:var(--bg);border-radius:8px;padding:10px 12px;overflow-x:auto;margin:0;white-space:pre}
+.mcb > pre.mc-lua{background:var(--bg)}
 /* Thermik-Tab: Kennzahlen, Balken mit Steigen/Netto/Sinken, Tabelle mit Häkchen, Detailkarte */
 :root{--good-bar:#6fae8c;--bad-bar:#cf4f4c;--mid-bar:#d9a02a;--map:#f6f8fa;--z:#b9c2cc;--c1:#9fd3a8;--c2:#3faa5a;--c3:#0d6b2c;--s1:#f2b4a8;--s2:#e0644f;--s3:#a51d16;--ideal:#7b4fd6;--wind:#17202b;--orig:#d98b00}
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--good-bar:#3f9a6e;--bad-bar:#d9534f;--map:#121920;--z:#5b6876;--c1:#4f8f62;--c2:#46c26a;--c3:#9af0b0;--s1:#8f4a42;--s2:#e8604c;--s3:#ffb1a3;--ideal:#b394ff;--wind:#e4e9ef;--orig:#ffbf3c}}
@@ -773,6 +822,50 @@ pre.code{background:var(--bg);border:1px solid var(--line);border-radius:8px;pad
         <div class="pol-cv"><canvas id="polChart" aria-label="Polare: Sinken über Fluggeschwindigkeit"></canvas><div class="pol-empty" id="polEmpty" hidden></div></div>
         <div class="legend" id="polLegend"></div>
       </section>
+      <section class="pol-box mcb" id="mcBox" hidden>
+        <div class="pol-head"><h2 class="hi">Für MacCready / Lua-Widget <button type="button" class="iconbtn sm" data-info="info-mc" aria-expanded="false" aria-controls="info-mc" aria-label="Was sind diese Werte?">i</button></h2><span id="mcInfo"></span></div>
+        <div class="infopop" id="info-mc" hidden><p>Die App nähert die physikalische Polare (A·v³ + B/v) mit einer Parabel Vario = a·v² + b·v + c an. Diese Form brauchen fast alle Vario- und MacCready-Rechner, weil sich damit die Sollfahrt in einer Zeile rechnen lässt.</p><p>Sinken ist negativ in m/s, wie auf dem Vario. Die Werte gelten nur im Fahrtbereich, in dem Gleitpunkte liegen; darüber ist die Kurve geraten, darum begrenzt das Widget die Sollfahrt auf diesen Bereich.</p><p>Die Sollfahrt ist die Fahrt, bei der die Gerade vom Punkt (Gegenwind, −MC) die Polare berührt. Ballast verschiebt die Polare mit k = √(1 + Ballast): a ÷ k, b bleibt, c · k, die Fahrten mal k. Verschmutzung macht das Sinken um so viele Prozent grösser, Netto (Steigen der Luft) hebt die ganze Kurve.</p><p>Die Datei polaren.lua enthält alle Ethos-Modelle, deren Polare Du hier schon einmal angesehen hast, mit dem Modellnamen wie auf dem Sender.</p></div>
+        <div class="note warn" id="mcEmpty" hidden></div>
+        <div class="mc-grid" id="mcBody">
+          <div class="mc-col">
+            <div class="pol-ctrl"><span>Koeffizienten für Fahrt in</span><span class="seg" id="mcUnit"><button type="button" data-v="ms">m/s</button><button type="button" data-v="kmh">km/h</button></span></div>
+            <div class="mc-formula" id="mcFormula"></div>
+            <div class="mc-coef" id="mcCoef"></div>
+            <p class="mc-sub">Gültigkeit und Eckwerte</p>
+            <dl class="mc-facts" id="mcFacts"></dl>
+            <p class="mc-sub">3-Punkte-Polare <span>(für Widgets, die Stützpunkte wollen)</span></p>
+            <div class="mc-tw"><table class="mc-tab" id="mcPts"></table></div>
+          </div>
+          <div class="mc-col">
+            <p class="mc-sub">Sollfahrt nach MacCready</p>
+            <div class="mc-env">
+              <label for="mcMc">MC-Wert</label><input type="range" id="mcMc" min="0" max="3" step="0.1" value="0"><output id="mcOMc"></output>
+              <label for="mcWind">Wind</label><input type="range" id="mcWind" min="-30" max="30" step="1" value="0"><output id="mcOWind"></output>
+              <small>+ Gegenwind, − Rückenwind, auf der Flugrichtung</small>
+              <label for="mcNet">Netto</label><input type="range" id="mcNet" min="-3" max="3" step="0.1" value="0"><output id="mcONet"></output>
+              <small>Steigen der Luft: + steigt, − fällt</small>
+              <label for="mcBal">Ballast</label><input type="range" id="mcBal" min="0" max="50" step="1" value="0"><output id="mcOBal"></output>
+              <small>Zuladung in % des Fluggewichts beim Loggen</small>
+              <label for="mcBug">Verschmutzung</label><input type="range" id="mcBug" min="0" max="30" step="1" value="0"><output id="mcOBug"></output>
+              <small>Mücken, Regen: Sinken wird um so viel % grösser</small>
+            </div>
+            <button type="button" class="mc-reset" id="mcReset">Alles zurücksetzen</button>
+            <div class="mc-tw"><table class="mc-tab" id="mcTab"></table></div>
+            <p class="mc-callout" id="mcHint"></p>
+          </div>
+        </div>
+        <div class="mc-tx" id="mcTx">
+          <div class="mc-head"><p class="mc-sub">Auf den Sender</p><span class="mc-state"><i class="mc-dot" id="mcDot"></i><span id="mcState"></span></span></div>
+          <div class="pol-ctrl"><span>Datei</span><span class="mc-path">scripts › maccready › polaren.lua</span></div>
+          <div class="mc-head" style="align-items:flex-start">
+            <label class="mc-chk deskonly" for="mcAuto"><input type="checkbox" id="mcAuto"><span>Beim Sync automatisch aktualisieren<small>Schreibt die Datei jedes Mal neu, wenn die App Logs vom Sender holt.</small></span></label>
+            <button type="button" class="btn" id="mcWrite">Auf Sender schreiben</button></div>
+          <div class="hint mc-res" id="mcRes"></div>
+          <details class="mc-code"><summary>Inhalt der Datei</summary><pre class="mc-lua" id="mcFile"></pre></details>
+        </div>
+        <div class="mc-head"><p class="mc-sub">Im Widget lesen</p><span class="mc-btns"><button type="button" class="btn ghost" id="mcCopyLua">Code kopieren</button><button type="button" class="btn ghost" id="mcCopyJson">Werte als JSON kopieren</button></span></div>
+        <pre class="mc-lua" id="mcLua"></pre>
+      </section>
     </div>
   </div>
   </div>
@@ -867,6 +960,7 @@ let LANG_PREF = ''; try{ LANG_PREF = localStorage.getItem('ethoslv.lang')||''; }
 const LANG = LANGS.includes(LANG_PREF) ? LANG_PREF : ((navigator.languages||[navigator.language]).map(l=>String(l).slice(0,2).toLowerCase()).find(l=>LANGS.includes(l)) || 'en');
 const LOC = LANG==='de' ? 'de-CH' : 'en-GB';
 // T('Text {n}', {n:5}); ein Zusatz nach "|" unterscheidet gleiche deutsche Wörter mit verschiedener Übersetzung
+Object.assign(EN, {"Für MacCready / Lua-Widget": "For MacCready / Lua widget", "Was sind diese Werte?": "What are these values?", "Koeffizienten für Fahrt in": "Coefficients for speed in", "Gültigkeit und Eckwerte": "Validity and key values", "3-Punkte-Polare": "3-point polar", "(für Widgets, die Stützpunkte wollen)": "(for widgets that want support points)", "Sollfahrt nach MacCready": "MacCready speed to fly", "MC-Wert": "MC value", "Wind": "Wind", "Netto": "Net", "Ballast": "Ballast", "Verschmutzung": "Bugs", "+ Gegenwind, − Rückenwind, auf der Flugrichtung": "+ headwind, − tailwind, along the flight path", "Steigen der Luft: + steigt, − fällt": "Air movement: + rising, − sinking", "Zuladung in % des Fluggewichts beim Loggen": "Added load in % of the weight when logging", "Mücken, Regen: Sinken wird um so viel % grösser": "Bugs, rain: sink grows by this many %", "Alles zurücksetzen": "Reset all", "Auf den Sender": "To the transmitter", "Datei": "File", "Beim Sync automatisch aktualisieren": "Update automatically on sync", "Schreibt die Datei jedes Mal neu, wenn die App Logs vom Sender holt.": "Writes the file again every time the app fetches logs from the transmitter.", "Auf Sender schreiben": "Write to transmitter", "Datei speichern": "Save file", "Inhalt der Datei": "File content", "Im Widget lesen": "Reading it in the widget", "Code kopieren": "Copy code", "Werte als JSON kopieren": "Copy values as JSON", "Gegenwind {v} km/h": "headwind {v} km/h", "Rückenwind {v} km/h": "tailwind {v} km/h", "Netto {v} m/s": "net {v} m/s", "Ballast {v} %": "ballast {v} %", "Verschmutzung {v} %": "bugs {v} %", "MacCready {m} → {v} km/h": "MacCready {m} → {v} km/h", "Widget: {v} km/h": "Widget: {v} km/h", "angepasst: {t}": "adjusted: {t}", "Noch keine Kennzahlen für dieses Modell.": "No values for this model yet.", "Die Gleitpunkte liegen nur zwischen {a} und {b} km/h, daraus lässt sich keine Polare mit Minimum rechnen. Fliege ein paar gerade Gleitstrecken langsamer und schneller (z. B. 30 bis 70 km/h), dann erscheinen die Werte hier.": "The glide points lie only between {a} and {b} km/h, which does not give a polar with a minimum. Fly a few straight glides slower and faster (e.g. 30 to 70 km/h), then the values appear here.", "Es gibt noch zu wenig Gleitpunkte.": "There are not enough glide points yet.", "{m} · gültig {a}–{b} km/h": "{m} · valid {a}–{b} km/h", "v in m/s": "v in m/s", "v in km/h": "v in km/h", "Ergebnis in m/s (Sinken negativ)": "result in m/s (sink negative)", "Kopieren": "Copy", "Gültig von": "Valid from", "Gültig bis": "Valid to", "Geringstes Sinken (Parabel)": "Minimum sink (parabola)", "{w} m/s bei {v}": "{w} m/s at {v}", "Beste Gleitzahl (Parabel)": "Best glide ratio (parabola)", "{g} bei {v}": "{g} at {v}", "Abweichung zur Polare": "Deviation from the polar", "max. {d} cm/s im Bereich": "max. {d} cm/s in range", "Punkt": "Point", "Fahrt ({u})": "Speed ({u})", "Vario (m/s)": "Vario (m/s)", "langsam": "slow", "beste Gleitzahl": "best glide ratio", "schnell": "fast", "Sollfahrt (km/h)": "Speed to fly (km/h)", "Schnitt": "Average", "über Bereich": "above range", "unter Bereich": "below range", "schneller": "faster", "langsamer": "slower", "Bei MC {m} wäre die Sollfahrt {v} km/h, {d} als der gültige Bereich ({a}–{b} km/h). Das Widget sagt dann <b>{l} km/h</b> an.": "At MC {m} the speed to fly would be {v} km/h, {d} than the valid range ({a}–{b} km/h). The widget then announces <b>{l} km/h</b>.", "Bei MC {m} mit {t}: Sollfahrt <b>{v} km/h</b>.": "At MC {m} with {t}: speed to fly <b>{v} km/h</b>.", "Bei MC {m} in ruhiger Luft: Sollfahrt <b>{v} km/h</b>.": "At MC {m} in still air: speed to fly <b>{v} km/h</b>.", "Ohne diese Einflüsse wären es {v} km/h.": "Without these it would be {v} km/h.", "Mit Ballast verschiebt sich der gültige Bereich auf {a}–{b} km/h.": "With ballast the valid range moves to {a}–{b} km/h.", "kein": "none", "ohne": "none", "sauber": "clean", "Nur in der Desktop-App direkt auf den Sender": "Directly to the transmitter only in the desktop app", "Sender verbunden": "Transmitter connected", "Kein Sender angeschlossen": "No transmitter connected", "Geschrieben {t}": "Written {t}", "Die Datei enthält das Modell {l}.": "The file contains the model {l}.", "Die Datei enthält {n} Modelle: {l}.": "The file contains {n} models: {l}.", "Noch keine Modelle in der Datei.": "No models in the file yet.", "Jeti-Modelle kommen nicht in die Datei, das Widget läuft auf Ethos.": "Jeti models are not in the file, the widget runs on Ethos.", "{m} fehlt darin, weil es noch keine Polare hat; das Widget zeigt dann „keine Polare“.": "{m} is missing because it has no polar yet; the widget then shows “no polar”.", "Weitere Modelle kommen dazu, sobald Du ihre Polare hier ansiehst.": "Other models are added as soon as you view their polar here.", "Schliesse den Sender per USB an, dann kannst Du schreiben. Mit dem Häkchen passiert es beim nächsten Sync von selbst.": "Connect the transmitter via USB to write. With the tick it happens on the next sync by itself.", "(beim Sync)": "(on sync)", "Schreiben fehlgeschlagen: {e}": "Writing failed: {e}"});
 function T(k, v){ let r = LANG==='de' ? k.split('|')[0] : (EN[k] ?? k.split('|')[0]); if (v) r = r.replace(/\{(\w+)\}/g, (m,x)=>v[x]??m); return r; }
 // feste Texte der Seite übersetzen
 function translateDom(root){
@@ -2747,6 +2841,10 @@ function drawPolar(){
   const shown=polarShown(bs,PST.smooth), c=shown.c, ref=polarCurve(bs,'phys')||polarCurve(bs,'med'), kc=c||ref;
   // Polare des Modells für das Netto-Vario merken (gilt ab dem nächsten Öffnen eines Logs)
   if (POLAR_LOGS.model===FILES[CUR]?.model){ const fa=polarFit(bs); if (fa) store.set(mkey('polar.ab'),JSON.stringify({A:fa.A,B:fa.B})); }
+  // MacCready: Parabel im Fahrtbereich mit Gleitpunkten, für das Lua-Widget gemerkt
+  const fp=bs.length ? polarFit(bs) : null;
+  MC_CUR = fp ? mcParabola(fp, bs[0].v-POLAR.bin/2, bs[bs.length-1].v+POLAR.bin/2) : null;
+  mcRemember();
   // Log-Liste: "weicht ab", wenn die beste Gleitzahl > 20 % neben der Polare der übrigen angehakten Logs liegt
   $('#polList').innerHTML=logs.map((l,i)=>{
     const lc=polarShown(polarBins(l.pts),'phys').c, rest=polarShown(polarBins(sel.filter(o=>o!==l).flatMap(o=>o.pts)),'phys').c;
@@ -2756,7 +2854,7 @@ function drawPolar(){
       `<span class="meta">${l.err?esc(l.err):T('{d} Flug · {n} Gleitpunkte · GZ {g}',{d:l.f.dur!=null?fmtDur(l.f.dur):'–', n:l.pts.length.toLocaleString(LOC), g:lc?fmt(lc.ld,0):'–'})}</span></li>`; }).join('');
   $('#polHint').textContent = sel.length ? T('{a} von {b} Logs in der Polare.',{a:sel.length,b:logs.length}) : T('Kein Log ausgewählt.');
   const k=(l,v,u,d)=>`<div class="kpi"><span class="l">${esc(l)}</span><span class="v">${v}<small>${esc(u)}</small></span><span class="d">${esc(d)}</span></div>`;
-  $('#polKpis').innerHTML = (kc ? k(T('Beste Gleitzahl'),fmt(kc.ld,0),'',T('bei {v} {u}',{v:fmt(X(kc.vbg),0),u:SPEED}))+k(T('Geringstes Sinken'),fmt(kc.wms,2),'m/s',T('bei {v} {u}',{v:fmt(X(kc.vms),0),u:SPEED}))
+  $('#polKpis').innerHTML = (kc ? k(T('Beste Gleitzahl'),fmt(kc.ld,0),'',T('bei {v} {u}',{v:fmt(X(kc.vbg),0),u:SPEED}))+k(T('Geringstes Sinken'),fmt(-kc.wms,2),'m/s',T('bei {v} {u}',{v:fmt(X(kc.vms),0),u:SPEED}))
       : k(T('Beste Gleitzahl'),'–','',T('zu wenig Punkte'))+k(T('Geringstes Sinken'),'–','',T('zu wenig Punkte')))+
     k(T('Gleitpunkte'),pts.length.toLocaleString(LOC),'',T('aus {n} Logs · {k} Klassen',{n:sel.length,k:bs.length}))+
     k(T('Fahrtbereich'),bs.length?`${fmt(X(bs[0].v-POLAR.bin/2),0)}–${fmt(X(bs[bs.length-1].v+POLAR.bin/2),0)}`:'–',SPEED,T('mit genug Punkten'));
@@ -2784,19 +2882,20 @@ function drawPolar(){
       ds.push({type:'line', data:[{x:0,y:0},{x:X(c.vbg)*1.35,y:wbg*1.35}], borderColor:good, borderWidth:1.4, borderDash:[2,3], pointRadius:0, order:0});
       ds.push({type:'scatter', data:[{x:X(c.vbg),y:wbg}], pointRadius:6, backgroundColor:good, order:-1});
       ds.push({type:'scatter', data:[{x:X(c.vms),y:c.wms}], pointRadius:6, pointStyle:'triangle', backgroundColor:warn, order:-1});
-      leg.push(`<span><i style="background:${good};width:8px;height:8px;border-radius:50%"></i>${T('Beste Gleitzahl {v}',{v:fmt(c.ld,0)})}</span><span><i style="background:${warn};width:8px;height:8px;border-radius:50%"></i>${T('Geringstes Sinken {v} m/s',{v:fmt(c.wms,2)})}</span>`);
+      leg.push(`<span><i style="background:${good};width:8px;height:8px;border-radius:50%"></i>${T('Beste Gleitzahl {v}',{v:fmt(c.ld,0)})}</span><span><i style="background:${warn};width:8px;height:8px;border-radius:50%"></i>${T('Geringstes Sinken {v} m/s',{v:fmt(-c.wms,2)})}</span>`);
     } else {
       ds.push({type:'scatter', data:[{x:X(c.vbg),y:c.ld}], pointRadius:6, backgroundColor:good, order:-1});
       leg.push(`<span><i style="background:${good};width:8px;height:8px;border-radius:50%"></i>${T('Beste Gleitzahl {v}',{v:fmt(c.ld,0)})}</span>`);
     }
   }
-  $('#polLegend').innerHTML=leg.join('');
+  $('#polLegend').innerHTML=leg.join('')+'<span id="mcLeg" style="display:contents"></span>';
   $('#polInfo').textContent = `${POLAR_LOGS.model} · ${T('{n} Punkte',{n:pts.length.toLocaleString(LOC)})} · ${shown.mode==='phys'?'A·v³ + B/v':shown.mode==='med'?T('Median je {b} {u}',{b:fmt(X(POLAR.bin),dk),u:SPEED})+(shown.note?' · '+T('A·v³ + B/v nicht möglich'):''):T('ungeglättet')}`;
   const none=!pts.length;
   $('#polNote').hidden=!shown.note || none; $('#polNote').textContent=shown.note||'';
   $('#polEmpty').hidden=!none; $('#polChart').hidden=none;
   $('#polEmpty').textContent = !sel.length ? T('Kein Log ausgewählt. Hake links mindestens ein Log an.') : T('Keine Gleitpunkte gefunden. Die Polare braucht Fahrt (TAS oder GPS-Geschwindigkeit), Vario oder Höhe und Gleitflug mit Motor aus.');
   if (polarChart){ polarChart.destroy(); polarChart=null; }
+  mcRender();
   if (none) return;
   const step={'km/h':10,kn:5,'m/s':2,mph:5}[SPEED], xmax=Math.ceil(X(Math.max(100,...pts.map(p=>p[0])))/step)*step, tf={family:css('--mono'),size:11};
   polarChart=new Chart($('#polChart'),{ data:{datasets:ds}, options:{
@@ -2804,12 +2903,214 @@ function drawPolar(){
     interaction:{mode:'nearest', intersect:false},
     plugins:{legend:{display:false}, tooltip:{filter:it=>it.dataset.label==='polar', callbacks:{label:it=>G
       ? `${fmt(it.parsed.x,dk)} ${SPEED} · ${T('Gleitzahl')} ${fmt(it.parsed.y,1)}`
-      : `${fmt(it.parsed.x,dk)} ${SPEED} · ${fmt(it.parsed.y,2)} m/s · ${T('Gleitzahl')} ${fmt(it.parsed.x/K/3.6/it.parsed.y,1)}`}}},
+      : `${fmt(it.parsed.x,dk)} ${SPEED} · ${fmt(-it.parsed.y,2)} m/s · ${T('Gleitzahl')} ${fmt(it.parsed.x/K/3.6/it.parsed.y,1)}`}}},
     scales:{
       x:{type:'linear', min:0, max:xmax, title:{display:true, text:T('Fluggeschwindigkeit ({u})',{u:SPEED}), color:mu, font:tf}, grid:{color:ln}, ticks:{color:mu, stepSize:step}},
       y: G ? {min:0, max:50, title:{display:true, text:T('Gleitzahl'), color:mu, font:tf}, grid:{color:ln}, ticks:{color:mu}}
-           : {reverse:true, min:0, max:2.5, title:{display:true, text:T('Sinken (m/s) ↓'), color:mu, font:tf}, grid:{color:ln}, ticks:{color:mu, callback:v=>fmt(v,1)}} } } });
+           : {reverse:true, ...mcRange(), title:{display:true, text:T('Vario (m/s)'), color:mu, font:tf}, grid:{color:c=>c.tick?.value===0?mu:ln}, ticks:{color:mu, stepSize:.5, callback:v=>fmt(v?-v:0,1)}} } } });
+  mcChart();
 }
+// ---------- MacCready: Polare als Parabel für ein Lua-Widget auf dem Sender ----------
+// Intern Sinken positiv: s(v) = a·v² + b·v + c, v in m/s. Angezeigt und in die Datei geschrieben wird mit Vario-Vorzeichen (Sinken negativ).
+const MCS={mc:0, wind:0, net:0, bal:0, bug:0, unit:store.get('mc.unit')==='kmh'?'kmh':'ms'};
+const MC_FILE='polaren.lua';
+let MC_CUR=null, MC_TX={roots:[], written:null, err:null, at:null};
+function solve3(M, r){
+  const A=M.map((row,i)=>[...row, r[i]]);
+  for (let i=0;i<3;i++){
+    let p=i; for (let k=i+1;k<3;k++) if (Math.abs(A[k][i])>Math.abs(A[p][i])) p=k;
+    [A[i],A[p]]=[A[p],A[i]]; if (!A[i][i]) return null;
+    for (let k=0;k<3;k++){ if (k===i) continue; const f=A[k][i]/A[i][i]; for (let j=i;j<4;j++) A[k][j]-=f*A[i][j]; }
+  }
+  return A.map((row,i)=>row[3]/row[i]);
+}
+// Kleinste Quadrate auf die Kurve A·v³ + B/v, nur im Fahrtbereich mit Gleitpunkten (loK…hiK in km/h)
+function mcParabola(fit, loK, hiK){
+  const lo=loK/3.6, hi=hiK/3.6, S=[0,0,0,0,0], R=[0,0,0], wp=v=>fit.A*v**3+fit.B/v;
+  for (let v=lo; v<=hi+1e-9; v+=0.05){ const w=wp(v); let p=1; for (let i=0;i<5;i++){ S[i]+=p; p*=v; } R[0]+=w; R[1]+=w*v; R[2]+=w*v*v; }
+  const x=solve3([[S[0],S[1],S[2]],[S[1],S[2],S[3]],[S[2],S[3],S[4]]], R); if (!x) return null;
+  const [c,b,a]=x; if (!(a>0) || !(c>0)) return null;
+  const s=v=>a*v*v+b*v+c; let dev=0; for (let v=lo; v<=hi+1e-9; v+=0.05) dev=Math.max(dev, Math.abs(s(v)-wp(v)));
+  const vms=-b/(2*a), vbg=Math.sqrt(c/a);
+  return {a, b, c, lo, hi, dev, s, vms, vbg, ld:vbg/s(vbg)};
+}
+// Polare mit Wind, Netto, Ballast und Verschmutzung; Sollfahrt = Tangente vom Punkt (Gegenwind, −MC) an die Kurve
+function mcEnv(p){
+  const k=Math.sqrt(1+MCS.bal/100), f=1+MCS.bug/100, a=f*p.a/k, b=f*p.b, c=f*p.c*k-MCS.net, u=MCS.wind/3.6;
+  return {k, u, a, b, c, s:v=>a*v*v+b*v+c, lo:p.lo*k, hi:p.hi*k,
+    stf:mc=>u+Math.sqrt(Math.max(u*u+(b*u+c+mc)/a, 0)), stf0:mc=>Math.sqrt((p.c+mc)/p.a)};
+}
+const mcOn = () => !!(MCS.wind||MCS.net||MCS.bal||MCS.bug);
+const mcSig = (v,n=5) => { if (!v) return '0'; const d=Math.max(0,n-1-Math.floor(Math.log10(Math.abs(v)))); return v.toFixed(d); };
+const mcSgn = (v,d) => (v>0?'+':v<0?'−':'')+fmt(Math.abs(v),d);
+function mcEnvText(){ const t=[];
+  if (MCS.wind) t.push(T(MCS.wind>0?'Gegenwind {v} km/h':'Rückenwind {v} km/h',{v:Math.abs(MCS.wind)}));
+  if (MCS.net) t.push(T('Netto {v} m/s',{v:mcSgn(MCS.net,1)}));
+  if (MCS.bal) t.push(T('Ballast {v} %',{v:MCS.bal})); if (MCS.bug) t.push(T('Verschmutzung {v} %',{v:MCS.bug}));
+  return t.join(', '); }
+// Kennzahlen pro Ethos-Modell merken (Schlüssel = Modellname wie auf dem Sender), daraus entsteht polaren.lua
+function mcPolars(){ try{ return JSON.parse(store.get('mc.polars')||'{}')||{}; }catch(e){ return {}; } }
+function mcRemember(){
+  const f=FILES[CUR]; if (!MC_CUR || !f || f.jeti || f.mid==null || POLAR_LOGS?.model!==f.model) return;
+  const all=mcPolars(), p=MC_CUR, e={name:f.model, a:+mcSig(-p.a), b:+mcSig(-p.b), c:+mcSig(-p.c), vMin:+p.lo.toFixed(1), vMax:+p.hi.toFixed(1)};
+  const o=all[f.mid]; if (o && ['name','a','b','c','vMin','vMax'].every(k=>o[k]===e[k])) return;
+  all[f.mid]={...e, at:Date.now()}; store.set('mc.polars', JSON.stringify(all));
+}
+function mcFileText(){
+  const d=new Date(), z=n=>String(n).padStart(2,'0'), ts=`${d.getFullYear()}-${z(d.getMonth()+1)}-${z(d.getDate())} ${z(d.getHours())}:${z(d.getMinutes())}`;
+  const rows=Object.entries(mcPolars()).sort((x,y)=>x[0].localeCompare(y[0]))
+    .map(([mid,p])=>`  [${JSON.stringify(mid)}] = { a = ${p.a}, b = ${p.b}, c = ${p.c}, vMin = ${p.vMin.toFixed(1)}, vMax = ${p.vMax.toFixed(1)} },`);
+  return `-- MM Flight Analyzer: Polaren für das MacCready-Widget, geschrieben ${ts}\n-- Vario (m/s, Sinken negativ) = a*v^2 + b*v + c, v in m/s; vMin/vMax = gültiger Bereich in m/s\n-- Wird von der App überschrieben, bitte nicht von Hand ändern.\nreturn {\n${rows.join('\n')}\n}\n`;
+}
+const MC_LUA=`-- Polare des aktiven Modells aus polaren.lua. Der MM Flight Analyzer schreibt die Datei
+-- in den Ordner scripts/maccready auf dem Sender, neben main.lua des Widgets.
+-- Pro Modell: a, b, c (Vario in m/s = a*v^2 + b*v + c, Sinken negativ, v in m/s), vMin, vMax (m/s)
+local DATEI = "polaren.lua"
+local polar, aktModell
+
+local function ladePolare()
+  local name = model.name()
+  if name == aktModell then return end          -- nur beim Modellwechsel neu lesen
+  aktModell = name
+  local chunk = loadfile(DATEI)
+  local ok, alle = pcall(chunk or function() return {} end)
+  polar = ok and type(alle) == "table" and alle[name] or nil   -- nil = keine Polare für dieses Modell
+end
+
+-- Sollfahrt in km/h. mc und netto in m/s (netto: + Luft steigt);
+-- wind = Gegenwind in km/h (− = Rückenwind); ballast und mueck in % (0 = ohne)
+local function sollfahrt(mc, netto, wind, ballast, mueck)
+  if not polar then return nil end
+  local k = math.sqrt(1 + (ballast or 0) / 100)   -- Ballast schiebt die Polare
+  local f = 1 + (mueck or 0) / 100                -- Verschmutzung: mehr Sinken
+  -- gerechnet wird mit Sinken positiv, darum die Vorzeichen umdrehen
+  local a = -f * polar.a / k
+  local b = -f * polar.b
+  local c = -f * polar.c * k - (netto or 0)
+  local u = (wind or 0) / 3.6
+  local r = u * u + (b * u + c + mc) / a
+  local v = u + math.sqrt(math.max(r, 0))
+  v = math.max(polar.vMin * k, math.min(polar.vMax * k, v))
+  return v * 3.6
+end`;
+// Diagramm: angepasste Polare (violett), Tangente vom Punkt (Gegenwind, −MC) und Sollfahrt; Werte intern km/h, Sinken positiv
+function mcRange(){
+  let lo=0, hi=2.5; const p=MC_CUR; if (!p || PST.view==='glide') return {min:0, max:2.5};
+  const e=mcEnv(p); for (let v=e.lo; v<=e.hi+1e-9; v+=0.1){ const w=e.s(v); lo=Math.min(lo,w); hi=Math.max(hi,w); }
+  lo=Math.min(lo,-MCS.mc); hi=Math.max(hi, e.s(e.stf(MCS.mc))+.1);
+  return {min:Math.max(-3.5, Math.floor(lo*2)/2), max:Math.min(5, Math.ceil(hi*2)/2)};
+}
+function mcDatasets(X, xmaxK){
+  const p=MC_CUR; if (!p || PST.view==='glide') return {ds:[], leg:''};
+  const col=css('--ideal'), e=mcEnv(p), mc=MCS.mc, ds=[], line=(d,o)=>({type:'line', mc:true, data:d, borderColor:col, pointRadius:0, order:-1, ...o});
+  if (mcOn()){ const c=[]; for (let v=e.lo; v<=e.hi+1e-9; v+=0.25) c.push({x:X(v*3.6), y:e.s(v)}); ds.push(line(c,{borderWidth:3})); }
+  const v=e.stf(mc), w=e.s(v), ux=e.u*3.6, vk=v*3.6, slope=(w+mc)/(vk-ux), x2=Math.min(xmaxK, vk*1.25);
+  ds.push(line([{x:X(ux),y:-mc},{x:X(x2),y:-mc+slope*(x2-ux)}],{borderWidth:1.6, borderDash:[5,3]}));
+  ds.push({type:'scatter', mc:true, data:[{x:X(ux),y:-mc}], pointRadius:4, backgroundColor:'transparent', borderColor:col, borderWidth:2, order:-2});
+  ds.push({type:'scatter', mc:true, data:[{x:X(vk),y:w}], pointRadius:6, backgroundColor:col, borderWidth:0, order:-2});
+  const vc=Math.max(e.lo, Math.min(e.hi, v));
+  if (Math.abs(vc-v)>.01) ds.push({type:'scatter', mc:true, data:[{x:X(vc*3.6),y:e.s(vc)}], pointRadius:6, backgroundColor:css('--panel'), borderColor:col, borderWidth:2.5, order:-2});
+  const leg=`<span><i style="background:${col};height:3px"></i>${T('MacCready {m} → {v} km/h',{m:fmt(mc,1),v:fmt(vk,0)})}${Math.abs(vc-v)>.01?' · '+T('Widget: {v} km/h',{v:fmt(vc*3.6,0)}):''}</span>`+
+    (mcOn()?`<span><i style="background:${col};height:4px"></i>${T('angepasst: {t}',{t:esc(mcEnvText())})}</span>`:'');
+  return {ds, leg};
+}
+// Nur die MacCready-Teile im Diagramm neu zeichnen (beim Schieben der Regler)
+function mcChart(){
+  if (!polarChart) return;
+  const K=1/3.6/speedMs(), X=v=>v*K, ds=polarChart.data.datasets.filter(d=>!d.mc), m=mcDatasets(X, polarChart.options.scales.x.max/K);
+  polarChart.data.datasets=[...ds, ...m.ds];
+  if (PST.view!=='glide'){ const r=mcRange(); polarChart.options.scales.y.min=r.min; polarChart.options.scales.y.max=r.max; }
+  polarChart.update('none');
+  const el=$('#mcLeg'); if (el) el.innerHTML=m.leg;
+}
+function mcRender(){
+  const box=$('#mcBox'), p=MC_CUR, has=!!POLAR_LOGS?.logs.some(l=>l.on && l.pts.length);
+  box.hidden=!has; if (!has) return;
+  $('#mcBody').hidden=!p; $('#mcEmpty').hidden=!!p;
+  $('#mcUnit').querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed', b.dataset.v===MCS.unit));
+  if (!p){
+    const bs=polarBins(POLAR_LOGS.logs.filter(l=>l.on).flatMap(l=>l.pts));
+    $('#mcEmpty').innerHTML=`<b>${T('Noch keine Kennzahlen für dieses Modell.')}</b> `+(bs.length
+      ? T('Die Gleitpunkte liegen nur zwischen {a} und {b} km/h, daraus lässt sich keine Polare mit Minimum rechnen. Fliege ein paar gerade Gleitstrecken langsamer und schneller (z. B. 30 bis 70 km/h), dann erscheinen die Werte hier.',{a:fmt(bs[0].v-POLAR.bin/2,0),b:fmt(bs[bs.length-1].v+POLAR.bin/2,0)})
+      : T('Es gibt noch zu wenig Gleitpunkte.'));
+    $('#mcInfo').textContent='';
+  } else {
+    const ms=MCS.unit==='ms', k=ms?{a:p.a,b:p.b,c:p.c,f:1,u:'m/s'}:{a:p.a/12.96,b:p.b/3.6,c:p.c,f:3.6,u:'km/h'};
+    $('#mcInfo').textContent=T('{m} · gültig {a}–{b} km/h',{m:POLAR_LOGS.model, a:fmt(p.lo*3.6,0), b:fmt(p.hi*3.6,0)});
+    $('#mcFormula').innerHTML=`Vario = <b>a</b>·v² + <b>b</b>·v + <b>c</b> <small>· ${T(ms?'v in m/s':'v in km/h')}, ${T('Ergebnis in m/s (Sinken negativ)')}</small>`;
+    const cf=(l,v,u)=>`<div class="mc-cf"><span class="l">${l}</span><span class="v">${v}</span><span class="u">${u}</span><button type="button" class="mc-copy" data-mccopy="${v}">${T('Kopieren')}</button></div>`;
+    $('#mcCoef').innerHTML=cf('a',mcSig(-k.a),ms?'s/m':'m/s ÷ (km/h)²')+cf('b',mcSig(-k.b),ms?'–':'m/s ÷ km/h')+cf('c',mcSig(-k.c),'m/s');
+    const sp=v=>ms?`${fmt(v,1)} m/s <span style="color:var(--muted)">(${fmt(v*3.6,0)} km/h)</span>`:`${fmt(v*3.6,0)} km/h`;
+    const fa=(l,v,cp)=>`<dt>${l}</dt><dd>${v}</dd><dd>${cp!=null?`<button type="button" class="mc-copy" data-mccopy="${cp}">${T('Kopieren')}</button>`:''}</dd>`;
+    $('#mcFacts').innerHTML=fa(T('Gültig von'),sp(p.lo),(p.lo*k.f).toFixed(ms?1:0))+fa(T('Gültig bis'),sp(p.hi),(p.hi*k.f).toFixed(ms?1:0))+
+      fa(T('Geringstes Sinken (Parabel)'),T('{w} m/s bei {v}',{w:fmt(-p.s(p.vms),2),v:sp(p.vms)}))+fa(T('Beste Gleitzahl (Parabel)'),T('{g} bei {v}',{g:fmt(p.ld,1),v:sp(p.vbg)}))+
+      fa(T('Abweichung zur Polare'),T('max. {d} cm/s im Bereich',{d:fmt(p.dev*100,0)}));
+    $('#mcPts').innerHTML=`<tr><th>${T('Punkt')}</th><th>${T('Fahrt ({u})',{u:k.u})}</th><th>${T('Vario (m/s)')}</th></tr>`+
+      [[T('langsam'),p.lo],[T('beste Gleitzahl'),p.vbg],[T('schnell'),p.hi]].map(([n,v])=>`<tr><td>${n}</td><td>${fmt(v*k.f,ms?1:0)}</td><td>${fmt(-p.s(v),2)}</td></tr>`).join('');
+    const e=mcEnv(p);
+    $('#mcTab').innerHTML=`<tr><th>MC</th><th>${T('Sollfahrt (km/h)')}</th><th>${T('Vario (m/s)')}</th><th>${T('Schnitt')}</th><th></th></tr>`+[0,.5,1,1.5,2,2.5,3].map(mc=>{
+      const v=e.stf(mc), w=e.s(v), out=v>e.hi+.01?T('über Bereich'):v<e.lo-.01?T('unter Bereich'):'', vg=v-e.u, vc=mc>0&&mc+w>0?vg*mc/(mc+w):0;
+      return `<tr data-mc="${mc}" class="${Math.abs(mc-MCS.mc)<.01?'sel':''} ${out?'out':''}"><td>${fmt(mc,1)} m/s</td><td>${fmt(v*3.6,0)}</td><td>${fmt(-w,2)}</td><td>${mc>0?fmt(vc*3.6,0)+' km/h':'–'}</td><td>${out||'ok'}</td></tr>`; }).join('');
+    const v=e.stf(MCS.mc), lim=v>e.hi+.01?e.hi:v<e.lo-.01?e.lo:null;
+    $('#mcHint').innerHTML=(lim!=null
+      ? T('Bei MC {m} wäre die Sollfahrt {v} km/h, {d} als der gültige Bereich ({a}–{b} km/h). Das Widget sagt dann <b>{l} km/h</b> an.',{m:fmt(MCS.mc,1),v:fmt(v*3.6,0),d:T(v>e.hi?'schneller':'langsamer'),a:fmt(e.lo*3.6,0),b:fmt(e.hi*3.6,0),l:fmt(lim*3.6,0)})
+      : mcOn() ? T('Bei MC {m} mit {t}: Sollfahrt <b>{v} km/h</b>.',{m:fmt(MCS.mc,1),t:esc(mcEnvText()),v:fmt(v*3.6,0)}) : T('Bei MC {m} in ruhiger Luft: Sollfahrt <b>{v} km/h</b>.',{m:fmt(MCS.mc,1),v:fmt(v*3.6,0)}))
+      +(mcOn()?' '+T('Ohne diese Einflüsse wären es {v} km/h.',{v:fmt(e.stf0(MCS.mc)*3.6,0)}):'')
+      +(e.k>1?' '+T('Mit Ballast verschiebt sich der gültige Bereich auf {a}–{b} km/h.',{a:fmt(e.lo*3.6,0),b:fmt(e.hi*3.6,0)}):'');
+    $('#mcCopyJson').dataset.mccopy=JSON.stringify({modell:POLAR_LOGS.model, einheit_fahrt:k.u, a:+mcSig(-k.a), b:+mcSig(-k.b), c:+mcSig(-k.c),
+      v_min:+(p.lo*k.f).toFixed(2), v_max:+(p.hi*k.f).toFixed(2), geringstes_sinken:+(-p.s(p.vms)).toFixed(2), v_geringstes_sinken:+(p.vms*k.f).toFixed(2),
+      beste_gleitzahl:+p.ld.toFixed(1), v_beste_gleitzahl:+(p.vbg*k.f).toFixed(2)}, null, 2);
+  }
+  const set=(id,on,txt)=>{ const o=$(id); o.textContent=txt; o.classList.toggle('zero',!on); };
+  $('#mcOMc').textContent=fmt(MCS.mc,1)+' m/s';
+  set('#mcOWind',MCS.wind,MCS.wind?`${mcSgn(MCS.wind,0)} km/h`:T('kein'));
+  set('#mcONet',MCS.net,MCS.net?`${mcSgn(MCS.net,1)} m/s`:'0 m/s');
+  set('#mcOBal',MCS.bal,MCS.bal?`+${MCS.bal} %`:T('ohne'));
+  set('#mcOBug',MCS.bug,MCS.bug?`+${MCS.bug} %`:T('sauber'));
+  $('#mcLua').textContent=MC_LUA; $('#mcCopyLua').dataset.mccopy=MC_LUA;
+  mcTxRender();
+}
+function mcTxRender(){
+  const all=mcPolars(), names=Object.values(all).map(p=>p.name), conn=MC_TX.roots.length>0, f=FILES[CUR];
+  $('#mcFile').textContent=mcFileText();
+  $('#mcDot').className='mc-dot'+(DESK&&conn?' on':'');
+  $('#mcState').textContent=!DESK ? T('Nur in der Desktop-App direkt auf den Sender') : conn ? T('Sender verbunden') : T('Kein Sender angeschlossen');
+  $('#mcWrite').textContent=DESK ? T('Auf Sender schreiben') : T('Datei speichern');
+  $('#mcWrite').disabled=!names.length || (!!DESK && !conn);
+  $('#mcAuto').checked=store.get('mc.auto')!=='0';
+  let r = MC_TX.err ? `<span class="err">${esc(MC_TX.err)}</span> ` : MC_TX.written ? `<b>${T('Geschrieben {t}',{t:MC_TX.written})}</b> · ` : '';
+  r += names.length ? T(names.length===1?'Die Datei enthält das Modell {l}.':'Die Datei enthält {n} Modelle: {l}.',{n:names.length,l:esc(names.join(', '))}) : T('Noch keine Modelle in der Datei.');
+  if (f?.jeti) r+=' '+T('Jeti-Modelle kommen nicht in die Datei, das Widget läuft auf Ethos.');
+  else if (f && !MC_CUR) r+=' '+T('{m} fehlt darin, weil es noch keine Polare hat; das Widget zeigt dann „keine Polare“.',{m:esc(f.model)});
+  r+=' '+T('Weitere Modelle kommen dazu, sobald Du ihre Polare hier ansiehst.');
+  if (DESK && !conn) r+=' '+T('Schliesse den Sender per USB an, dann kannst Du schreiben. Mit dem Häkchen passiert es beim nächsten Sync von selbst.');
+  $('#mcRes').innerHTML=r;
+}
+async function mcWrite(auto){
+  const txt=mcFileText(); if (!Object.keys(mcPolars()).length) return;
+  if (!DESK){ const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([txt],{type:'text/plain'})); a.download=MC_FILE; document.body.append(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(a.href),2000); return; }
+  try{ await DESK.writePolars(txt); MC_TX.err=null;
+    const d=new Date(); MC_TX.written=d.toLocaleDateString(LOC)+' '+d.toLocaleTimeString(LOC,{hour:'2-digit',minute:'2-digit'})+(auto?' '+T('(beim Sync)'):''); }
+  catch(e){ MC_TX.err=T('Schreiben fehlgeschlagen: {e}',{e:String(e.message||e).replace(/^Error invoking remote method '[^']+': (Error: )?/,'')}); }
+  mcTxRender();
+}
+// Desktop: Sender-Status mitverfolgen, nach jedem Sync die Datei neu schreiben (Häkchen)
+async function mcOnSync(s){
+  try{ MC_TX.roots=(await DESK.polarsTarget()).roots||[]; }catch(e){ MC_TX.roots=[]; }
+  if (s && s.state==='done' && s.connected && s.at && s.at!==MC_TX.at){ MC_TX.at=s.at;
+    if (store.get('mc.auto')!=='0' && MC_TX.roots.length && Object.keys(mcPolars()).length) await mcWrite(true); }
+  if (!$('#mcBox').hidden) mcTxRender();
+}
+(function mcEvents(){
+  $('#mcUnit').addEventListener('click',e=>{ const b=e.target.closest('button'); if (!b) return; MCS.unit=b.dataset.v; store.set('mc.unit',MCS.unit); mcRender(); });
+  const IDS={mc:'#mcMc', wind:'#mcWind', net:'#mcNet', bal:'#mcBal', bug:'#mcBug'};
+  for (const [k,id] of Object.entries(IDS)) $(id).addEventListener('input',e=>{ MCS[k]=+e.target.value; mcRender(); mcChart(); });
+  $('#mcReset').addEventListener('click',()=>{ for (const [k,id] of Object.entries(IDS)){ MCS[k]=0; $(id).value=0; } mcRender(); mcChart(); });
+  $('#mcTab').addEventListener('click',e=>{ const r=e.target.closest('tr[data-mc]'); if (!r) return; MCS.mc=+r.dataset.mc; $('#mcMc').value=MCS.mc; mcRender(); mcChart(); });
+  $('#mcAuto').addEventListener('change',e=>store.set('mc.auto',e.target.checked?'1':'0'));
+  $('#mcWrite').addEventListener('click',()=>mcWrite(false));
+  $('#mcBox').addEventListener('click',e=>{ const b=e.target.closest('[data-mccopy]'); if (!b) return; const t=b.textContent; kiCopyText(b.dataset.mccopy, b).then(()=>setTimeout(()=>{ b.textContent=t; },1200)); });
+})();
 (function polarEvents(){
   const seg=(id,key)=>{ const el=$(id); el.querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.v===PST[key]));
     el.addEventListener('click',e=>{ const b=e.target.closest('button'); if (!b) return; PST[key]=b.dataset.v; store.set('polar.'+key,PST[key]);
@@ -3138,6 +3439,7 @@ async function deskBoot(){
   $('#impArcL').hidden = false; $('#impArc').checked = !!SETTINGS.archiveManual;
   $('#impArc').addEventListener('change', async e=>{ SETTINGS = await DESK.setSettings({ archiveManual:e.target.checked }); });
   DESK.onSync(renderSync); renderSync(await DESK.syncStatus());
+  if (DESK.writePolars){ DESK.onSync(mcOnSync); mcOnSync(null); }
   if (DESK.appVersion){ const v=await DESK.appVersion(); $('#setVer').textContent=T('Version {v}',{v}); $('#infoVer').textContent=T('MM Flight Analyzer, Version {v}',{v}); $('#infoVer').hidden=false; }
   if (DESK.onUpdate){ DESK.onUpdate(renderUpdate); DESK.checkUpdate().then(renderUpdate).catch(()=>{}); }
   $('#ejectBtn').addEventListener('click', ejectSender);
@@ -3441,7 +3743,7 @@ const HILFE=[{"nr":1,"titel":"Was der MM Flight Analyzer macht","text":"Der MM F
 {"nr":9,"titel":"Tab „Übersicht“","text":"### Kennzahlen\nDie Kacheln fassen das ganze Log zusammen. Welche erscheinen, hängt von den Sensoren im Log ab.\n- Logdauer: Zeit vom ersten bis zum letzten Datensatz, darunter Anzahl Zeilen und Aufzeichnungsrate.\n- Flugzeit: Zeit, in der die Höhe über 5 m lag.\n- Motorläufe: Anzahl Motorläufe und gesamte Motorzeit. Motor an = Drehzahl über 300 U/min bzw. Strom über 3 A; Lücken unter 2 s zählen mit, Läufe ab 1 s.\n- Max. Höhe, Max. Tempo, Vario: Höchstwerte; darunter Höhenquelle, Durchschnitt bzw. stärkstes Sinken.\n- VFR / RSSI min: Schlechtester Empfang und Durchschnitt. Orange und rot warnen: VFR unter 70 % bzw. 40 %, RSSI unter 40 bzw. 25 dB.\n- Spannung min, Strom max, Verbraucht: Antriebsakku: tiefste Spannung (mit Start- und Endwert), höchster Strom, verbrauchte Kapazität.\n- Wind Ø, TAS Ø: Berechneter Durchschnittswind mit Richtung und Höchstwert sowie Geschwindigkeit gegenüber der Luft (siehe Kapitel 13).\n- … Leistung max: Höchste Leistung (Strom × Spannung) mit gesamter Energie in Wh, für jedes Paar wie ESC, SRV1, SRV2.\n- Temp. max, Empf.Bat. min, Senderakku min: Höchste Temperatur, tiefste Empfänger- und Senderspannung.\n### Werte am Zeitpunkt\nIst ein Zeitpunkt gesetzt, zeigen die Kacheln darunter alle wichtigen Werte genau in diesem Moment: Uhrzeit, Phase (Thermik, Steigflug oder kein Schalter aktiv), Höhe, Vario, Geschwindigkeit, Wind, Empfang, Akku und mehr. Ohne Zeitpunkt steht dort „Kein Zeitpunkt gewählt“."},
 {"nr":10,"titel":"Tab „Diagramme“","text":"- Kanäle: Ein Klick schaltet einen Sensor ein oder aus. Eingeschaltete Kanäle sind umrandet. ƒ markiert berechnete Werte. Die Auswahl bleibt pro Modell gespeichert. Die Sensoren stehen in Gruppen, siehe „Sensoren in Gruppen“ unten.\n- Einzeln / Überlagert: Ein Diagramm pro Kanal oder alle Kanäle in einem Diagramm.\n- Sender-Kanäle …: Blendet zusätzlich die Gruppen Knüppel, Drehgeber & Potis, Schalter (SA, SB …), logische Schalter (LS1 …) und Kanäle (K1 …) ein.\n- Filter: Blendet Logeinträge nach Parametern aus (siehe unten). Die Zeile steht zwischen den Optionen und dem Zoom.\n- − + Alles: Herauszoomen, hineinzoomen, ganzes Log zeigen.\n- Ausschnitt: Sichtbarer Zeitraum und seine Länge.\n- Rot markieren: Färbt die Zeit rot, in der ein gewählter Schalter in einem gewählten Zustand stand (siehe unten).\n- Übersichtsleiste: Höhenprofil des ganzen Fluges. Das helle Fenster ist der sichtbare Ausschnitt: ziehen verschiebt, an den Rändern ziehen macht ihn grösser oder kleiner, Doppelklick zeigt alles.\n- Zeitpunkt: Zeitstrahl wie in Kapitel 7.\n- Griff ⋮⋮, ▲ ▼ und ✕: Diagramm am Griff ziehen oder mit den Pfeilen verschieben, um die Reihenfolge zu ändern. Die Reihenfolge bleibt gespeichert. ✕ schliesst das Diagramm; das wirkt genau wie ein Klick auf den Sensor oben, der Knopf ist danach nicht mehr umrandet.\n### Sensoren in Gruppen\nDie Sensoren stehen nach Thema in Gruppen: Flug, Navigation & Wind, Antrieb & Akku, Bordstrom, Servos, Lage & Beschleunigung, Empfang, Senderakku und Sonstiges. Berechnete Werte (ƒ) stehen bei ihrem Thema, die Leistung des Reglers also bei Antrieb & Akku. Gruppen ohne Sensoren im Log erscheinen nicht. Ethos- und Jeti-Sensoren landen in denselben Gruppen.\nInnerhalb einer Gruppe steht vorne, was Du bei diesem Modell am häufigsten einschaltest. Die App zählt das selbst mit, markieren musst Du nichts. Ein neues Modell startet mit den Zahlen aller Modelle. Bei gleich vielen Klicks gilt eine feste Reihenfolge, z. B. Spannung, Strom, Leistung, Verbrauch, Energie, Drehzahl, Temperatur. Neu sortiert wird erst beim nächsten Öffnen eines Logs, damit beim Klicken nichts verrutscht.\nEin Klick auf den Gruppennamen klappt die Gruppe zu oder auf. Eine zugeklappte Gruppe zeigt noch eine Zeile Sensoren; was keinen Platz mehr hat, steckt im Knopf „+ 5 weitere“, der die Gruppe wieder aufklappt. Ist darunter ein eingeschalteter Sensor, steht das auf dem Knopf. Welche Gruppen zu sind, merkt sich die App pro Modell.\nMit „Sender-Kanäle …“ kommen unter „Sender“ die Gruppen Knüppel, Drehgeber & Potis, Schalter, Logische Schalter und Kanäle dazu. Schalter und Kanäle, die sich im ganzen Log nie ändern, stehen abgedunkelt am Schluss ihrer Gruppe. Die Zahl neben dem Gruppennamen zeigt, wie viele sich ändern, z. B. 18/64.\nDie Auswahllisten (Filter, Thermik- und Steigflug-Schalter, Höhenquelle, Rot markieren) haben dieselben Gruppen als Zwischentitel. Kommt ein Sensorname im Log doppelt vor, hängt die App das Funkband an, z. B. „EMPF. (2.4G)“ und „EMPF. (Lora)“.\n### Zoomen und Verschieben\n- Verschieben: im Diagramm mit der Maus ziehen.\n- Zoomen: Strg (Mac ⌘) + Mausrad, Trackpad-Pinch oder die Knöpfe − und +.\n- Alles zeigen: Doppelklick ins Diagramm oder Alles.\n- Zeitpunkt setzen: Klick oder Fingertipp ins Diagramm. Zeit und Wert stehen dann in einem Schild direkt neben der orangen Linie, in jedem Diagramm; am rechten Rand wechselt es auf die linke Seite. Der Zeitstrahl zeigt den Wert genau gleich an.\nAlle Diagramme teilen denselben Ausschnitt. Die Zeitachse zählt Minuten ab Logbeginn. Kopfzeile jedes Diagramms: Name, Einheit sowie Min, Ø und Max des sichtbaren Ausschnitts. Diese drei Werte laufen beim Zoomen und Verschieben mit und zählen nur aktive Einträge (siehe Filter).\n### Farbige Hintergründe\nBlau hinterlegt sind Steigflüge, grün Thermikphasen und rot die Zeiten des unter „Rot markieren“ gewählten Schalterzustands. Steigflüge und Thermik kommen aus den Tabs „Thermik“ und „Motorsteigflüge“.\n### Rot markieren\nWähle einen Schalter (SA …) oder logischen Schalter (LS …) und den Zustand, zum Beispiel SB und oben (−1). Ohne eigene Wahl stellt die App das automatisch ein: derselbe Schalter wie für die Thermik, aber in der Gegenstellung. Ist SB unten = Thermik, wird SB oben rot markiert. Dann steht „automatisch“ daneben. Deine Wahl merkt sich die App pro Modell; der Link „automatisch“ setzt sie zurück.\n### Überlagert\nJeder Kanal hat seine eigene Skala und nutzt die ganze Höhe. Die ersten zwei Skalen stehen links und rechts in der Farbe des Kanals. Die Legende oben zeigt bei jedem Kanal Min, Ø und Max des sichtbaren Ausschnitts, das ✕ dahinter blendet den Kanal aus; das Schild am Zeitpunkt listet alle Kanäle untereinander. Am übersichtlichsten ist „Überlagert“ mit zwei bis vier Kanälen.\n### Berechnete Werte (ƒ)\n- Leistung = Strom × Spannung für jedes Paar mit gleichem Präfix (ESC, BEC, SRV1 …), Energie = Leistung über die Zeit aufsummiert.\n- GPS Kurs (ber.), Windgeschw., Windrichtung, TAS rechnen wie die Lua-Widgets „GPS Course“ und „Wind Estimator“ mit deren Standardwerten (40 Werte alle 0,7 s, Fit jede Sekunde, Kurs ab 3 m Abstand). Vor dem ersten gültigen Fit zeigt der Wind 0 und die TAS die Geschwindigkeit über Grund, genau wie am Sender.\n- Steuerkurs (windkorr.) = Richtung, in die die Nase zeigt (Bodenvektor minus Windvektor). Drift = Kurs über Grund minus Steuerkurs, positiv heisst nach rechts versetzt. Gegenwind = Windanteil gegen die Flugrichtung, negativ heisst Rückenwind.\n- Distanz zum Start = waagrechte Distanz zum ersten GPS-Fix. Effektive Distanz = schräg vom Startpunkt zum Modell, mit der Höhe über dem Start.\n- Winkel zum Start = Winkel zwischen der Längsachse des Modells (Steuerkurs, ohne Wind der GPS Kurs) und der Linie vom Modell zum Startort. 0° heisst, die Nase zeigt zum Start, ±180° das Heck, ±90° fliegt das Modell quer dazu. Positiv: Der Start liegt rechts. Nützlich zum Beispiel, um Empfangseinbrüche mit der Lage der Antennen zu vergleichen. Unter 10 m Abstand zum Start gibt es keinen Wert.\n- Vario TEK = Vario plus Änderung der Fahrt umgerechnet in Höhe (TAS²/2g), also ohne die Stösse vom Ziehen und Drücken. Netto-Vario = Vario TEK plus Eigensinken aus der Polare des Modells (Kapitel 12); es zeigt, wie die Luft steigt oder sinkt. Ohne gespeicherte Polare nimmt die App eine aus dem offenen Log. Während der Motor läuft und 15 s danach bleiben beide leer.\n- Gleitzahl = geflogene Strecke durch Höhenverlust, jeweils über 10 s gerechnet (5 s vor und nach dem Zeitpunkt). Die Strecke kommt aus der TAS, also durch die Luft; ohne Wind aus der GPS-Geschwindigkeit. Werte gibt es nur im Gleitflug, also mit Motor aus und mindestens 0,2 m/s Sinken; beim Steigen und mit Motor bleibt die Kurve leer. Gleitzahl 20 heisst 20 m weit pro Meter Höhe. Im Steigen der Thermik wird sie gross, weil die Luft mitträgt; aussagekräftig sind ruhige Gleitstrecken.\nDiese Erklärungen findest Du in der App auch hinter dem ⓘ neben „Kanäle“.\n### Filter\nMit dem Filter blendest Du Logeinträge nach Werten aus, zum Beispiel alles unter 100 m Höhe. Unter „Filter“ wählst Du einen Parameter. Darauf erscheint ein Histogramm der vorhandenen Werte mit zwei Griffen und den Feldern Min und Max; mit beiden stellst Du den Bereich ein.\n- Mehrere Filter lassen sich kombinieren. Aktiv ist ein Eintrag, wenn er bei allen Filtern im Bereich liegt. Daneben steht, wie viele Einträge aktiv sind.\n- Inaktive Einträge verschwinden nicht: In den Diagrammen ist die Linie dort grau und der Hintergrund dezent grau, ebenso in der Übersichtsleiste. In den Rohdaten sind sie blass.\n- Min, Ø und Max in den Diagrammen und unter „Alle Werte“ zählen nur aktive Einträge. Kennzahlen, Thermik und Steigflüge rechnen weiter mit dem ganzen Log.\n- Zurücksetzen stellt einen Filter auf den ganzen Bereich, ✕ entfernt ihn, „Alle zurücksetzen“ entfernt alle.\n- Beim Wechsel zu einem anderen Log bleiben die Filter bestehen. Jeder Filter gilt für den Parameter mit demselben Namen im neuen Log, mit den Grenzen, die Du gesetzt hast; liegen sie ausserhalb der Werte des neuen Logs, rückt der Griff an den Rand. Fehlt ein Parameter im neuen Log, bleibt der Filter gestrichelt als Hinweis stehen und gilt wieder, sobald ein Log den Parameter hat."},
 {"nr":11,"titel":"Tabs „Thermik“ und „Motorsteigflüge“","text":"Beide Tabs rechnen wie die Sender-Widgets „Thermik“ und „Steigfluege“: Eine Phase läuft, solange der gewählte Schalter EIN ist (Wert über 0). Der Tab Thermik zeigt links Kennzahlen, Balken und Tabelle, rechts die Karte der gewählten Thermik. Die Motorsteigflüge haben einen eigenen Tab.\n### Einstellungen\n- Thermik-Schalter: Schalter, mit dem Du im Flug die Thermik markierst. Vorschlag: SB.\n- Steigflug-Schalter: Im Tab Motorsteigflüge: Schalter für den Steigflug (Motor). Vorschlag: LS9. Gibt es keinen passenden Schalter, wählt die App „ESC Strom (automatisch)“: Motor an, solange der Strom über der Schwelle liegt. Die Schwelle stellst Du im Feld „ab … A“ ein (Standard 3 A); kurze Lücken bis 1 s zählen mit.\n- Höhenquelle: Welcher Höhensensor gerechnet wird, zum Beispiel Altitude (Vario) oder GAlt (GPS). Jeder Tab hat seine eigene.\n- Verbrauch: Im Tab Motorsteigflüge: welcher Sensor den verbrauchten Akku in mAh misst. Die App schlägt einen vor („automatisch“); passt er nicht, wählst Du einen anderen Sensor mit mAh oder „– kein –“, wenn das Modell keinen Verbrauch misst. Die Wahl gilt auch für die Kennzahl „Verbraucht“ in der Übersicht und wird nur für dieses Modell gespeichert, ein neues Modell startet wieder mit dem Vorschlag.\n- Balkenhöhe: Was die Balken der Thermik zeigen: Steiggeschwindigkeit, erreichte Höhe oder Steigdauer.\n- Ohne Motor: Steigen mit Motor zählt nicht als Thermik (Standard: an). Läuft der Motor während einer Thermik-Phase, endet sie beim Motorstart und beginnt erst 5 s nach Motor aus wieder. Als Motorlauf gilt Drehzahl über 300 U/min, ohne Drehzahl-Sensor ESC-Strom über 3 A. Daneben steht, wie viele Phasen gekürzt sind; ohne Häkchen, wie viele mit Motor waren. Das Feld erscheint nur, wenn das Log Drehzahl oder Strom des Motors enthält.\nAlle Einstellungen bleiben pro Modell gespeichert.\n### Thermik: Kennzahlen\n- Ausnutzung zeigt, wie gut Du eine Thermik ausgenutzt hast: Ø Steigen über die ganze Phase (Endhöhe minus Starthöhe, geteilt durch die Dauer) im Verhältnis zum besten Steigen über 30 s in derselben Thermik. Der Tageswert ist zeitgewichtet über die aktiven Thermiken mit Höhengewinn. Ab 70 % gut, 50–70 % mittel, unter 50 % schwach. Phasen unter 30 s bekommen keinen Wert. Wird eine Thermik nach oben stärker, sinkt die Ausnutzung, auch wenn Du gut zentriert hast.\n- Trefferquote = wie viele der aktiven Phasen Höhe gebracht haben. Fehlversuche = Anteil der Thermikzeit in Phasen ohne Höhengewinn.\n- Ø Steigen, Gesamthöhe und Gesamtdauer rechnen wie das Widget mit dem Gewinn bis zur höchsten Höhe der Phase.\n### Thermik: Balken und Tabelle\n- Jeder Balken ist eine Phase: grün mit Höhengewinn, rot ohne. Die Farbe zeigt Steigen, Netto oder Sinken.\n- Die Tabelle listet jede Phase mit Uhrzeit, Dauer, Start- und Endhöhe, Gewinn, Ø Steigen und Ausnutzung. Mit dem Häkchen nimmst Du eine Phase aus Kennzahlen, Balken und Heatmap; die Auswahl wird pro Log gemerkt.\n- Netto bis … m nimmt Phasen bis zu diesem Gewinn heraus, Erfolglose inaktiv alle ohne Höhengewinn, Alle aktiv setzt zurück.\n- Ein Klick auf Balken oder Zeile wählt die Thermik für die Karte; mit ◀ ▶ blätterst Du weiter.\n### Thermik: Karte\n- Spur: Die Spur der gewählten Thermik ist nach dem Netto-Vario (Steigen der Luft, 10 s gemittelt) eingefärbt, gestrichelt wo die Luft sinkt; ohne Polare nach dem Vario. Den Wind liest die App am Versatz Deiner Kreise ab (ab zwei Kreisen), sonst nimmt sie das Mittel des Flugs.\n- Ideale Spur kreist mit Deinem Radius und Deiner Fahrt sauber um den Bartkern (Netto 3 s) und wandert mit dem Wind mit.\n- Ursprung (geschätzt): Die App rechnet zurück, wo die Luft am Boden losgestiegen ist: von der Einstiegshöhe mit dem mittleren positiven Netto-Steigen, mit dem Wind getrieben, plus 20 %, weil Thermik nahe am Boden langsamer steigt. Mit Gelände rechnet sie mit der Höhe über dem Boden am Ursprung (Höhenmodell AWS Terrain Tiles, weltweit). Der orange Bereich reicht von 0,8- bis 1,4-mal dieser Distanz entlang der Windlinie. Such darin nach Auslösern wie Baumreihen, Höfen, Feldrändern oder Dämmen. Unter 0,5 m/s ist die Schätzung unsicher.\n- Heatmap legt die Ursprungsbereiche aller aktiven Thermiken übereinander. Wo es rot wird, lösen sich an diesem Tag vermutlich immer wieder Bärte ab.\n- Luftbild: in der Schweiz von swisstopo, im Ausland von Esri. Für Esri brauchst Du einen eigenen Schlüssel unter ⚙ → Luftbild im Ausland (Esri-Schlüssel) (Kapitel 20).\n- Mausrad oder zwei Finger zoomen, Ziehen verschiebt, Doppelklick zeigt wieder alles.\n### Motorsteigflüge\n- Kennzahlen: Anzahl, Gesamthöhe, Gesamtdauer, Ø Steigen unter Motor, Verbrauch und Höhe pro 100 mAh. Diese zeigt, wie viel Höhe Dir der Akku bringt; ein Vergleich über mehrere Flüge zeigt Luftschraube, Akku und Steigwinkel.\n- Gipfel = höchste Höhe bis 20 s nach dem Abschalten, Gewinn = Gipfel minus Höhe beim Einschalten; das Ausgleiten zählt also mit. Ø Steigen rechnet nur über die Motorlaufzeit.\n- Jeder Balken ist ein Steigflug, die Zahl darüber das Ø Steigen in m/s. Die Tabelle zeigt pro Steigflug auch Ausgleiten, höchsten Strom und Verbrauch in mAh.\n### So wird gerechnet\nThermik zählt ab 5 s Dauer, Steigflüge ab 1 s. Mit „Ohne Motor“ zählen Motorlauf und die 5 s danach nicht zur Thermik; bleibt von einer Phase weniger als 5 s übrig, fällt dieser Rest weg. Eine Phase, die beim Logende noch läuft, zählt wie im Widget nicht. Die Zeiten sind so genau wie das Log (etwa 0,5 s).\nTipp: Steht „Kein Steigflug. Prüfe, ob der richtige Schalter gewählt ist.“, stimmt meist der Schalter nicht. Probiere den logischen Schalter, den Du am Sender für „Motor an“ nutzt, oder „ESC Strom (automatisch)“."},
-{"nr":12,"titel":"Tab „Polare“","text":"Die Polare zeigt, wie schnell Dein Modell bei welcher Fahrt sinkt. Sie wird nicht aus einem einzelnen Log gerechnet, sondern aus allen Logs des gewählten Modells.\n### Logs wählen\nLinks stehen alle Logs des Modells zum An- und Abhaken, mit Alle und Keine. Die Auswahl bleibt pro Modell gespeichert; neue Logs sind automatisch dabei. Logs, deren beste Gleitzahl mehr als 20 % von den übrigen abweicht, sind mit „weicht ab“ markiert. Oft steckt ein Flug mit Ballast, anderer Wölbklappe oder viel Wind dahinter.\n### Kennzahlen und Diagramm\n- Oben stehen die beste Gleitzahl und das geringste Sinken, jeweils mit der Geschwindigkeit, bei der sie erreicht werden.\n- Ansicht: „Sinken“ zeigt das Sinken in m/s über der Fahrt, „Gleitzahl“ die Gleitzahl über der Fahrt.\n- Glättung: „Physikalisch“ legt die Kurve Sinken = A·v³ + B/v durch die Mediane, „Median“ zeigt die geglätteten Mediane pro 4-km/h-Klasse, „Aus“ zeichnet keine Kurve.\n- Punkte zeigt jede gezählte Sekunde, Streuung das Band der mittleren Hälfte der Punkte, Einzel-Logs die Polare jedes Logs zum Vergleich.\n- Filter anwenden: Es zählen nur Einträge, die bei allen Filtern im Tab Diagramme im Bereich liegen (Kapitel 10), und zwar in allen gewählten Logs des Modells. So entsteht z. B. eine Polare nur aus ruhiger Luft oder nur aus einem Höhenbereich. Ändern sich die Filter, rechnet die Polare neu.\n### So wird gerechnet\nJeder Punkt ist eine Sekunde Gleitflug: Motor aus (und 15 s danach), geradeaus (Kursänderung unter 8°/s) und ohne starkes Beschleunigen. Die Fahrt ist die TAS, ohne Wind die GPS-Geschwindigkeit; das Sinken kommt vom Vario, korrigiert um Fahrtänderungen. Pro 4-km/h-Klasse zählt der Median. Details stehen im ⓘ neben „Polare“."},
+{"nr":12,"titel":"Tab „Polare“","text":"Die Polare zeigt, wie schnell Dein Modell bei welcher Fahrt sinkt. Sie wird nicht aus einem einzelnen Log gerechnet, sondern aus allen Logs des gewählten Modells.\n### Logs wählen\nLinks stehen alle Logs des Modells zum An- und Abhaken, mit Alle und Keine. Die Auswahl bleibt pro Modell gespeichert; neue Logs sind automatisch dabei. Logs, deren beste Gleitzahl mehr als 20 % von den übrigen abweicht, sind mit „weicht ab“ markiert. Oft steckt ein Flug mit Ballast, anderer Wölbklappe oder viel Wind dahinter.\n### Kennzahlen und Diagramm\n- Oben stehen die beste Gleitzahl und das geringste Sinken, jeweils mit der Geschwindigkeit, bei der sie erreicht werden.\n- Ansicht: „Sinken“ zeigt das Vario in m/s über der Fahrt, Sinken negativ wie auf dem Vario (−0,6 m/s = 0,6 m/s Sinken); „Gleitzahl“ zeigt die Gleitzahl über der Fahrt.\n- Glättung: „Physikalisch“ legt die Kurve Sinken = A·v³ + B/v durch die Mediane, „Median“ zeigt die geglätteten Mediane pro 4-km/h-Klasse, „Aus“ zeichnet keine Kurve.\n- Punkte zeigt jede gezählte Sekunde, Streuung das Band der mittleren Hälfte der Punkte, Einzel-Logs die Polare jedes Logs zum Vergleich.\n- Filter anwenden: Es zählen nur Einträge, die bei allen Filtern im Tab Diagramme im Bereich liegen (Kapitel 10), und zwar in allen gewählten Logs des Modells. So entsteht z. B. eine Polare nur aus ruhiger Luft oder nur aus einem Höhenbereich. Ändern sich die Filter, rechnet die Polare neu.\n### So wird gerechnet\nJeder Punkt ist eine Sekunde Gleitflug: Motor aus (und 15 s danach), geradeaus (Kursänderung unter 8°/s) und ohne starkes Beschleunigen. Die Fahrt ist die TAS, ohne Wind die GPS-Geschwindigkeit; das Sinken kommt vom Vario, korrigiert um Fahrtänderungen. Pro 4-km/h-Klasse zählt der Median. Details stehen im ⓘ neben „Polare“.\n### Für MacCready / Lua-Widget\nUnter dem Diagramm stehen die Kennzahlen für ein MacCready-Widget auf dem Sender. Die App nähert die physikalische Polare im Fahrtbereich mit Gleitpunkten durch eine Parabel an: Vario = a·v² + b·v + c, Ergebnis in m/s mit Sinken negativ. Mit m/s oder km/h wählst Du, für welche Einheit von v die Koeffizienten gelten; jeder Wert hat einen Knopf Kopieren. Darunter stehen der gültige Bereich, geringstes Sinken und beste Gleitzahl der Parabel, die Abweichung zur Polare und eine 3-Punkte-Polare.\n- Sollfahrt nach MacCready: Mit den Reglern MC-Wert, Wind (+ Gegenwind), Netto (Steigen der Luft), Ballast (in % des Fluggewichts beim Loggen) und Verschmutzung (Sinken um so viel % grösser) siehst Du die Sollfahrt. Im Diagramm erscheinen die angepasste Polare violett und die Tangente vom Punkt (Gegenwind, −MC) an die Kurve. Die Tabelle zeigt MC 0 bis 3 mit Sollfahrt, Vario und Schnitt; ein Klick auf eine Zeile setzt den MC-Wert. Liegt die Sollfahrt über dem gültigen Bereich, steht dort „über Bereich“, und das Widget sagt die höchste gültige Fahrt an. Die App startet immer mit MC 0, Alles zurücksetzen stellt alle Regler auf 0.\n- Auf den Sender: Die Datei polaren.lua enthält alle Ethos-Modelle, deren Polare Du im Tab Polare schon angesehen hast, mit dem Modellnamen wie auf dem Sender. In der Desktop-App schreibt Auf Sender schreiben sie in den Ordner scripts/maccready des angeschlossenen Senders (neben dem Ordner logs). Mit dem Häkchen „Beim Sync automatisch aktualisieren“ (Standard an) passiert das bei jedem Sync von selbst. In der Web-Version speichert Datei speichern die Datei, und Du kopierst sie selbst auf den Sender. Jeti-Modelle kommen nicht in die Datei.\n- Im Widget lesen: Der gezeigte Lua-Code liest polaren.lua neben main.lua des Widgets (Ordner scripts/maccready), sucht das aktive Modell mit model.name() und rechnet mit sollfahrt(mc, netto, wind, ballast, mueck) die Sollfahrt in km/h. Code kopieren und Werte als JSON kopieren legen Code oder Werte in die Zwischenablage.\nTipp: Damit die Kennzahlen erscheinen, braucht es Gleitflug über einen breiten Fahrtbereich, z. B. 30 bis 70 km/h. Liegen alle Gleitpunkte in einem schmalen Bereich, zeigt der Block einen Hinweis statt Werten."},
 {"nr":13,"titel":"Tab „Karte & Wind“","text":"### GPS-Spur\n- Die Spur ist von oben gesehen, Norden oben, ohne Kartenhintergrund. Das Gitter hat 100 m Abstand.\n- Die Farbe zeigt die Höhe (Legende unten). Weiss sind Steigflüge, grün Thermik. Kräftig gezeichnet ist der Zeitraum, den der Tab Diagramme gerade zeigt.\n- „Start“ markiert den Startpunkt, der orange Kreis den Zeitpunkt mit Uhrzeit und Höhe.\n- Zoomen mit − +, Strg + Mausrad oder Doppelklick; ziehen verschiebt; Alles zeigt die ganze Spur.\n- Unten steht die grösste Entfernung vom Startpunkt.\n### Wind nach Höhe\nDie Tabelle teilt die Höhe in Stufen (25, 50 oder 100 m, Feld „Stufe“) und zeigt pro Stufe den durchschnittlichen Wind, die Richtung, aus der er kommt, das Maximum und die Anzahl Wind-Fits. Der Pfeil zeigt, wohin der Wind weht. „wechselnd“ heisst, die Richtungen in dieser Stufe streuen stark. Die Stufe des Zeitpunkts ist hervorgehoben, darunter steht der Wind genau am Zeitpunkt.\nFür den Wind braucht es GPS-Position, GPS-Geschwindigkeit und Kurven im Flug. Gerade Strecken liefern keinen Wind."},
 {"nr":14,"titel":"Tab „Alle Werte“","text":"Die Tabelle listet jeden Sensor des Logs mit Einheit, Wert am Zeitpunkt, Minimum, Durchschnitt, Maximum und Anzahl Werte. Berechnete Werte tragen das Zeichen berechnet. Sender-Kanäle und Schalter sind hier nicht aufgeführt; sie siehst Du in den Rohdaten."},
 {"nr":15,"titel":"Tab „Rohdaten“","text":"Alle Zeilen und Spalten so, wie sie im Log stehen, auch bei grossen Logs flüssig. Oben steht die Anzahl Zeilen und Spalten. Ein Klick auf eine Zeile setzt den Zeitpunkt; die Zeile des gewählten Zeitpunkts ist hervorgehoben und wird beim Öffnen des Tabs ins Bild geholt. Zum Lesen breiter Logs scrollst Du in der Tabelle seitwärts."},

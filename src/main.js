@@ -67,9 +67,18 @@ ipcMain.handle('sender:eject', async () => {
   watcher.paused = true;
   try {
     for (const r of roots) await E.eject(r);
-    watcher.roots = []; watcher.synced.clear();
+    watcher.roots = []; watcher.ethosRoots = []; watcher.synced.clear();
     watcher.set({ ...watcher.status, connected: false, ejected: true });
   } finally { watcher.paused = false; }
+});
+// Polaren fürs MacCready-Widget: scripts/maccready/polaren.lua auf jedem angeschlossenen Ethos-Sender
+ipcMain.handle('sender:polarsTarget', () => ({ roots: watcher.ethosRoots || [] }));
+ipcMain.handle('sender:polars', async (_, text) => {
+  const roots = watcher.ethosRoots || [];
+  if (!roots.length) throw new Error('Kein Ethos-Sender angeschlossen.');
+  const out = [];
+  for (const r of roots) out.push(await S.writePolars(r, text));
+  return out;
 });
 ipcMain.handle('archive:list', () => S.listArchive(settings.archiveDir));
 ipcMain.handle('archive:save', (_, name, bytes) => S.archiveFile(settings.archiveDir, name, Buffer.from(bytes)));

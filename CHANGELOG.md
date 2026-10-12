@@ -10,6 +10,8 @@
 - Thermik- und Steigflug-Schalter gelten nur für das Modell, bei dem Du sie wählst. Ein Modell ohne eigene Wahl nimmt den Standard (SB bzw. LS9) statt des Schalters, den Du zuletzt bei einem anderen Modell gewählt hast.
 - Rohdaten: Die Tabelle zeichnet nur noch die sichtbaren Zeilen und Spalten. Logs mit über 100 Spalten (z. B. Lak-17) scrollen wieder flüssig.
 - Logliste: Bei Logs mit springender Stunde stimmt die angezeigte Dauer wieder (z. B. rund 34 Minuten statt 1:33:56).
+- Tab Polare: neuer Block „Für MacCready / Lua-Widget“. Die App nähert die Polare im Fahrtbereich mit Gleitpunkten durch eine Parabel Vario = a·v² + b·v + c an (Koeffizienten in m/s oder km/h zum Kopieren, gültiger Bereich, 3-Punkte-Polare). Regler für MC, Wind, Netto, Ballast und Verschmutzung zeigen die Sollfahrt, im Diagramm mit angepasster Polare und Tangente; Tabelle MC 0 bis 3. Die Datei polaren.lua mit allen Ethos-Modellen schreibt die Desktop-App in scripts/maccready auf den Sender, auf Knopfdruck oder bei jedem Sync; die Web-Version speichert sie als Datei. Dazu Lua-Code fürs Widget zum Kopieren.
+- Polare: Sinken wird jetzt überall negativ gezeigt wie auf dem Vario (Achse „Vario (m/s)“, Kennzahl geringstes Sinken z. B. −0,59 m/s).
 
 ## 2026.10.1 – 2026-10-09
 
