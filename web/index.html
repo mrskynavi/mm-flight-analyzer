@@ -1388,17 +1388,20 @@ end
 -- Fehlt die Polare fuer das aktive Modell, zeigt die Konfiguration nur diesen Status (erste
 -- Zeile) und das Widget nur die Meldung "Polare fehlt".
 --
--- Sensoren (nur diese zwei gehoeren in die Konfiguration)
---   GPS        Position -> Grundgeschwindigkeit und Kurs (aus den Positionsaenderungen)
+-- Sensoren
+--   GPS        Position -> Kurs (aus den Positionsaenderungen, ab 3 m Abstand)
+--   GPS-Geschw. Grundgeschwindigkeit vom GPS-Empfaenger (empfohlen). Ohne diesen Sensor rechnet
+--              das Widget die Geschwindigkeit aus den Positionen (deutlich unruhiger).
 --   Vario      kompensiert (TE) oder rein barometrisch. Barometrisch: das Widget addiert die
 --              Energiekompensation selbst:  TE = Vario + Faktor * (v/g) * dv/dt
 --              (Faktor in %, Vario-Zeitkonstante gleicht die Traegheit des Varios an)
 --
--- Wind (automatisch, kein Sensor noetig)
---   Kreisfit (Kasa) ueber die GPS-Geschwindigkeitsvektoren der letzten ~28 s: Kreismittelpunkt =
---   Windvektor, Radius = Fluggeschwindigkeit (TAS). Erst nach Kreisen/Kurven verfuegbar, der letzte
---   gute Wert bleibt danach 15 min erhalten. Die Fluggeschwindigkeit fuer Polare und Netto ist
---   |Grundgeschwindigkeit - Wind|. Der GPS-Kurs gilt als Richtung zum Ziel: Gegenwindkomponente h.
+-- Wind (automatisch, wie im MM Flight Analyzer und im Widget "Wind Estimator")
+--   Alle 0.7 s ein Bodenvektor (GPS-Geschw. + Kurs), die letzten 40 (~28 s) im Ringpuffer. Jede
+--   Sekunde Kreisfit (Kasa): Kreismittelpunkt = Windvektor, Radius = Fluggeschwindigkeit (TAS).
+--   Nur bei genug Kursstreuung und plausiblem Ergebnis; der letzte gute Wert bleibt. Vor dem ersten
+--   Fit gilt Wind 0, TAS = Grundgeschwindigkeit. Die Fluggeschwindigkeit fuer Polare und Netto ist
+--   |Bodenvektor - Wind|. Der GPS-Kurs gilt als Richtung zum Ziel: Gegenwindkomponente h.
 --
 -- Rechnung
 --   Polare:  Sinken w(v) = A*v^2 + B*v + C
@@ -1827,6 +1830,99 @@ local function readNumber(source)
   return nil
 end
 
+-- Wind wie im MM Flight Analyzer: Bodenvektor = GPS-Geschw. (Sensor) in Richtung GPS-Kurs.
+-- Kurs = Azimut vom letzten Ankerpunkt zur neuen Position, erst ab 3 m Abstand.
+local MIN_FIX_DISTANCE = 3.0
+local R_EARTH = 6371000
+local function distM(la1, lo1, la2, lo2)
+  local dLat = math.rad(la2 - la1)
+  local dLon = math.rad(lo2 - lo1) * math.cos(math.rad((la1 + la2) / 2))
+  return math.sqrt(dLat * dLat + dLon * dLon) * R_EARTH
+end
+local function bearingDeg(la1, lo1, la2, lo2)
+  local p1, p2, dl = math.rad(la1), math.rad(la2), math.rad(lo2 - lo1)
+  local y = math.sin(dl) * math.cos(p2)
+  local x = math.cos(p1) * math.sin(p2) - math.sin(p1) * math.cos(p2) * math.cos(dl)
+  return math.deg(atan2(y, x)) % 360
+end
+
+local function courseUpdate(w, lat, lon, now)
+  w.gpsOk = w.gSeen ~= nil and now - w.gSeen <= 3
+  if lat == nil then return end
+  if lat ~= w.lastLat or lon ~= w.lastLon then
+    w.lastLat, w.lastLon, w.gSeen = lat, lon, now
+    if w.aLat == nil then
+      w.aLat, w.aLon = lat, lon
+    elseif distM(w.aLat, w.aLon, lat, lon) >= MIN_FIX_DISTANCE then
+      w.crs = bearingDeg(w.aLat, w.aLon, lat, lon)
+      w.aLat, w.aLon = lat, lon
+    end
+  end
+  w.gpsOk = w.gSeen ~= nil and now - w.gSeen <= 3
+end
+
+-- Geschwindigkeit des Sensors in m/s (Ethos liefert eine Einheiten-Konstante, der Simulator den Text).
+local function speedMs(src)
+  local v = readNumber(src)
+  if v == nil then return nil end
+  local ok, u = pcall(src.unit, src)
+  if not ok then u = nil end
+  if u == "m/s" or (UNIT_METER_PER_SECOND and u == UNIT_METER_PER_SECOND) then return v end
+  if u == "kn" or (UNIT_KNOT and u == UNIT_KNOT) then return v * 0.514444 end
+  if u == "mph" or (UNIT_MPH and u == UNIT_MPH) then return v * 0.44704 end
+  return v / KMH                                   -- Standard km/h
+end
+
+-- Plausibel wie im Analyzer: Radius und Wind hoechstens so gross wie die groesste Grundgeschw.
+-- (mal Faktor), mittlere Abweichung vom Kreis hoechstens 25 % des Radius.
+local function fitOkMax(cx, cy, r, resFrac, pts)
+  if not r or r <= 1e-3 then return false end
+  local maxG = 0
+  for _, p in ipairs(pts) do maxG = math.max(maxG, math.sqrt(p.x * p.x + p.y * p.y)) end
+  if maxG <= 1e-3 or r > MAX_TAS_FACTOR * maxG then return false end
+  if math.sqrt(cx * cx + cy * cy) > MAX_WIND_FACTOR * maxG then return false end
+  return resFrac <= MAX_RESIDUAL_FRAC
+end
+
+local function windStep(w, spd, now)
+  local ok = spd ~= nil and w.crs ~= nil
+  if ok then
+    local c = math.rad(w.crs)
+    w.gve, w.gvn = spd * math.sin(c), spd * math.cos(c)
+  else
+    w.gve, w.gvn = nil, nil
+  end
+  if ok and spd >= 2 / KMH and (w.sT == nil or now - w.sT >= SAMPLE_DT) then
+    local win = w.win
+    win[#win + 1] = {x = w.gve, y = w.gvn}
+    if #win > WINDOW then table.remove(win, 1) end
+    w.sT = now
+  end
+  if #w.win >= MIN_SAMPLES and (w.fitT == nil or now - w.fitT >= FIT_INTERVAL) then
+    w.fitT = now
+    if courseSpread(w.win) < MAX_SPREAD_R then
+      local cx, cy, r, res = kasaFit(w.win)
+      if cx and fitOkMax(cx, cy, r, res, w.win) then w.fit = {cx = cx, cy = cy, r = r, t = now} end
+    end
+  end
+end
+
+local function airDataSensor(w, now)
+  if not w.gpsOk or w.gve == nil then return nil end
+  local gs = math.sqrt(w.gve ^ 2 + w.gvn ^ 2)
+  local course = math.rad(w.crs)
+  local f = w.fit
+  local cx, cy = 0, 0                               -- vor dem ersten Fit: Wind 0
+  if f then cx, cy = f.cx, f.cy end
+  local tas = math.sqrt((w.gve - cx) ^ 2 + (w.gvn - cy) ^ 2)
+  local head, wind = nil, nil
+  if f then
+    head = -(cx * math.sin(course) + cy * math.cos(course))
+    wind = {spd = math.sqrt(cx * cx + cy * cy), from = (math.deg(atan2(cx, cy)) + 180) % 360, age = now - f.t}
+  end
+  return {gs = gs, course = course, tas = tas, head = head, wind = wind}
+end
+
 -- Spielt einen Ton. Ethos erwartet ganze Zahlen (Hz, ms), deshalb wird gerundet.
 local function playToneSafe(freq, len)
   if not (system and system.playTone) then return false, "system.playTone fehlt" end
@@ -1971,8 +2067,15 @@ end
 -- Alle Messwerte -> TE (m/s), TAS (m/s), Gegenwind (m/s) und ein Hinweistext, falls Daten fehlen.
 local function inputsStep(w, now, dt)
   local lat, lon, perr = readPosition(w.gps)
-  gpsUpdate(w, lat, lon, now)
-  local air = airData(w, now)
+  local air
+  if validSource(w.gpsSpd) then                     -- wie im Analyzer (empfohlen)
+    courseUpdate(w, lat, lon, now)
+    windStep(w, speedMs(w.gpsSpd), now)
+    air = airDataSensor(w, now)
+  else                                              -- nur Positionen
+    gpsUpdate(w, lat, lon, now)
+    air = airData(w, now)
+  end
   local tas = air and air.tas or nil
   w.air = air
   kineticStep(w, tas, dt, now)
@@ -2405,6 +2508,7 @@ local function configure(w)
 
   -- Sensoren
   addSource(w, "GPS", "gps")
+  addSource(w, "GPS-Geschw. (empfohlen)", "gpsSpd")
   addSource(w, "Vario", "vario")
   line = form.addLine("Vario-Typ")
   form.addChoiceField(line, nil, {{"Kompensiert (TE)", 1}, {"Barometrisch", 2}},
@@ -2457,7 +2561,8 @@ end
 
 local function read(w)
   -- Versionsmarke zuerst: aeltere Speicherstaende (anderes Layout) werden verworfen.
-  if storage.read("ver") ~= STORE_VER then
+  local same = storage.read("ver") == STORE_VER
+  if not same then
     setDefaults(w)
   else
     for _, k in ipairs(SOURCE_KEYS) do
@@ -2472,6 +2577,8 @@ local function read(w)
       if type(v) == "boolean" then w[d.key] = v else w[d.key] = d.def end
     end
   end
+  -- spaeter dazugekommen, deshalb am Ende (Ethos-Storage arbeitet nach Aufrufreihenfolge)
+  w.gpsSpd = same and validSource(storage.read("gpsSpd")) or nil
   w.mcValue = w.mc / 10
   w.polarSig = nil
   w.fileChecked = nil
@@ -2482,6 +2589,7 @@ local function write(w)
   for _, k in ipairs(SOURCE_KEYS) do storage.write(k, w[k]) end
   for _, d in ipairs(NUM_DEFS) do storage.write(d.key, w[d.key]) end
   for _, d in ipairs(BOOL_DEFS) do storage.write(d.key, w[d.key]) end
+  storage.write("gpsSpd", w.gpsSpd)
 end
 
 local function init()
@@ -6506,7 +6614,7 @@ const g = id => document.getElementById(id);
 const SAMPLE = {'sollfahrt/main.lua': g('simW_sollf').textContent, 'thermik/main.lua': g('simW_therm').textContent,
   'steigfluege/main.lua': g('simW_climb').textContent};
 // Startwerte, falls ein Widget noch nie konfiguriert wurde (nach registriertem Namen)
-const DEFS = {Sollfahrt:[['GPS','GPS'],['Vario','Steigr. Vario']],
+const DEFS = {Sollfahrt:[['GPS','GPS'],['GPS-Geschw. (empfohlen)','GPS-Geschw.'],['Vario','Steigr. Vario']],
   Thermik:[['Demo-Modus','0'],['Thermik-Schalter','SB'],['Höhenquelle','Altitude']],
   Steigfluege:[['Demo-Modus','0'],['Steigflug-Schalter','LS9'],['Höhenquelle','Altitude']]};
 const SW_RE = /^(S[A-Z]|LS\d+)$/i;
