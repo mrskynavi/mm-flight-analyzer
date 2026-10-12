@@ -7,6 +7,9 @@
 - Thermik-Karte rechts im Tab: Spur der gewählten Thermik nach Netto-Vario eingefärbt, ideale Spur um den Bartkern, Wind aus dem Versatz der Kreise, geschätzter Ursprung der Thermik am Boden mit Suchbereich (auf Wunsch mit Gelände aus dem Höhenmodell) und eine Heatmap aller Ursprünge des Tages. Luftbild in der Schweiz von swisstopo, im Ausland von Esri mit eigenem Schlüssel unter ⚙ Einstellungen.
 - Eigener Tab Motorsteigflüge: Gipfel bis 20 s nach dem Abschalten (Ausgleiten zählt mit), Ø Steigen unter Motor, Verbrauch und Höhe pro 100 mAh, Tabelle mit Ausgleiten und höchstem Strom.
 - Neue berechnete Werte Vario TEK (ohne Stösse vom Ziehen und Drücken) und Netto-Vario (Steigen der Luft, mit der Polare des Modells).
+- Thermik- und Steigflug-Schalter gelten nur für das Modell, bei dem Du sie wählst. Ein Modell ohne eigene Wahl nimmt den Standard (SB bzw. LS9) statt des Schalters, den Du zuletzt bei einem anderen Modell gewählt hast.
+- Rohdaten: Die Tabelle zeichnet nur noch die sichtbaren Zeilen und Spalten. Logs mit über 100 Spalten (z. B. Lak-17) scrollen wieder flüssig.
+- Logliste: Bei Logs mit springender Stunde stimmt die angezeigte Dauer wieder (z. B. rund 34 Minuten statt 1:33:56).
 
 ## 2026.10.1 – 2026-10-09
 
