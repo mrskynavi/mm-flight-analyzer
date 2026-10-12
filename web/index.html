@@ -1390,18 +1390,24 @@ end
 --
 -- Sensoren
 --   GPS        Position -> Kurs (aus den Positionsaenderungen, ab 3 m Abstand)
---   GPS-Geschw. Grundgeschwindigkeit vom GPS-Empfaenger (empfohlen). Ohne diesen Sensor rechnet
---              das Widget die Geschwindigkeit aus den Positionen (deutlich unruhiger).
+--   GPS-Geschw. Grundgeschwindigkeit vom GPS-Empfaenger (empfohlen, wie im MM Flight Analyzer).
+--              Ohne diesen Sensor rechnet das Widget die Geschwindigkeit aus den Positionen;
+--              die sind im Log auf ~1 m gerundet und kommen etwa jede Sekunde, das rauscht stark.
+--   GPS Hoehe  Hoehe in m, bestimmt die Windschicht
 --   Vario      kompensiert (TE) oder rein barometrisch. Barometrisch: das Widget addiert die
 --              Energiekompensation selbst:  TE = Vario + Faktor * (v/g) * dv/dt
 --              (Faktor in %, Vario-Zeitkonstante gleicht die Traegheit des Varios an)
 --
--- Wind (automatisch, wie im MM Flight Analyzer und im Widget "Wind Estimator")
---   Alle 0.7 s ein Bodenvektor (GPS-Geschw. + Kurs), die letzten 40 (~28 s) im Ringpuffer. Jede
---   Sekunde Kreisfit (Kasa): Kreismittelpunkt = Windvektor, Radius = Fluggeschwindigkeit (TAS).
---   Nur bei genug Kursstreuung und plausiblem Ergebnis; der letzte gute Wert bleibt. Vor dem ersten
---   Fit gilt Wind 0, TAS = Grundgeschwindigkeit. Die Fluggeschwindigkeit fuer Polare und Netto ist
---   |Bodenvektor - Wind|. Der GPS-Kurs gilt als Richtung zum Ziel: Gegenwindkomponente h.
+-- Wind (automatisch): Windtabelle nach Hoehe
+--   Kreisfit (Kasa) ueber die GPS-Geschwindigkeitsvektoren der letzten ~28 s: Kreismittelpunkt =
+--   Windvektor, Radius = Fluggeschwindigkeit. Mit GPS-Geschw. wie im MM Flight Analyzer: alle 0.7 s
+--   ein Bodenvektor (Sensor-Geschwindigkeit in Richtung GPS-Kurs), Fit jede Sekunde, gleiche
+--   Plausibilitaetsgrenzen. Vor dem ersten Fit: Wind 0, TAS = Grundgeschwindigkeit. Der erste gute Fit gilt als Startwert fuer ALLE
+--   Hoehen ("~" in der Anzeige). Jeder weitere Fit ergaenzt/ueberschreibt nur die 100-m-Schichten
+--   seines Hoehenbereichs (gleitend, 30 % pro Fit). Die Fluggeschwindigkeit fuer Polare und Netto
+--   ist |Grundgeschwindigkeit - Wind der aktuellen Hoehe| (linear zwischen den Schichten), auch
+--   im Geradeausflug und sofort nach einem Hoehenwechsel. Die Hoehe kommt vom Sensor "GPS Hoehe"
+--   (ohne Sensor: aus dem Vario aufintegriert). Der GPS-Kurs gilt als Richtung zum Ziel.
 --
 -- Rechnung
 --   Polare:  Sinken w(v) = A*v^2 + B*v + C
@@ -1419,11 +1425,11 @@ end
 
 local KMH = 3.6
 local G = 9.81
-local STORE_VER = 4
+local STORE_VER = 5   -- gpsSpd wird am Ende gelesen/geschrieben, deshalb unveraendert
 
 -- ---------------------------------------------------------------- Einstellungen
 
-local SOURCE_KEYS = {"gps", "vario", "mcSrc", "mcUp", "mcDn", "modeSw", "soundSw"}
+local SOURCE_KEYS = {"gps", "gpsAlt", "vario", "mcSrc", "mcUp", "mcDn", "modeSw", "soundSw"}
 
 -- Reihenfolge nur am Ende erweitern: Ethos-Storage arbeitet nach Aufrufreihenfolge.
 local NUM_DEFS = {
@@ -1675,7 +1681,43 @@ local MAX_SPREAD_R = 0.85     -- Richtungsstreuung: 1 = alle gleich, 0 = voller 
 local MAX_TAS_FACTOR = 2.0    -- Radius darf max. so viel groesser als die mittlere Grundgeschw. sein
 local MAX_WIND_FACTOR = 1.0   -- Wind darf nicht groesser als die Fluggeschwindigkeit sein
 local MAX_RESIDUAL_FRAC = 0.25
-local WIND_HOLD = 900         -- s, so lange bleibt ein guter Wert gueltig
+local WIND_HOLD = 900         -- s, nach so langer Zeit ohne Messung gilt eine Schicht als veraltet (Anzeige)
+
+-- Windtabelle: Schichten nach Hoehe. Der erste gute Fit fuellt alle Schichten (Startwert),
+-- jeder weitere Fit ueberschreibt/ergaenzt nur die Schichten seines Hoehenbereichs.
+local BINS, BIN_H, BIN_OFF = 120, 100, 500      -- 120 Schichten a 100 m (-500 m ... 11500 m)
+local BIN_ALPHA = 0.3                           -- Gewicht eines neuen Fits in einer Schicht
+local function binOf(alt) return clamp(math.floor((alt + BIN_OFF) / BIN_H) + 1, 1, BINS) end
+local function binCenter(i) return (i - 1) * BIN_H - BIN_OFF + BIN_H / 2 end
+
+local function windApply(w, cx, cy, lo, hi, now)
+  local t = w.wt
+  if not t.filled then
+    for i = 1, BINS do t[i] = {cx = cx, cy = cy, t = now, meas = false} end
+    t.filled = true
+  end
+  for i = binOf(lo), binOf(hi) do
+    local b = t[i]
+    if b.meas then
+      b.cx, b.cy = b.cx + BIN_ALPHA * (cx - b.cx), b.cy + BIN_ALPHA * (cy - b.cy)
+    else
+      b.cx, b.cy = cx, cy
+    end
+    b.t, b.meas = now, true
+  end
+end
+
+-- Wind (m/s Ost/Nord) in der Hoehe alt, linear zwischen den Schichtmitten. Dritter Wert: Schicht.
+local function windAt(w, alt)
+  local t = w.wt
+  if not t.filled then return nil end
+  local i = binOf(alt)
+  local c = binCenter(i)
+  local j = clamp((alt >= c) and i + 1 or i - 1, 1, BINS)
+  local f = (j == i) and 0 or clamp(math.abs(alt - c) / BIN_H, 0, 0.5)
+  local a, b = t[i], t[j]
+  return a.cx * (1 - f) + b.cx * f, a.cy * (1 - f) + b.cy * f, a
+end
 
 -- Kreisfit nach Kasa. pts = {{x=, y=}, ...} (Ost/Nord-Geschwindigkeit in m/s).
 -- Liefert cx, cy (= Wind), r (= TAS), relativer Rest.
@@ -1778,8 +1820,10 @@ local function gpsUpdate(w, lat, lon, now)
     w.bLat, w.bLon, w.bT = lat, lon, now
     w.gve, w.gvn = ve, vn            -- letzter Stuetzwert (Glaettung folgt in process)
     local win = w.win
+    -- grosser Hoehensprung: alte Stuetzwerte gehoeren zu einer anderen Windschicht
+    if #win > 0 and math.abs((w.alt or 0) - win[#win].alt) > 150 then for i = #win, 1, -1 do win[i] = nil end end
     if math.sqrt(ve * ve + vn * vn) >= 2 then
-      win[#win + 1] = {x = ve, y = vn}
+      win[#win + 1] = {x = ve, y = vn, alt = w.alt or 0}
       if #win > WINDOW then table.remove(win, 1) end
     end
     -- Kreisfit
@@ -1787,14 +1831,10 @@ local function gpsUpdate(w, lat, lon, now)
       w.fitT = now
       local cx, cy, r, res = kasaFit(win)
       if cx and courseSpread(win) <= MAX_SPREAD_R and fitIsPlausible(cx, cy, r, res, win) then
-        local f = w.fit
-        if f and now - f.t <= WIND_HOLD then      -- sanft nachfuehren
-          f.cx, f.cy = f.cx + 0.3 * (cx - f.cx), f.cy + 0.3 * (cy - f.cy)
-          f.r = f.r + 0.3 * (r - f.r)
-          f.t = now
-        else
-          w.fit = {cx = cx, cy = cy, r = r, t = now}
-        end
+        w.fit = {cx = cx, cy = cy, r = r, t = now}      -- letzter roher Fit
+        local lo, hi = win[1].alt, win[1].alt
+        for _, p in ipairs(win) do lo, hi = math.min(lo, p.alt), math.max(hi, p.alt) end
+        windApply(w, cx, cy, lo, hi, now)
       end
     end
   end
@@ -1805,13 +1845,15 @@ local function airData(w, now)
   if not w.gpsOk or w.gve == nil then return nil end
   local gs = math.sqrt(w.gve ^ 2 + w.gvn ^ 2)
   local course = atan2(w.gve, w.gvn)
-  local f = w.fit
+  local alt = w.alt or 0
+  local cx, cy, bin = windAt(w, alt)
   local tas, head, wind = gs, nil, nil
-  if f and now - f.t <= WIND_HOLD then
-    tas = math.sqrt((w.gve - f.cx) ^ 2 + (w.gvn - f.cy) ^ 2)
-    head = -(f.cx * math.sin(course) + f.cy * math.cos(course))
-    local from = math.deg(atan2(f.cx, f.cy)) + 180
-    wind = {spd = math.sqrt(f.cx ^ 2 + f.cy ^ 2), from = from % 360, age = now - f.t}
+  if cx then
+    -- Fluggeschwindigkeit mit dem Wind der aktuellen Hoehe (Windtabelle)
+    tas = math.sqrt((w.gve - cx) ^ 2 + (w.gvn - cy) ^ 2)
+    head = -(cx * math.sin(course) + cy * math.cos(course))
+    local from = math.deg(atan2(cx, cy)) + 180
+    wind = {spd = math.sqrt(cx ^ 2 + cy ^ 2), from = from % 360, age = now - bin.t, meas = bin.meas, alt = alt}
   end
   return {gs = gs, course = course, tas = tas, head = head, wind = wind}
 end
@@ -1830,7 +1872,7 @@ local function readNumber(source)
   return nil
 end
 
--- Wind wie im MM Flight Analyzer: Bodenvektor = GPS-Geschw. (Sensor) in Richtung GPS-Kurs.
+-- ---- Mit GPS-Geschw.: Bodenvektor wie im MM Flight Analyzer
 -- Kurs = Azimut vom letzten Ankerpunkt zur neuen Position, erst ab 3 m Abstand.
 local MIN_FIX_DISTANCE = 3.0
 local R_EARTH = 6371000
@@ -1847,9 +1889,7 @@ local function bearingDeg(la1, lo1, la2, lo2)
 end
 
 local function courseUpdate(w, lat, lon, now)
-  w.gpsOk = w.gSeen ~= nil and now - w.gSeen <= 3
-  if lat == nil then return end
-  if lat ~= w.lastLat or lon ~= w.lastLon then
+  if lat ~= nil and (lat ~= w.lastLat or lon ~= w.lastLon) then
     w.lastLat, w.lastLon, w.gSeen = lat, lon, now
     if w.aLat == nil then
       w.aLat, w.aLon = lat, lon
@@ -1873,8 +1913,8 @@ local function speedMs(src)
   return v / KMH                                   -- Standard km/h
 end
 
--- Plausibel wie im Analyzer: Radius und Wind hoechstens so gross wie die groesste Grundgeschw.
--- (mal Faktor), mittlere Abweichung vom Kreis hoechstens 25 % des Radius.
+-- Plausibel wie im Analyzer: Radius hoechstens 2x, Wind hoechstens 1x die groesste
+-- Grundgeschwindigkeit im Fenster, mittlere Abweichung vom Kreis hoechstens 25 % des Radius.
 local function fitOkMax(cx, cy, r, resFrac, pts)
   if not r or r <= 1e-3 then return false end
   local maxG = 0
@@ -1884,43 +1924,36 @@ local function fitOkMax(cx, cy, r, resFrac, pts)
   return resFrac <= MAX_RESIDUAL_FRAC
 end
 
-local function windStep(w, spd, now)
-  local ok = spd ~= nil and w.crs ~= nil
-  if ok then
+-- Ein Schritt mit Sensor-Geschwindigkeit: Bodenvektor, Stuetzwert alle 0.7 s, Fit jede Sekunde,
+-- gute Fits gehen wie bisher in die Windtabelle (Hoehenbereich des Fensters).
+local function sensorUpdate(w, lat, lon, spd, now)
+  courseUpdate(w, lat, lon, now)
+  if spd ~= nil and w.crs ~= nil then
     local c = math.rad(w.crs)
     w.gve, w.gvn = spd * math.sin(c), spd * math.cos(c)
   else
     w.gve, w.gvn = nil, nil
   end
-  if ok and spd >= 2 / KMH and (w.sT == nil or now - w.sT >= SAMPLE_DT) then
-    local win = w.win
-    win[#win + 1] = {x = w.gve, y = w.gvn}
-    if #win > WINDOW then table.remove(win, 1) end
+  local win = w.win
+  if w.gve and spd >= 2 / KMH and (w.sT == nil or now - w.sT >= SAMPLE_DT) then
     w.sT = now
+    -- grosser Hoehensprung: alte Stuetzwerte gehoeren zu einer anderen Windschicht
+    if #win > 0 and math.abs((w.alt or 0) - win[#win].alt) > 150 then for i = #win, 1, -1 do win[i] = nil end end
+    win[#win + 1] = {x = w.gve, y = w.gvn, alt = w.alt or 0}
+    if #win > WINDOW then table.remove(win, 1) end
   end
-  if #w.win >= MIN_SAMPLES and (w.fitT == nil or now - w.fitT >= FIT_INTERVAL) then
+  if #win >= MIN_SAMPLES and (w.fitT == nil or now - w.fitT >= FIT_INTERVAL) then
     w.fitT = now
-    if courseSpread(w.win) < MAX_SPREAD_R then
-      local cx, cy, r, res = kasaFit(w.win)
-      if cx and fitOkMax(cx, cy, r, res, w.win) then w.fit = {cx = cx, cy = cy, r = r, t = now} end
+    if courseSpread(win) < MAX_SPREAD_R then
+      local cx, cy, r, res = kasaFit(win)
+      if cx and fitOkMax(cx, cy, r, res, win) then
+        w.fit = {cx = cx, cy = cy, r = r, t = now}
+        local lo, hi = win[1].alt, win[1].alt
+        for _, p in ipairs(win) do lo, hi = math.min(lo, p.alt), math.max(hi, p.alt) end
+        windApply(w, cx, cy, lo, hi, now)
+      end
     end
   end
-end
-
-local function airDataSensor(w, now)
-  if not w.gpsOk or w.gve == nil then return nil end
-  local gs = math.sqrt(w.gve ^ 2 + w.gvn ^ 2)
-  local course = math.rad(w.crs)
-  local f = w.fit
-  local cx, cy = 0, 0                               -- vor dem ersten Fit: Wind 0
-  if f then cx, cy = f.cx, f.cy end
-  local tas = math.sqrt((w.gve - cx) ^ 2 + (w.gvn - cy) ^ 2)
-  local head, wind = nil, nil
-  if f then
-    head = -(cx * math.sin(course) + cy * math.cos(course))
-    wind = {spd = math.sqrt(cx * cx + cy * cy), from = (math.deg(atan2(cx, cy)) + 180) % 360, age = now - f.t}
-  end
-  return {gs = gs, course = course, tas = tas, head = head, wind = wind}
 end
 
 -- Spielt einen Ton. Ethos erwartet ganze Zahlen (Hz, ms), deshalb wird gerundet.
@@ -2034,7 +2067,7 @@ local function create()
   local w = {
     lastT = nil, lastInvalidate = 0, nextBeep = 0, lastMcChange = nil, mcAnnounced = nil,
     mcUpOn = false, mcDnOn = false, cruise = true, buttons = nil,
-    polarSig = nil, win = {},
+    polarSig = nil, win = {}, wt = {},
   }
   for _, d in ipairs(NUM_DEFS) do w[d.key] = d.def end
   for _, d in ipairs(BOOL_DEFS) do w[d.key] = d.def end
@@ -2066,23 +2099,27 @@ end
 
 -- Alle Messwerte -> TE (m/s), TAS (m/s), Gegenwind (m/s) und ein Hinweistext, falls Daten fehlen.
 local function inputsStep(w, now, dt)
-  local lat, lon, perr = readPosition(w.gps)
-  local air
-  if validSource(w.gpsSpd) then                     -- wie im Analyzer (empfohlen)
-    courseUpdate(w, lat, lon, now)
-    windStep(w, speedMs(w.gpsSpd), now)
-    air = airDataSensor(w, now)
-  else                                              -- nur Positionen
-    gpsUpdate(w, lat, lon, now)
-    air = airData(w, now)
+  -- Hoehe: GPS-Hoehe, sonst aus dem Vario aufintegriert (relativ, nur Notbehelf)
+  local vario = readNumber(w.vario)
+  local alt = readNumber(w.gpsAlt)
+  if alt == nil then
+    w.altInt = (w.altInt or 0) + (vario or 0) * dt
+    alt = w.altInt
   end
+  w.alt = alt
+  local lat, lon, perr = readPosition(w.gps)
+  if validSource(w.gpsSpd) then
+    sensorUpdate(w, lat, lon, speedMs(w.gpsSpd), now)   -- wie im Analyzer (empfohlen)
+  else
+    gpsUpdate(w, lat, lon, now)                         -- nur Positionen
+  end
+  local air = airData(w, now)
   local tas = air and air.tas or nil
   w.air = air
   kineticStep(w, tas, dt, now)
   local kin = w.kin or 0
 
   -- Vario / TE (barometrisch: Energiekompensation selbst addieren)
-  local vario = readNumber(w.vario)
   local te
   if vario ~= nil then
     te = (w.varioType == 2) and (vario + w.teFactor / 100 * kin) or vario
@@ -2299,8 +2336,8 @@ local function paint(w)
   local wind = w.air and w.air.wind
   local windText, windColor = "Wind: kreisen = messen", DIM
   if wind then
-    windText = string.format("Wind %.0f km/h aus %03d", wind.spd * KMH, math.floor(wind.from + 0.5) % 360)
-    windColor = (wind.age > 120) and ORANGE or WHITE
+    windText = string.format("%sWind %.0f km/h aus %03d", wind.meas and "" or "~", wind.spd * KMH, math.floor(wind.from + 0.5) % 360)
+    windColor = (wind.meas and wind.age <= WIND_HOLD) and WHITE or ORANGE
   end
   drawT(margin, sy + (xsH + 2) * 2, leftW - margin, windText, FONT_XS, windColor, "l")
   local headText, headColor = "", DIM
@@ -2509,6 +2546,7 @@ local function configure(w)
   -- Sensoren
   addSource(w, "GPS", "gps")
   addSource(w, "GPS-Geschw. (empfohlen)", "gpsSpd")
+  addSource(w, "GPS Hoehe (Windschichten)", "gpsAlt")
   addSource(w, "Vario", "vario")
   line = form.addLine("Vario-Typ")
   form.addChoiceField(line, nil, {{"Kompensiert (TE)", 1}, {"Barometrisch", 2}},
@@ -2617,7 +2655,8 @@ M._test = {
   setPolarPaths = function(list) polarPaths = list end,
   kasaFit = kasaFit, courseSpread = courseSpread, fitIsPlausible = fitIsPlausible,
   extractLatLon = extractLatLon, readPosition = readPosition, gpsUpdate = gpsUpdate,
-  airData = airData, inputsStep = inputsStep, sayMC = sayMC, polarStatus = polarStatus,
+  sensorUpdate = sensorUpdate, courseUpdate = courseUpdate, fitOkMax = fitOkMax,
+  airData = airData, windAt = windAt, binOf = binOf, inputsStep = inputsStep, sayMC = sayMC, polarStatus = polarStatus,
 }
 return M
 </script>
@@ -6614,7 +6653,7 @@ const g = id => document.getElementById(id);
 const SAMPLE = {'sollfahrt/main.lua': g('simW_sollf').textContent, 'thermik/main.lua': g('simW_therm').textContent,
   'steigfluege/main.lua': g('simW_climb').textContent};
 // Startwerte, falls ein Widget noch nie konfiguriert wurde (nach registriertem Namen)
-const DEFS = {Sollfahrt:[['GPS','GPS'],['GPS-Geschw. (empfohlen)','GPS-Geschw.'],['Vario','Steigr. Vario']],
+const DEFS = {Sollfahrt:[['GPS','GPS'],['GPS-Geschw. (empfohlen)','GPS-Geschw.'],['GPS Hoehe (Windschichten)','GAlt'],['Vario','Steigr. Vario']],
   Thermik:[['Demo-Modus','0'],['Thermik-Schalter','SB'],['Höhenquelle','Altitude']],
   Steigfluege:[['Demo-Modus','0'],['Steigflug-Schalter','LS9'],['Höhenquelle','Altitude']]};
 const SW_RE = /^(S[A-Z]|LS\d+)$/i;
