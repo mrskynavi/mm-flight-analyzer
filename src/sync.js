@@ -219,6 +219,37 @@ async function writePolars(root, text) {
   return dest;
 }
 
+// Simulator: Textdateien aus einem scripts-Ordner (Widgets, polaren.lua …), Pfade relativ zum Ordner
+const SCRIPT_EXT = /\.(lua|txt|json|csv|cfg|ini)$/i;
+async function readScripts(dir, max = 600) {
+  const files = {};
+  let n = 0;
+  const walk = async (d, rel, depth) => {
+    let ents; try { ents = await fsp.readdir(d, { withFileTypes: true }); } catch { return; }
+    for (const e of ents) {
+      if (n >= max || e.name.startsWith('.')) continue;
+      const p = path.join(d, e.name), r = rel ? rel + '/' + e.name : e.name;
+      if (e.isDirectory()) { if (depth < 4) await walk(p, r, depth + 1); continue; }
+      if (!SCRIPT_EXT.test(e.name)) continue;
+      const st = await fsp.stat(p).catch(() => null);
+      if (!st || st.size > 2e6) continue;
+      files[r] = decodeText(await fsp.readFile(p)); n++;
+    }
+  };
+  await walk(dir, '', 0);
+  return files;
+}
+// Widget-Datei zurückschreiben; nur .lua innerhalb des Ordners, die alte Datei bleibt als .bak
+async function writeScript(dir, rel, text) {
+  const s = String(text ?? '');
+  if (!/\.lua$/i.test(rel) || s.length > 2e6) throw new Error('Ungültige Datei');
+  const base = path.resolve(dir) + path.sep, dest = path.resolve(dir, rel);
+  if (!dest.startsWith(base)) throw new Error('Pfad ausserhalb des scripts-Ordners');
+  if (fs.existsSync(dest)) await fsp.copyFile(dest, dest + '.bak');
+  await fsp.writeFile(dest, s, 'utf8');
+  return dest;
+}
+
 // Alle Logs im Archiv (Modell-Ordner und lose CSVs in der Wurzel)
 async function listArchive(archive) {
   const out = [];
@@ -326,4 +357,4 @@ class SyncWatcher extends EventEmitter {
   }
 }
 
-module.exports = { denied, modelOf, safeDir, decodeText, volumes, findSenderDirs, findJetiDirs, listCsv, listJeti, syncDir, archiveFile, writePolars, listArchive, defaultArchive, SyncWatcher };
+module.exports = { denied, modelOf, safeDir, decodeText, volumes, findSenderDirs, findJetiDirs, listCsv, listJeti, syncDir, archiveFile, writePolars, readScripts, writeScript, listArchive, defaultArchive, SyncWatcher };

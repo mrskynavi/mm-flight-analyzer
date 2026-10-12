@@ -5,6 +5,7 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Barlow:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
 <script>try{ const t=localStorage.getItem('ethoslv.theme'); if (t==='light'||t==='dark') document.documentElement.dataset.theme=t; }catch(e){}</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fengari-web@0.1.4/dist/fengari-web.js"></script>
 <style>
 /* Layout: Kopfzeile mit Datei-Ablage, Kennzahl-Leiste, Kanal-Chips, gestapelte Diagramme mit gemeinsamer Zeitachse, Statistik-Tabelle */
 :root{
@@ -353,6 +354,56 @@ td.mut{color:var(--muted)}
 .det.heatmode .trk{display:none} .det.heatmode .dscale.heat{display:flex} .det.heatmode p.heat{display:block}
 .dmore summary{cursor:pointer;font-size:.82rem;color:var(--muted)}
 .dmore p{margin-top:6px}
+/* Simulator: links Widget-Wahl und Ethos-Konfiguration, rechts Senderbildschirm, Wiedergabe, Werkzeuge */
+:root{--e-bezel:#0a0d11;--e-bar:#11161d;--e-bg:#1c232c;--e-row:#232c37;--e-rowalt:#28323e;--e-fg:#e6eaf0;--e-muted:#8d99a6;--e-focus:#2f7fd8;--e-line:#36414e;--sim-therm:rgba(31,122,77,.18)}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--sim-therm:rgba(76,195,138,.18)}}
+:root[data-theme="dark"]{--sim-therm:rgba(76,195,138,.18)}
+.simgrid{display:grid;grid-template-columns:minmax(0,340px) minmax(0,1fr);gap:14px;align-items:start}
+@media (max-width:900px){.simgrid{grid-template-columns:minmax(0,1fr)}}
+.simside,.simmain{display:grid;gap:12px;min-width:0}
+.simfl{display:grid;gap:3px;font-size:.82rem;color:var(--muted)}
+.simfl select{font:inherit;color:var(--fg);background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:5px 8px;min-width:0}
+.simrow{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.eform{background:var(--e-bg);border-radius:8px;overflow:hidden;font:15px/1.2 Roboto,"Segoe UI",Arial,sans-serif;color:var(--e-fg);border:1px solid var(--e-line)}
+.eform .ehead{background:var(--e-bar);padding:8px 12px;font-weight:700;display:flex;justify-content:space-between;gap:8px}
+.eform .ehead span+span{color:var(--e-muted);font-weight:400;font-size:.85em}
+.erow{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,150px);align-items:center;gap:8px;padding:7px 12px;background:var(--e-row);border-top:1px solid var(--e-bg)}
+.erow:nth-child(odd){background:var(--e-rowalt)}
+.erow.off{opacity:.45}
+.erow .el{min-width:0;overflow-wrap:anywhere}
+.erow .es{color:var(--e-muted);font-size:13px;overflow-wrap:anywhere}
+.erow select,.erow input{background:var(--e-bg);color:var(--e-fg);border:1px solid var(--e-line);border-radius:4px;padding:4px 6px;width:100%;font:14px Roboto,"Segoe UI",Arial,sans-serif}
+.erow select:focus,.erow input:focus{border-color:var(--e-focus);outline:none;box-shadow:0 0 0 2px var(--e-focus)}
+.etog{justify-self:end;width:46px;height:24px;border-radius:12px;background:var(--e-line);border:0;position:relative;cursor:pointer}
+.etog::after{content:"";position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:var(--e-fg);transition:left .15s}
+.etog[aria-checked="true"]{background:var(--e-focus)} .etog[aria-checked="true"]::after{left:25px}
+.enum{display:flex;align-items:center;gap:4px} .enum span{color:var(--e-muted);font-size:13px;white-space:nowrap}
+.eempty{padding:14px 12px;color:var(--e-muted);font-size:14px}
+.simtx{background:var(--e-bezel);border-radius:18px;padding:14px;justify-self:center;max-width:100%}
+.simtxbar{display:flex;justify-content:space-between;gap:10px;font:500 13px Roboto,"Segoe UI",Arial,sans-serif;color:var(--e-muted);padding:0 4px 8px}
+.simtxbar b{color:var(--e-fg)}
+#simScr{display:block;background:var(--e-bg);border-radius:4px;max-width:100%;height:auto;cursor:pointer}
+.simerr{border:1px solid var(--bad);color:var(--bad);border-radius:8px;padding:8px 12px;font:.8rem/1.45 var(--mono);white-space:pre-wrap;overflow-wrap:anywhere}
+#simTl{width:100%;height:64px;display:block;cursor:pointer;border-radius:6px;background:var(--bg);touch-action:none}
+.simctl{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center}
+.simctl .btn{min-width:6em}
+.simclock{font:500 .95rem var(--mono);font-variant-numeric:tabular-nums;min-width:12ch}
+.simseg{display:inline-flex;border:1px solid var(--line);border-radius:6px;overflow:hidden}
+.simseg button{border:0;background:none;padding:4px 8px;font:500 .8rem var(--mono);cursor:pointer;color:var(--muted)}
+.simseg button[aria-pressed="true"]{background:var(--accent);color:#fff}
+.simgoto{display:flex;gap:4px;align-items:center} .simgoto input{width:6.5em;font:.85rem var(--mono);color:var(--fg);background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:4px 6px}
+.simchk{display:flex;gap:6px;align-items:center;font-size:.84rem;color:var(--muted)}
+.simprog{font-size:.82rem;color:var(--accent)}
+.simtabs{display:flex;gap:4px;flex-wrap:wrap}
+.simtabs button{border:1px solid var(--line);background:none;border-radius:999px;padding:3px 12px;font:500 .84rem var(--body);cursor:pointer;color:var(--muted)}
+.simtabs button[aria-selected="true"]{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
+.simlog{font:.8rem/1.5 var(--mono);max-height:240px;overflow:auto;background:var(--bg);border-radius:6px;padding:8px 10px;min-height:80px}
+.simlog div{white-space:pre-wrap;overflow-wrap:anywhere} .simlog .t{color:var(--muted)}
+.simlog .ansage{color:var(--accent)} .simlog .hinweis{color:var(--warn)} .simlog .fehler{color:var(--bad)}
+.simstack{display:grid;gap:8px}
+.simcode{width:100%;min-height:340px;font:.8rem/1.5 var(--mono);color:var(--fg);border:1px solid var(--line);border-radius:6px;padding:8px 10px;background:var(--bg);tab-size:2;resize:vertical}
+.simcode.short{min-height:160px}
+@media (prefers-reduced-motion:reduce){.etog::after{transition:none}}
 </style>
 
 <style>
@@ -705,6 +756,7 @@ pre.code{background:var(--bg);border:1px solid var(--line);border-radius:8px;pad
     <button type="button" role="tab" class="tab" data-tab="karte" id="tab-karte" aria-controls="pane-karte">Karte &amp; Wind</button>
     <button type="button" role="tab" class="tab" data-tab="werte" id="tab-werte" aria-controls="pane-werte">Alle Werte</button>
     <button type="button" role="tab" class="tab" data-tab="rohdaten" id="tab-rohdaten" aria-controls="pane-rohdaten">Rohdaten</button>
+    <button type="button" role="tab" class="tab" data-tab="simulator" id="tab-simulator" aria-controls="pane-simulator">Simulator</button>
   </nav>
   <button type="button" class="kibtn" id="kiOpen" hidden aria-expanded="false" aria-controls="kiPanel" aria-label="KI-Auswertung" title="KI-Auswertung"><span class="spark">✦</span> <span class="lbl">KI-Auswertung</span></button>
   </div>
@@ -935,6 +987,86 @@ pre.code{background:var(--bg);border:1px solid var(--line);border-radius:8px;pad
     <div class="rawwrap" id="rawwrap"><table id="rawtable"><thead></thead><tbody></tbody></table></div>
   </section>
   </div>
+  <div class="pane" role="tabpanel" id="pane-simulator" data-tab="simulator" aria-labelledby="tab-simulator" hidden>
+  <div class="simgrid">
+    <section class="simside">
+      <h2 class="hi">Simulator <button type="button" class="iconbtn sm" data-info="info-sim" aria-expanded="false" aria-controls="info-sim" aria-label="So funktioniert es">i</button></h2>
+      <div class="infopop" id="info-sim" hidden>
+        <p>Der Simulator führt Deine Ethos-Widgets aus, genau die Lua-Datei main.lua, die auf dem Sender liegt, und spielt dazu das gewählte Log ab. So testest Du ein Widget am Schreibtisch und überträgst die Erkenntnisse direkt ins Lua.</p>
+        <p>Nachgebaut sind lcd, system, form, model, storage, io und loadfile. <code>wakeup</code> läuft alle 50 ms in Logzeit, <code>os.clock()</code> läuft mit dem Log. Die Werte kommen genau so, wie sie im Log stehen; Schalter liefern −1024 / 0 / 1024 wie am Sender, GPS die Position als lat/lon.</p>
+        <p>Klick auf den Bildschirm = Touch, Mausrad = Drehgeber. <code>playTone</code> und <code>playNumber</code> sind bis 2× Tempo hörbar. Eine Änderung in der Konfiguration gilt sofort, das Log läuft weiter. Beim Zurückspringen startet das Widget neu und rechnet bis zur Stelle nach.</p>
+        <p>Noch nicht nachgebaut: Bilder (lcd.loadBitmap), weitere Tasten, Telemetrie senden. Schriften und Bildschirmgrössen sind angenähert.</p>
+      </div>
+      <label class="simfl">Widget<select id="simSel"></select></label>
+      <div class="simrow">
+        <button type="button" class="zb" id="simDirBtn">scripts-Ordner wählen …</button>
+        <input type="file" id="simDirIn" webkitdirectory multiple hidden>
+        <button type="button" class="zb" id="simSenderBtn" hidden>Sender verwenden</button>
+      </div>
+      <p class="hint" id="simDirInfo"></p>
+      <label class="simfl">Bildschirm
+        <select id="simSize">
+          <option value="784x316">X20 · ganzer Bildschirm (784 × 316)</option>
+          <option value="388x316">X20 · halber Bildschirm (388 × 316)</option>
+          <option value="388x154">X20 · Viertel (388 × 154)</option>
+          <option value="256x100">X20 · Sechstel (256 × 100)</option>
+          <option value="472x208">X18 · ganzer Bildschirm (472 × 208)</option>
+          <option value="234x208">X18 · halber Bildschirm (234 × 208)</option>
+        </select></label>
+      <div class="eform" aria-label="Widget-Konfiguration wie in Ethos">
+        <div class="ehead"><span id="simTitle">Widget</span><span>Konfigurieren</span></div>
+        <div id="simRows"></div>
+      </div>
+    </section>
+    <div class="simmain">
+      <section>
+        <p class="hint" id="simNoLog" hidden>Der Simulator braucht ein Ethos-Log (CSV). Wähle oben ein Log aus.</p>
+        <div class="simtx">
+          <div class="simtxbar"><b id="simModel">–</b><span id="simClock">--:--:--</span><span>Simulator</span></div>
+          <canvas id="simScr" width="784" height="316" aria-label="Widget wie auf dem Sender. Klick = Touch, Mausrad = Drehgeber."></canvas>
+        </div>
+        <div id="simErr" class="simerr" hidden></div>
+        <canvas id="simTl" aria-label="Zeitstrahl: Höhe, grün = Thermik. Klicken springt an die Stelle."></canvas>
+        <div class="simctl">
+          <button type="button" class="zb" id="simStart" title="An den Anfang">⏮</button>
+          <button type="button" class="zb" id="simBack" title="10 s zurück">−10 s</button>
+          <button type="button" class="btn" id="simPlay">▶ Abspielen</button>
+          <button type="button" class="zb" id="simFwd" title="10 s vor">+10 s</button>
+          <span class="simclock" id="simTime">00:00 / 00:00</span>
+          <span class="simseg" id="simSpeed" role="group" aria-label="Tempo"></span>
+        </div>
+        <div class="simctl">
+          <form class="simgoto" id="simGoto"><label for="simGotoIn" class="hint">Springen zu</label><input id="simGotoIn" type="text" inputmode="numeric" placeholder="mm:ss"><button class="zb" type="submit">Los</button></form>
+          <button type="button" class="zb" id="simCur" title="Zeitpunkt aus den Diagrammen übernehmen">Zum Zeitpunkt</button>
+          <label class="simchk"><input type="checkbox" id="simReplay" checked> Beim Springen ab Start nachrechnen</label>
+          <label class="simchk"><input type="checkbox" id="simSnd" checked> Ton und Ansagen hörbar (bis 2×)</label>
+          <span class="simprog" id="simProg" hidden></span>
+        </div>
+      </section>
+      <section>
+        <div class="simtabs" role="tablist">
+          <button type="button" role="tab" aria-selected="true" data-t="simOut">Ausgabe</button>
+          <button type="button" role="tab" aria-selected="false" data-t="simSrc">Quellen</button>
+          <button type="button" role="tab" aria-selected="false" data-t="simCode">Code</button>
+          <button type="button" role="tab" aria-selected="false" data-t="simSd">SD-Karte</button>
+        </div>
+        <div id="simOut"><div id="simLog" class="simlog" aria-live="polite"></div></div>
+        <div id="simSrc" hidden><div class="tablewrap"><table><thead><tr><th>Quelle, die das Widget liest</th><th style="text-align:right">Wert jetzt</th></tr></thead><tbody id="simSrcBody"></tbody></table></div></div>
+        <div id="simCode" hidden class="simstack">
+          <p class="hint">main.lua des Widgets. Ändern, dann Übernehmen: Das Widget startet neu und spielt bis zur aktuellen Stelle nach.</p>
+          <textarea class="simcode" id="simCodeTxt" spellcheck="false" aria-label="Lua-Code des Widgets"></textarea>
+          <div class="simrow"><button type="button" class="btn" id="simApply">Übernehmen</button><button type="button" class="zb" id="simSave" hidden>In den scripts-Ordner speichern</button><button type="button" class="zb" id="simCopy">Code kopieren</button><button type="button" class="zb" id="simOrig">Original laden</button><span class="hint" id="simCodeMsg"></span></div>
+        </div>
+        <div id="simSd" hidden class="simstack">
+          <p class="hint">Dateien im scripts-Ordner. Das Widget findet sie mit loadfile, io.open oder require, z. B. /scripts/maccready/polaren.lua oder relativ zu seinem Ordner. Fehlt polaren.lua, nimmt der Simulator die Polaren aus dem Tab Polare.</p>
+          <label class="simfl">Datei<select id="simSdSel"></select></label>
+          <textarea class="simcode short" id="simSdTxt" spellcheck="false" aria-label="Dateiinhalt"></textarea>
+          <div class="simrow"><button type="button" class="zb" id="simSdSave">Übernehmen und Widget neu starten</button></div>
+        </div>
+      </section>
+    </div>
+  </div>
+  </div>
 </div>
 
 <aside class="kipanel" id="kiPanel" aria-label="KI-Auswertung" hidden>
@@ -944,6 +1076,2139 @@ pre.code{background:var(--bg);border:1px solid var(--line);border-radius:8px;pad
   <div class="dfoot" id="kiFoot"></div>
 </aside>
 <div class="toast" id="toast" role="status" hidden></div>
+
+<!-- Simulator: Ethos-Nachbau in Lua und Beispiel-Widgets -->
+<script type="text/plain" id="simShim">-- Ethos-Nachbau für den Simulator. JS liefert nur einfache Funktionen (__lcd, __val, ...);
+-- alles, was ein Widget sieht (lcd, system, form, model, storage, io), entsteht hier in Lua.
+local J = {tone=__tone, lcd=__lcd, val=__val, unit=__unit, setval=__setval, log=__log, fs_get=__fs_get, fs_put=__fs_put,
+           clock=__clock, epoch=__epoch, tw=__tw, th=__th, info=__info}
+
+-- Konstanten wie in Ethos (Werte frei gewählt, Widgets nutzen nur die Namen)
+FONT_XXS, FONT_XS, FONT_S, FONT_STD, FONT_L, FONT_XL, FONT_XXL = 1, 2, 3, 4, 5, 6, 7
+FONT_S_BOLD, FONT_STD_BOLD, FONT_L_BOLD, FONT_XL_BOLD, FONT_XXL_BOLD = 13, 14, 15, 16, 17
+FONT_BOLD = FONT_STD_BOLD
+LEFT, CENTERED, RIGHT = 0, 1, 2
+TEXT_LEFT, TEXT_CENTERED, TEXT_RIGHT = 0, 1, 2
+SOLID, DOTTED = 0, 1
+CATEGORY_NONE, CATEGORY_ANALOG, CATEGORY_SWITCH_POSITION, CATEGORY_LOGIC_SWITCH, CATEGORY_TELEMETRY, CATEGORY_TELEMETRY_SENSOR, CATEGORY_CHANNEL = 0, 1, 2, 3, 4, 5, 6
+WHITE, BLACK, RED, GREEN, BLUE, YELLOW, GREY, ORANGE = 0xFFFFFF, 0, 0xFF0000, 0x00C000, 0x0060FF, 0xFFE000, 0x808080, 0xFF8000
+THEME_DEFAULT_COLOR, THEME_DEFAULT_BGCOLOR, THEME_FOCUS_COLOR, THEME_FOCUS_BGCOLOR = 0xE6EAF0, 0x1B232E, 0xFFFFFF, 0x0B6BCB
+EVT_KEY, EVT_TOUCH = 1, 2
+TOUCH_START, TOUCH_MOVE, TOUCH_END = 16, 17, 18
+KEY_ROTARY_LEFT, KEY_ROTARY_RIGHT, KEY_ENTER_FIRST, KEY_ENTER_BREAK, KEY_EXIT_BREAK = 100, 101, 102, 103, 104
+UNIT_RAW, UNIT_VOLT, UNIT_AMPERE, UNIT_METER, UNIT_KPH, UNIT_METER_PER_SECOND, UNIT_PERCENT, UNIT_DEGREE = 0, 1, 2, 3, 4, 5, 6, 7
+
+local warned = {}
+local function nachbauFehlt(name)
+  return function() if not warned[name] then warned[name] = true; J.log("hinweis", name .. " ist im Simulator noch nicht nachgebaut") end end
+end
+local function stubTable(prefix, t)
+  return setmetatable(t, {__index = function(_, k) return nachbauFehlt(prefix .. "." .. k) end})
+end
+
+-- lcd ---------------------------------------------------------------------------------------
+lcd = stubTable("lcd", {
+  RGB = function(r, g, b) return math.floor(r) * 65536 + math.floor(g) * 256 + math.floor(b) end,
+  color = function(c) J.lcd("color", c) end,
+  font = function(f) J.lcd("font", f) end,
+  pen = function(p) J.lcd("pen", p) end,
+  drawText = function(x, y, s, flags) J.lcd("text", x, y, tostring(s), flags or 0) end,
+  drawNumber = function(x, y, v, unit, dec, flags)
+    J.lcd("text", x, y, string.format("%." .. (dec or 0) .. "f", v or 0), flags or 0)
+  end,
+  drawLine = function(x1, y1, x2, y2) J.lcd("line", x1, y1, x2, y2) end,
+  drawPoint = function(x, y) J.lcd("rect", x, y, 1, 1) end,
+  drawRectangle = function(x, y, w, h, t) J.lcd("frame", x, y, w, h, t or 1) end,
+  drawFilledRectangle = function(x, y, w, h) J.lcd("rect", x, y, w, h) end,
+  drawCircle = function(x, y, r) J.lcd("circle", x, y, r, 0) end,
+  drawFilledCircle = function(x, y, r) J.lcd("circle", x, y, r, 1) end,
+  drawFilledTriangle = function(x1, y1, x2, y2, x3, y3) J.lcd("tri", x1, y1, x2, y2, x3, y3) end,
+  getTextSize = function(s) return J.tw(tostring(s)), J.th() end,
+  getWindowSize = function() return J.info("w"), J.info("h") end,
+  invalidate = function() J.lcd("invalidate") end,
+  darkMode = function() return true end,
+  themeColor = function(c) return c end,
+  loadBitmap = function(p) nachbauFehlt("lcd.loadBitmap")(); return {} end,
+  loadMask = function(p) nachbauFehlt("lcd.loadMask")(); return {} end,
+  drawBitmap = nachbauFehlt("lcd.drawBitmap"),
+  drawMask = nachbauFehlt("lcd.drawMask"),
+})
+
+-- Quellen -----------------------------------------------------------------------------------
+local Src = {}
+Src.__index = {
+  value = function(s, v)
+    if v ~= nil and type(v) ~= "table" then J.setval(s._n, v) return end
+    local x = J.val(s._n)
+    if type(x) == "string" then             -- GPS steht im Log als "lat lon"
+      local la, lo = x:match("^%s*(-?[%d%.]+)%s+(-?[%d%.]+)%s*$")
+      if la then return {lat = tonumber(la), lon = tonumber(lo)} end
+    end
+    return x
+  end,
+  minimum = function(s) return -1024 end,
+  maximum = function(s) return 1024 end,
+  stringValue = function(s)
+    local v = J.val(s._n); if v == nil then return "---" end
+    if type(v) == "number" then return string.format("%.1f", v) .. (J.unit(s._n) or "") end
+    return tostring(v)
+  end,
+  name = function(s) return s._n end,
+  unit = function(s) return J.unit(s._n) end,
+  decimals = function(s) return 1 end,
+  state = function(s) local v = J.val(s._n); return type(v) == "number" and v > 0 end,
+  category = function(s) return CATEGORY_TELEMETRY end,
+  member = function(s) return 0 end,
+}
+Src.__tostring = function(s) return s._n end
+Src.__eq = function(a, b) return a._n == b._n end
+function __src(name) if not name or name == "" then return nil end return setmetatable({_n = name}, Src) end
+
+-- system ------------------------------------------------------------------------------------
+local widgetDefs, sourceDefs = {}, {}
+system = stubTable("system", {
+  registerWidget = function(d) table.insert(widgetDefs, d) end,
+  registerSource = function(d)
+    d.__s = __src(tostring(d.name or d.key)); table.insert(sourceDefs, d)
+    if d.init then pcall(d.init, d.__s) end
+    J.log("hinweis", "Quelle " .. tostring(d.name or d.key) .. " registriert")
+  end,
+  registerTask = nachbauFehlt("system.registerTask"),
+  getSource = function(x)
+    if type(x) == "table" then x = x.name or x.member end
+    if type(x) == "string" and J.unit(x) == nil and J.val(x) == nil and not J.info("has:" .. x) then return nil end
+    return __src(x)
+  end,
+  getLocale = function() return "de" end,
+  getVersion = function() return {board = "X20S", version = "1.6.0", major = 1, minor = 6, revision = 0, simulation = true} end,
+  getTime = function() return J.clock() end,
+  playNumber = function(v, unit, dec) J.log("ansage", string.format("%." .. (dec or 0) .. "f", v or 0), unit or 0) end,
+  playFile = function(f) J.log("ansage", "Datei " .. tostring(f)) end,
+  playTone = function(f, d) J.tone(f or 0, d or 100) end,
+  playHaptic = function() J.log("ansage", "Vibration") end,
+  getAudioVoice = function() return "AUDIO:/de" end,
+})
+model = stubTable("model", {name = function() return J.info("model") end})
+
+-- os: Zeit läuft mit dem Log, nicht mit der Uhr des Rechners
+os.clock = function() return J.clock() end
+os.time = function(t) if t then return 0 end return math.floor(J.epoch()) end
+os.getenv, os.execute, os.remove, os.rename = nil, nil, nil, nil
+
+-- storage: pro Widget, Quellen als Name gemerkt
+__store = {}
+storage = {
+  read = function(k) local v = __store[k]; if type(v) == "table" and v.src then return __src(v.src) end return v end,
+  write = function(k, v) if getmetatable(v) == Src then v = {src = v._n} end __store[k] = v end,
+}
+
+-- Dateien: kleines virtuelles SD-Laufwerk (z. B. polaren.lua neben main.lua)
+local realLoad = load
+loadfile = function(p, mode, env)
+  local t = J.fs_get(p); if not t then return nil, p .. ": Datei fehlt" end
+  if env then return realLoad(t, "@" .. p, mode or "t", env) end
+  return realLoad(t, "@" .. p, mode or "t")
+end
+local loaded = {}
+require = function(name)
+  if loaded[name] ~= nil then return loaded[name] end
+  local f, err = loadfile((name:gsub("%.", "/")) .. ".lua")
+  if not f then error("require " .. name .. ": " .. tostring(err), 2) end
+  local r = f(name); loaded[name] = (r == nil) and true or r; return loaded[name]
+end
+dofile = function(p) local f = assert(loadfile(p)); return f() end
+io = {
+  open = function(p, mode)
+    mode = mode or "r"
+    if mode:sub(1, 1) == "r" then
+      local t = J.fs_get(p); if not t then return nil, p .. ": Datei fehlt" end
+      local pos = 1
+      local f = {}
+      function f:read(fmt)
+        fmt = fmt or "l"
+        if fmt == "*a" or fmt == "a" then local r = t:sub(pos); pos = #t + 1; return r end
+        if pos > #t then return nil end
+        local e = t:find("\n", pos, true) or (#t + 1)
+        local r = t:sub(pos, e - 1):gsub("\r$", ""); pos = e + 1; return r
+      end
+      function f:lines() return function() return f:read("l") end end
+      function f:close() end
+      return f
+    else
+      local buf = mode:sub(1, 1) == "a" and (J.fs_get(p) or "") or ""
+      local f = {}
+      function f:write(...) for _, s in ipairs({...}) do buf = buf .. tostring(s) end return f end
+      function f:close() J.fs_put(p, buf) end
+      return f
+    end
+  end,
+}
+print = function(...) local t = {} for i, v in ipairs({...}) do t[i] = tostring(v) end J.log("print", table.concat(t, "\t")) end
+
+-- form: Felder werden gesammelt, die Simulator-Seite zeichnet sie wie die Ethos-Konfiguration
+__fields, __lines = {}, {}
+local Field = {}
+Field.__index = {
+  enable = function(f, b) f.enabled = (b ~= false) end,
+  value = function(f, v) if v ~= nil and f.set then f.set(v) end return f.get and f.get() end,
+  decimals = function(f, d) f.dec = d end,
+  suffix = function(f, s) f.suf = s end,
+  step = function(f, s) f.stp = s end,
+  default = function(f, d) f.def = d end,
+  minimum = function(f, m) f.min = m end,
+  maximum = function(f, m) f.max = m end,
+  focus = function() end,
+  help = function() end,
+}
+local function addField(kind, line, get, set, extra)
+  local f = setmetatable({kind = kind, line = line, get = get, set = set, enabled = true}, Field)
+  for k, v in pairs(extra or {}) do f[k] = v end
+  table.insert(__fields, f); return f
+end
+form = stubTable("form", {
+  clear = function() __fields, __lines = {}, {} end,
+  addLine = function(label) table.insert(__lines, tostring(label)); return #__lines end,
+  getFieldSlots = function(line, t) return {[0] = 0, 1, 2, 3} end,
+  addBooleanField = function(l, s, g, st) return addField("bool", l, g, st) end,
+  addSwitchField = function(l, s, g, st) return addField("switch", l, g, st) end,
+  addSourceField = function(l, s, g, st) return addField("source", l, g, st) end,
+  addNumberField = function(l, s, mn, mx, g, st) return addField("number", l, g, st, {min = mn, max = mx, dec = 0}) end,
+  addChoiceField = function(l, s, ch, g, st) return addField("choice", l, g, st, {choices = ch}) end,
+  addTextField = function(l, s, g, st) return addField("text", l, g, st) end,
+  addStaticText = function(l, s, t) return addField("static", l, function() return t end, nil) end,
+  addTextButton = function(l, s, t, press) return addField("button", l, function() return t end, press) end,
+  addColorField = function(l, s, g, st) return addField("color", l, g, st) end,
+})
+
+-- Aufrufe aus JS ----------------------------------------------------------------------------
+local W, D
+local function guard(fn, ...) local ok, err = xpcall(fn, debug.traceback, ...) if not ok then return tostring(err) end end
+
+function __init(code)
+  local chunk, err = load(code, "@main.lua"); if not chunk then return err end
+  local e = guard(function()
+    local m = chunk()
+    if type(m) == "table" and m.init then m.init() end
+  end)
+  if e then return e end
+  D = widgetDefs[1]
+  if not D then return "Das Skript registriert kein Widget (system.registerWidget fehlt)" end
+end
+function __widgetName() return D and (D.name or D.key) or "" end
+function __create() return guard(function() W = D.create and D.create() or {} end) end
+function __read() if D.read then return guard(D.read, W) end end
+function __write() if D.write then return guard(D.write, W) end end
+function __wakeup()
+  local e
+  for _, s in ipairs(sourceDefs) do if s.wakeup then e = e or guard(s.wakeup, s.__s) end end
+  if D.wakeup then e = e or guard(D.wakeup, W) end
+  return e
+end
+function __event(cat, val, x, y)
+  if D.event then local res; local e = guard(function() res = D.event(W, cat, val, x, y) end); return e end
+end
+function __paint() if D.paint then return guard(D.paint, W) end end
+function __configure()
+  __fields, __lines = {}, {}
+  if not D.configure then return nil end
+  return guard(D.configure, W)
+end
+-- Felder als Text: i | Art | Zeile | Wert | aktiv | Zusatz
+local function fmt(v) if getmetatable(v) == Src then return v._n end if v == nil then return "" end return tostring(v) end
+function __formList()
+  local out = {}
+  for i, f in ipairs(__fields) do
+    local ok, v = pcall(f.get or function() end)
+    local extra = ""
+    if f.kind == "choice" then
+      local t = {} for _, c in ipairs(f.choices or {}) do t[#t + 1] = tostring(c[1]) .. "=" .. tostring(c[2]) end
+      extra = table.concat(t, ";")
+    elseif f.kind == "number" then
+      extra = tostring(f.min) .. ";" .. tostring(f.max) .. ";" .. tostring(f.dec or 0) .. ";" .. tostring(f.suf or "")
+    end
+    out[#out + 1] = table.concat({i, f.kind, __lines[f.line] or "", ok and fmt(v) or "", f.enabled and 1 or 0, extra}, "\31")
+  end
+  return table.concat(out, "\30")
+end
+function __formSet(i, v)
+  local f = __fields[i]; if not f or not f.set then return end
+  local val
+  if f.kind == "bool" then val = (v == "1")
+  elseif f.kind == "number" or f.kind == "choice" then val = tonumber(v)
+  elseif f.kind == "source" or f.kind == "switch" then val = __src(v)
+  elseif f.kind == "button" then return guard(f.set)
+  else val = v end
+  return guard(f.set, val)
+end
+function __storeDump()
+  local out = {}
+  for k, v in pairs(__store) do
+    local t, s = type(v), nil
+    if t == "table" and v.src then s = "s" .. v.src elseif t == "boolean" then s = v and "b1" or "b0"
+    elseif t == "number" then s = "n" .. tostring(v) elseif t == "string" then s = "t" .. v end
+    if s then out[#out + 1] = k .. "\31" .. s end
+  end
+  return table.concat(out, "\30")
+end
+function __storeLoad(txt)
+  __store = {}
+  for item in (txt or ""):gmatch("[^\30]+") do
+    local k, s = item:match("^(.-)\31(.*)$")
+    if k then
+      local c, r = s:sub(1, 1), s:sub(2)
+      if c == "s" then __store[k] = {src = r} elseif c == "b" then __store[k] = (r == "1")
+      elseif c == "n" then __store[k] = tonumber(r) else __store[k] = r end
+    end
+  end
+end
+</script>
+<script type="text/plain" id="simW_sollf">-- Sollfahrt (MacCready Speed-to-Fly) fuer Ethos -- Vollbild-Widget mit Tonausgabe.
+--
+-- Das Widget arbeitet nur zusammen mit dem MM Flight Analyzer: Die App schreibt die Polaren
+-- auf den Sender (scripts/maccready/polaren.lua). Polarendaten werden hier NICHT eingegeben.
+-- Fehlt die Polare fuer das aktive Modell, zeigt die Konfiguration nur diesen Status (erste
+-- Zeile) und das Widget nur die Meldung "Polare fehlt".
+--
+-- Sensoren (nur diese zwei gehoeren in die Konfiguration)
+--   GPS        Position -> Grundgeschwindigkeit und Kurs (aus den Positionsaenderungen)
+--   Vario      kompensiert (TE) oder rein barometrisch. Barometrisch: das Widget addiert die
+--              Energiekompensation selbst:  TE = Vario + Faktor * (v/g) * dv/dt
+--              (Faktor in %, Vario-Zeitkonstante gleicht die Traegheit des Varios an)
+--
+-- Wind (automatisch, kein Sensor noetig)
+--   Kreisfit (Kasa) ueber die GPS-Geschwindigkeitsvektoren der letzten ~28 s: Kreismittelpunkt =
+--   Windvektor, Radius = Fluggeschwindigkeit (TAS). Erst nach Kreisen/Kurven verfuegbar, der letzte
+--   gute Wert bleibt danach 15 min erhalten. Die Fluggeschwindigkeit fuer Polare und Netto ist
+--   |Grundgeschwindigkeit - Wind|. Der GPS-Kurs gilt als Richtung zum Ziel: Gegenwindkomponente h.
+--
+-- Rechnung
+--   Polare:  Sinken w(v) = A*v^2 + B*v + C
+--   Netto:   Luftmassenbewegung = TE + Sinken(TAS)   (positiv = Luft steigt), geglaettet
+--   Sollfahrt:  v = h + sqrt( h^2 + (C + MC - Netto + B*h) / A )      (h = Gegenwind m/s)
+--   Abweichung = geglaettete Ist-Fahrt - Sollfahrt (km/h), positiv = zu schnell.
+--
+-- Glaettung (gegen die Phygoide): Fahrt, Netto, Vario; Totzone; Ton-Verzoegerung.
+-- Ton (system.playTone): wie beim Vario zeigt die Tonhoehe die Richtung, die Taktfolge die
+-- Groesse der Abweichung. Modus: Schalter (an = Gleiten) oder Automatik.
+-- MC: Poti/Schieber (hat Vorrang), MC+/MC- Schalter oder +/- auf dem Touchscreen. Eine Aenderung
+-- wird nach 1.2 s Ruhe per Sprachausgabe angesagt (Fehler werden im Widget angezeigt).
+--
+-- Alle Zahlenfelder sind ganzzahlig: MC in 0.1 m/s, Zeiten in s bzw. 0.1 s.
+
+local KMH = 3.6
+local G = 9.81
+local STORE_VER = 4
+
+-- ---------------------------------------------------------------- Einstellungen
+
+local SOURCE_KEYS = {"gps", "vario", "mcSrc", "mcUp", "mcDn", "modeSw", "soundSw"}
+
+-- Reihenfolge nur am Ende erweitern: Ethos-Storage arbeitet nach Aufrufreihenfolge.
+local NUM_DEFS = {
+  {key = "varioType",  def = 1},    -- 1 = kompensiert (TE), 2 = barometrisch
+  {key = "teFactor",   def = 100},  -- barometrisch: Kompensation in %
+  {key = "varioTau",   def = 10},   -- barometrisch: Vario-Zeitkonstante in 0.1 s
+  {key = "ballast",    def = 100},  -- Fluggewicht in % des Polaren-Gewichts
+  {key = "bugs",       def = 0},    -- Verschmutzung: Zuschlag aufs Sinken in %
+  {key = "mc",         def = 10},   -- aktueller MC in 0.1 m/s
+  {key = "mcMax",      def = 30},   -- Poti-Bereich 0..mcMax in 0.1 m/s
+  {key = "mcStep",     def = 5},    -- Schrittweite Schalter/Touch in 0.1 m/s
+  {key = "smoothSpd",  def = 8},    -- Fahrt-Glaettung s
+  {key = "smoothNet",  def = 8},    -- Netto-Glaettung s
+  {key = "smoothVar",  def = 2},    -- Vario-Glaettung s
+  {key = "dead",       def = 3},    -- Totzone +-km/h
+  {key = "delay",      def = 20},   -- Ton-Verzoegerung in 0.1 s
+  {key = "climbThr",   def = 5},    -- Steigen-Schwelle Automatik in 0.1 m/s
+  {key = "minSpeed",   def = 15},   -- darunter keine Auswertung (km/h)
+  {key = "announceMode", def = 2}, -- 1 = Sprache, 2 = Sprache + Quittungston, 3 = nur Quittungston
+  {key = "toneLogic",  def = 2},    -- 1 = schneller fliegen = hoeher, 2 = bremsen = hoeher
+}
+local BOOL_DEFS = {
+  {key = "demo",     def = false},
+  {key = "tone",     def = true},
+  {key = "announce", def = true},   -- MC per Sprachausgabe ansagen
+}
+
+-- Moegliche Orte der Polaren-Datei (erster Treffer gewinnt).
+local POLAR_PATHS = {
+  "/scripts/maccready/polaren.lua",
+  "scripts/maccready/polaren.lua",
+  "../maccready/polaren.lua",
+  "polaren.lua",
+}
+
+-- ---------------------------------------------------------------- Rechenkern
+
+local function clamp(x, lo, hi)
+  if x < lo then return lo end
+  if x > hi then return hi end
+  return x
+end
+
+-- Exponentielles Tiefpassfilter mit Zeitschritt dt und Zeitkonstante tau (s).
+local function lpf(prev, x, dt, tau)
+  if prev == nil then return x end
+  if tau <= 0.05 then return x end
+  return prev + (1 - math.exp(-dt / tau)) * (x - prev)
+end
+
+-- Polare aus Koeffizienten: Sinken (m/s, positiv) = A*v^2 + B*v + C, v in m/s.
+-- vMin/vMax = gueltiger Fahrtbereich (m/s); die Sollfahrt wird darauf begrenzt.
+local function makePolar(A, B, C, vMin, vMax)
+  if type(A) ~= "number" or type(B) ~= "number" or type(C) ~= "number" then return nil end
+  if A <= 1e-9 or C <= 0 then return nil end
+  vMin = (type(vMin) == "number" and vMin > 0) and vMin or 1
+  vMax = (type(vMax) == "number" and vMax > vMin) and vMax or (vMin * 3)
+  local vms = -B / (2 * A)                       -- Fahrt des geringsten Sinkens
+  local lo = math.min(math.max(vms, vMin), vMax)  -- niedrigste Sollfahrt
+  return {A = A, B = B, C = C, vms = (vms > 0) and vms or vMin, lo = lo, vmin = vMin, vmax = vMax}
+end
+
+-- Quadratische Polare durch 3 Punkte (v in m/s, w = Sinken positiv in m/s).
+local function buildPolar(vs, ws, k, bugs)
+  local s = math.sqrt(math.max(k, 0.1))
+  local v1, v2, v3 = vs[1] * s, vs[2] * s, vs[3] * s
+  local w1, w2, w3 = ws[1] * s * (1 + bugs), ws[2] * s * (1 + bugs), ws[3] * s * (1 + bugs)
+  if v1 >= v2 or v2 >= v3 then return nil end
+  local f12 = (w2 - w1) / (v2 - v1)
+  local f23 = (w3 - w2) / (v3 - v2)
+  local A = (f23 - f12) / (v3 - v1)
+  if A <= 1e-6 then return nil end
+  local B = f12 - A * (v1 + v2)
+  local C = w1 - f12 * v1 + A * v1 * v2
+  return makePolar(A, B, C, v1, v3)
+end
+
+-- Polare aus a,b,c der App (Fluggewicht wie dort: s = sqrt(m_neu/m_alt) -> a/s, b, c*s).
+local function polarFromAbc(a, b, c, vMin, vMax, mass, bugs)
+  -- Die App kann die Polare auch als Vertikalgeschwindigkeit schreiben (Sinken = negativ,
+  -- also c < 0): dann Vorzeichen umdrehen.
+  if type(c) == "number" and c < 0 and type(a) == "number" and type(b) == "number" then
+    a, b, c = -a, -b, -c
+  end
+  local s = math.sqrt(math.max(mass, 0.1))
+  local f = 1 + bugs
+  return makePolar(a / s * f, b * f, c * s * f, (vMin or 0) * s, (vMax or 0) * s)
+end
+
+local function polarSink(p, v)
+  return p.A * v * v + p.B * v + p.C
+end
+
+-- Sollfahrt (m/s) fuer MC (m/s), Netto-Luftbewegung (m/s, positiv = steigend) und
+-- Gegenwindkomponente h (m/s, positiv = Gegenwind, negativ = Rueckenwind; Standard 0).
+--   v = h + sqrt( h^2 + (c + MC - netto + b*h) / a )      (h = 0: sqrt((c + MC - netto) / a))
+-- Zweiter Rueckgabewert: true, wenn auf vMax begrenzt wurde.
+local function speedToFly(p, mc, netto, headwind)
+  local h = headwind or 0
+  local x = p.C + mc - netto + p.B * h          -- darf bei starkem Gegenwind negativ sein
+  local rad = h * h + x / p.A
+  local v = h + math.sqrt(math.max(rad, 0))
+  return clamp(v, p.lo, p.vmax), v > p.vmax + 1e-9
+end
+
+-- Liest die Polaren-Datei der App. Liefert Tabelle {Modellname = {a,b,c,vMin,vMax}} oder nil.
+local polarPaths = POLAR_PATHS
+local function loadPolarFile()
+  for _, path in ipairs(polarPaths) do
+    local chunk
+    if loadfile then
+      local ok, c = pcall(loadfile, path, "t", {})
+      if ok and type(c) == "function" then chunk = c end
+    end
+    if not chunk and io and io.open and load then
+      local okOpen, f = pcall(io.open, path, "r")
+      if okOpen and f then
+        local okRead, text = pcall(f.read, f, "*a")
+        pcall(f.close, f)
+        if okRead and type(text) == "string" then
+          local okLoad, c = pcall(load, text, "polaren", "t", {})
+          if okLoad and type(c) == "function" then chunk = c end
+        end
+      end
+    end
+    if chunk then
+      local ok, t = pcall(chunk)
+      if ok and type(t) == "table" then return t, path end
+    end
+  end
+  return nil
+end
+
+-- Eintrag fuer ein Modell: exakter Name, sonst ohne Gross-/Kleinschreibung und Leerraum.
+local function findPolarEntry(all, name)
+  if type(all) ~= "table" or type(name) ~= "string" then return nil end
+  if type(all[name]) == "table" then return all[name], name end
+  local function norm(s) return (s:lower():gsub("^%s+", ""):gsub("%s+$", "")) end
+  local wanted = norm(name)
+  for key, entry in pairs(all) do
+    if type(key) == "string" and type(entry) == "table" and norm(key) == wanted then return entry, key end
+  end
+  return nil
+end
+
+-- Ein Rechenschritt. teRaw in m/s, vRaw = Fluggeschwindigkeit in m/s (nil = keine Daten).
+-- hRaw: Gegenwindkomponente in m/s (nil = kein Wind bekannt).
+local function process(w, teRaw, vRaw, dt, now, hRaw)
+  if not w.polar then w.valid = false; return end
+  if teRaw == nil or vRaw == nil or vRaw * KMH < w.minSpeed then
+    w.valid = false
+    w.vSlow, w.vFast, w.teFast, w.teSlow, w.netto = nil, nil, nil, nil, nil
+    w.vstf, w.dv, w.stfLimited = nil, nil, false
+    w.tooFastSince, w.tooSlowSince = nil, nil
+    return
+  end
+  w.valid = true
+
+  local tauVar = w.smoothVar
+  w.vFast  = lpf(w.vFast,  vRaw,  dt, tauVar)
+  w.teFast = lpf(w.teFast, teRaw, dt, tauVar)
+  w.vSlow  = lpf(w.vSlow,  vRaw,  dt, w.smoothSpd)
+  w.teSlow = lpf(w.teSlow, teRaw, dt, 4)
+
+  -- Netto: Steigen der Luftmasse = TE + Sinken der Polare bei der Fluggeschwindigkeit
+  local nettoInst = w.teFast + polarSink(w.polar, w.vFast)
+  w.netto = lpf(w.netto, nettoInst, dt, w.smoothNet)
+
+  -- Gegenwindkomponente geglaettet; ohne Winddaten nach 3 s zurueck auf 0
+  if hRaw ~= nil then
+    w.headwind = lpf(w.headwind, hRaw, dt, w.smoothNet)
+    w.windStale = nil
+  else
+    w.windStale = w.windStale or now
+    if now - w.windStale > 3 then w.headwind = nil end
+  end
+
+  w.vstf, w.stfLimited = speedToFly(w.polar, w.mcValue, clamp(w.netto, -5, 5), w.headwind)
+  w.dv = (w.vSlow - w.vstf) * KMH                       -- km/h, positiv = zu schnell
+
+  -- Trend der geglaetteten Fahrt (km/h pro s), stark geglaettet
+  if w.vSlowPrev ~= nil and dt > 0 then
+    w.trend = lpf(w.trend, (w.vSlow - w.vSlowPrev) * KMH / dt, dt, 2)
+  end
+  w.vSlowPrev = w.vSlow
+
+  -- Modus: Schalter oder Automatik (langsam und steigend = Kreisen)
+  if w.modeFixed ~= nil then
+    w.cruise = w.modeFixed
+    w.climbSince, w.cruiseSince = nil, nil
+  else
+    local circling = w.teSlow > w.climbThr / 10 and w.vSlow < 1.3 * w.polar.vms
+    if circling then
+      w.cruiseSince = nil
+      w.climbSince = w.climbSince or now
+      if now - w.climbSince >= 3 then w.cruise = false end
+    else
+      w.climbSince = nil
+      w.cruiseSince = w.cruiseSince or now
+      if now - w.cruiseSince >= 3 then w.cruise = true end
+    end
+  end
+
+  -- Ton-Bedingung: Abweichung ausserhalb Totzone, anhaltend
+  if w.cruise and math.abs(w.dv) > w.dead then
+    if w.dv > 0 then
+      w.tooFastSince, w.tooSlowSince = w.tooFastSince or now, nil
+    else
+      w.tooSlowSince, w.tooFastSince = w.tooSlowSince or now, nil
+    end
+  else
+    w.tooFastSince, w.tooSlowSince = nil, nil
+  end
+end
+
+-- Liefert Frequenz (Hz), Laenge (ms) und Pause bis zum naechsten Piep (s), oder nil.
+local function toneFor(w, now)
+  local since = w.tooFastSince or w.tooSlowSince
+  if not since or now - since < w.delay / 10 then return nil end
+  if not w.dv or math.abs(w.dv) <= w.dead then return nil end
+  -- Tonhoehe zeigt die Richtung, die Taktfolge die Groesse der Abweichung. Stille in der Totzone.
+  --   Logik 1 (Standard): schneller fliegen noetig = hoeher, langsamer fliegen noetig = tiefer
+  --   Logik 2 (Vario-Analogie "Knueppel"): bremsen/ziehen = hoeher, schneller/druecken = tiefer
+  local excess = clamp(math.abs(w.dv) - w.dead, 0, 25)
+  local needFaster = w.dv < 0
+  local high = needFaster
+  if w.toneLogic == 2 then high = not needFaster end
+  if high then
+    -- hoher Ton: Piepen, je groesser die Abweichung, desto schneller
+    local period = math.max(0.14, 0.55 - excess * 0.016)
+    local len = clamp(period * 550, 70, 140)
+    return 850 + excess * 20, len, period
+  end
+  -- tiefer Ton: laengere, tiefere Piepser (Vario im Sinken); je groesser die Abweichung, desto tiefer
+  local period = math.max(0.30, 0.50 - excess * 0.01)
+  return math.max(220, 400 - excess * 8), clamp(period * 600, 180, 300), period
+end
+
+-- ---------------------------------------------------------------- GPS und Wind
+
+local M_PER_DEG = 111320
+-- Lua 5.3+ hat kein math.atan2: math.atan mit zwei Argumenten
+local atan2 = math.atan2 or function(y, x) return math.atan(y, x) end
+local SAMPLE_DT = 0.7         -- Abstand der Geschwindigkeits-Stuetzwerte (s)
+local WINDOW = 40             -- Stuetzwerte im Fit-Fenster (~28 s)
+local MIN_SAMPLES = 10
+local FIT_INTERVAL = 1.0
+local MAX_SPREAD_R = 0.85     -- Richtungsstreuung: 1 = alle gleich, 0 = voller Kreis
+local MAX_TAS_FACTOR = 2.0    -- Radius darf max. so viel groesser als die mittlere Grundgeschw. sein
+local MAX_WIND_FACTOR = 1.0   -- Wind darf nicht groesser als die Fluggeschwindigkeit sein
+local MAX_RESIDUAL_FRAC = 0.25
+local WIND_HOLD = 900         -- s, so lange bleibt ein guter Wert gueltig
+
+-- Kreisfit nach Kasa. pts = {{x=, y=}, ...} (Ost/Nord-Geschwindigkeit in m/s).
+-- Liefert cx, cy (= Wind), r (= TAS), relativer Rest.
+local function kasaFit(pts)
+  local n = #pts
+  if n < 3 then return nil end
+  local mx, my = 0, 0
+  for _, p in ipairs(pts) do mx, my = mx + p.x, my + p.y end
+  mx, my = mx / n, my / n
+  local Suu, Svv, Suv, Suuu, Svvv, Suvv, Svuu = 0, 0, 0, 0, 0, 0, 0
+  for _, p in ipairs(pts) do
+    local u, v = p.x - mx, p.y - my
+    Suu, Svv, Suv = Suu + u * u, Svv + v * v, Suv + u * v
+    Suuu, Svvv = Suuu + u * u * u, Svvv + v * v * v
+    Suvv, Svuu = Suvv + u * v * v, Svuu + v * u * u
+  end
+  local det = Suu * Svv - Suv * Suv
+  if math.abs(det) < 1e-9 then return nil end
+  local b1, b2 = 0.5 * (Suuu + Suvv), 0.5 * (Svvv + Svuu)
+  local uc = (b1 * Svv - b2 * Suv) / det
+  local vc = (b2 * Suu - b1 * Suv) / det
+  local r2 = uc * uc + vc * vc + (Suu + Svv) / n
+  if r2 <= 0 then return nil end
+  local r = math.sqrt(r2)
+  local cx, cy = mx + uc, my + vc
+  local res = 0
+  for _, p in ipairs(pts) do
+    local d = math.sqrt((p.x - cx) ^ 2 + (p.y - cy) ^ 2)
+    res = res + (d - r) ^ 2
+  end
+  return cx, cy, r, math.sqrt(res / n) / r
+end
+
+-- Genug Richtungsaenderung im Fenster (Kreisen/Kurven)? 1 = alle Richtungen gleich.
+local function courseSpread(pts)
+  local sx, sy, n = 0, 0, 0
+  for _, p in ipairs(pts) do
+    local m = math.sqrt(p.x * p.x + p.y * p.y)
+    if m > 0.1 then sx, sy, n = sx + p.x / m, sy + p.y / m, n + 1 end
+  end
+  if n == 0 then return 1 end
+  return math.sqrt(sx * sx + sy * sy) / n
+end
+
+local function fitIsPlausible(cx, cy, r, resFrac, pts)
+  if not r or r < 1 then return false end
+  local mean = 0
+  for _, p in ipairs(pts) do mean = mean + math.sqrt(p.x * p.x + p.y * p.y) end
+  mean = mean / #pts
+  if r > MAX_TAS_FACTOR * mean then return false end
+  if math.sqrt(cx * cx + cy * cy) > MAX_WIND_FACTOR * r then return false end
+  if resFrac > MAX_RESIDUAL_FRAC then return false end
+  return true
+end
+
+-- Breiten-/Laengengrad aus dem, was value() der GPS-Quelle liefert.
+local function extractLatLon(v)
+  if type(v) ~= "table" then return nil end
+  local lat = v.lat or v.latitude or v.Lat or v.Latitude or v[1]
+  local lon = v.lon or v.lng or v.long or v.longitude or v.Lon or v.Longitude or v[2]
+  if type(lat) == "number" and type(lon) == "number" then return lat, lon end
+  return nil
+end
+
+-- Position der GPS-Quelle. Liefert lat, lon oder nil und eine Fehlermeldung.
+local validSource   -- (unten definiert)
+local function readPosition(src)
+  if not validSource(src) then return nil, nil, "GPS-Quelle waehlen" end
+  local ok, v = pcall(src.value, src)
+  if ok then
+    local la, lo = extractLatLon(v)
+    if la then return la, lo end
+  end
+  if OPTION_LATITUDE and OPTION_LONGITUDE then
+    local ok1, la = pcall(src.value, src, {options = OPTION_LATITUDE})
+    local ok2, lo = pcall(src.value, src, {options = OPTION_LONGITUDE})
+    if ok1 and ok2 and type(la) == "number" and type(lo) == "number" then return la, lo end
+  end
+  return nil, nil, "GPS: Position nicht lesbar"
+end
+
+-- Neue GPS-Position verarbeiten: Geschwindigkeitsvektor, Wind-Fit, TAS, Gegenwind.
+-- Stuetzwerte entstehen nur, wenn sich die Position wirklich geaendert hat (frischer Fix),
+-- damit der Zeitstempel zur Position passt.
+local function gpsUpdate(w, lat, lon, now)
+  w.gpsOk = w.gSeen ~= nil and now - w.gSeen <= 3
+  if lat == nil then return end
+  local fresh = (lat ~= w.lastLat or lon ~= w.lastLon)
+  w.lastLat, w.lastLon = lat, lon
+  if fresh then w.gSeen = now end
+  w.gpsOk = w.gSeen ~= nil and now - w.gSeen <= 3
+  if w.bLat == nil or now - w.bT > 3 then          -- Basis (neu) setzen
+    w.bLat, w.bLon, w.bT = lat, lon, now
+    return
+  end
+  local dt = now - w.bT
+  if fresh and dt >= SAMPLE_DT then
+    local vn = (lat - w.bLat) * M_PER_DEG / dt
+    local ve = (lon - w.bLon) * M_PER_DEG * math.cos(math.rad(lat)) / dt
+    w.bLat, w.bLon, w.bT = lat, lon, now
+    w.gve, w.gvn = ve, vn            -- letzter Stuetzwert (Glaettung folgt in process)
+    local win = w.win
+    if math.sqrt(ve * ve + vn * vn) >= 2 then
+      win[#win + 1] = {x = ve, y = vn}
+      if #win > WINDOW then table.remove(win, 1) end
+    end
+    -- Kreisfit
+    if #win >= MIN_SAMPLES and (w.fitT == nil or now - w.fitT >= FIT_INTERVAL) then
+      w.fitT = now
+      local cx, cy, r, res = kasaFit(win)
+      if cx and courseSpread(win) <= MAX_SPREAD_R and fitIsPlausible(cx, cy, r, res, win) then
+        local f = w.fit
+        if f and now - f.t <= WIND_HOLD then      -- sanft nachfuehren
+          f.cx, f.cy = f.cx + 0.3 * (cx - f.cx), f.cy + 0.3 * (cy - f.cy)
+          f.r = f.r + 0.3 * (r - f.r)
+          f.t = now
+        else
+          w.fit = {cx = cx, cy = cy, r = r, t = now}
+        end
+      end
+    end
+  end
+end
+
+-- Aus Geschwindigkeitsvektor und Wind: Grundgeschwindigkeit, Kurs, TAS, Gegenwind (m/s), Wind.
+local function airData(w, now)
+  if not w.gpsOk or w.gve == nil then return nil end
+  local gs = math.sqrt(w.gve ^ 2 + w.gvn ^ 2)
+  local course = atan2(w.gve, w.gvn)
+  local f = w.fit
+  local tas, head, wind = gs, nil, nil
+  if f and now - f.t <= WIND_HOLD then
+    tas = math.sqrt((w.gve - f.cx) ^ 2 + (w.gvn - f.cy) ^ 2)
+    head = -(f.cx * math.sin(course) + f.cy * math.cos(course))
+    local from = math.deg(atan2(f.cx, f.cy)) + 180
+    wind = {spd = math.sqrt(f.cx ^ 2 + f.cy ^ 2), from = from % 360, age = now - f.t}
+  end
+  return {gs = gs, course = course, tas = tas, head = head, wind = wind}
+end
+
+-- ---------------------------------------------------------------- Ethos-Anbindung
+
+validSource = function(source)
+  if source and type(source) ~= "boolean" then return source end
+  return nil
+end
+
+local function readNumber(source)
+  if not validSource(source) then return nil end
+  local v = source:value()
+  if type(v) == "number" then return v end
+  return nil
+end
+
+-- Spielt einen Ton. Ethos erwartet ganze Zahlen (Hz, ms), deshalb wird gerundet.
+local function playToneSafe(freq, len)
+  if not (system and system.playTone) then return false, "system.playTone fehlt" end
+  local ok, err = pcall(system.playTone, math.floor(freq + 0.5), math.floor(len + 0.5), 0)
+  if not ok then return false, tostring(err) end
+  return true
+end
+
+-- Warum ist der Ton gerade (nicht) zu hoeren? Kurztext fuer die Kopfzeile.
+local function toneReason(w, now, soundOn)
+  if w.toneErr then return "FEHLER", true end
+  if not soundOn then return "AUS", false end
+  if not w.valid then return "keine Daten", false end
+  if not w.cruise then return "Kreisen", false end
+  if not w.dv or math.abs(w.dv) <= w.dead then return "Totzone", false end
+  local since = w.tooFastSince or w.tooSlowSince
+  if not since or now - since < w.delay / 10 then return "Verzoegerung", false end
+  return "spielt", false
+end
+
+-- MC ansagen. Speichert Erfolg oder Fehler in w.announceInfo / w.announceErr.
+-- Faellt die Sprachausgabe aus, kommt ein Bestaetigungs-Doppelton.
+local function sayMC(w, mc, now)
+  local mode = w.announceMode or 2
+  w.announceT = now
+  w.announceCount = (w.announceCount or 0) + 1
+  w.announceInfo = string.format("MC %.1f angesagt", mc)
+  w.speakMC = mc
+  -- Quittungston zuerst (Tonhoehe zeigt den MC), die Sprache folgt 0.6 s spaeter,
+  -- damit der Ton nicht von der Sprachausgabe verschluckt wird.
+  if mode >= 2 then playToneSafe(500 + clamp(mc, 0, 5) * 200, 150) end
+  w.speakAt = (mode ~= 3) and (now + 0.6) or nil
+  w.nextBeep = math.max(w.nextBeep or 0, now + 3.5)
+end
+
+-- Sprachausgabe des gemerkten MC-Werts (zeitversetzt nach sayMC).
+local function speakPending(w, now)
+  if not w.speakAt or now < w.speakAt then return end
+  local mc = w.speakMC
+  w.speakAt, w.speakMC = nil, nil
+  local err
+  local unit = UNIT_METER_PER_SECOND
+  if not (system and system.playNumber) then
+    err = "system.playNumber fehlt"
+  elseif unit == nil then
+    err = "UNIT_METER_PER_SECOND fehlt"
+  else
+    local ok, e = pcall(system.playNumber, mc, unit, 1)
+    if not ok then err = tostring(e) end
+  end
+  if err then
+    w.announceErr, w.announceInfo = err, nil
+    playToneSafe(1000, 90)
+    playToneSafe(1300, 90)
+  else
+    w.announceErr = nil
+  end
+  w.nextBeep = math.max(w.nextBeep or 0, now + 3.5)
+end
+
+local function currentModelName()
+  if model and model.name then
+    local ok, name = pcall(model.name)
+    if ok and type(name) == "string" then return name end
+  end
+  return nil
+end
+
+-- Datei neu einlesen (bei Modellwechsel, erzwungen oder alle 30 s).
+local function refreshPolarFile(w, now, force)
+  local name = currentModelName()
+  w.modelName = name
+  if not force and name == w.fileModel and w.fileChecked and now - w.fileChecked < 30 then return end
+  w.fileModel, w.fileChecked = name, now
+  local all = loadPolarFile()
+  w.fileFound = all ~= nil
+  w.fileEntry, w.fileKey = nil, nil
+  if all and name then
+    w.fileEntry, w.fileKey = findPolarEntry(all, name)
+  end
+  local sig = "-"
+  local e = w.fileEntry
+  if e then sig = string.format("%s,%s,%s,%s,%s", tostring(e.a), tostring(e.b), tostring(e.c), tostring(e.vMin), tostring(e.vMax)) end
+  w.fileSig = sig
+end
+
+-- Polare bauen: nur aus der Datei der App. Ohne gueltigen Eintrag gibt es keine Polare.
+local function rebuildPolar(w)
+  w.polar, w.polarNote = nil, nil
+  local e = w.fileEntry
+  if e then
+    local p = polarFromAbc(e.a, e.b, e.c, e.vMin, e.vMax, w.ballast / 100, w.bugs / 100)
+    if p then w.polar = p else w.polarNote = "Eintrag ungueltig" end
+  elseif w.fileFound then
+    w.polarNote = "kein Eintrag fuer dieses Modell"
+  else
+    w.polarNote = "keine Polaren-Datei auf dem Sender"
+  end
+end
+
+-- Statuszeile fuer Konfiguration und Widget. Zweiter Wert: true = Polare vorhanden.
+local function polarStatus(w)
+  local name = w.modelName or "?"
+  if w.polar then return "vorhanden: " .. tostring(w.fileKey or name), true end
+  return "FEHLT fuer '" .. name .. "' (" .. tostring(w.polarNote or "?") .. ")", false
+end
+
+local function create()
+  local w = {
+    lastT = nil, lastInvalidate = 0, nextBeep = 0, lastMcChange = nil, mcAnnounced = nil,
+    mcUpOn = false, mcDnOn = false, cruise = true, buttons = nil,
+    polarSig = nil, win = {},
+  }
+  for _, d in ipairs(NUM_DEFS) do w[d.key] = d.def end
+  for _, d in ipairs(BOOL_DEFS) do w[d.key] = d.def end
+  w.mcValue = w.mc / 10
+  return w
+end
+
+local function demoInputs(w, now)
+  -- Simulierte Phygoide + wechselnde Luftmasse, damit Anzeige und Ton im Simulator testbar sind.
+  local vTrue = (62 + 7 * math.sin(2 * math.pi * now / 7.0) + 8 * math.sin(2 * math.pi * now / 55)) / KMH
+  local air = 1.3 * math.sin(2 * math.pi * now / 40)
+  local sink = w.polar and polarSink(w.polar, vTrue) or 0.7
+  return -sink + air, vTrue
+end
+
+-- Kinetischer Anteil (v/g)*dv/dt der TAS (m/s), ueber 1 s Basis (weniger Rauschen).
+local function kineticStep(w, tas, dt, now)
+  if tas == nil then w.tasF, w.kin, w.kT0 = nil, nil, nil; return end
+  w.tasF = lpf(w.tasF, tas, dt, 1.0)
+  if w.kT0 == nil then w.kT0, w.kTas0 = now, w.tasF; return end
+  local span = now - w.kT0
+  if span >= 1.0 then
+    local raw = w.tasF / G * (w.tasF - w.kTas0) / span
+    local tau = (w.varioType == 2) and (w.varioTau / 10) or 4
+    w.kin = lpf(w.kin, raw, span, tau)
+    w.kT0, w.kTas0 = now, w.tasF
+  end
+end
+
+-- Alle Messwerte -> TE (m/s), TAS (m/s), Gegenwind (m/s) und ein Hinweistext, falls Daten fehlen.
+local function inputsStep(w, now, dt)
+  local lat, lon, perr = readPosition(w.gps)
+  gpsUpdate(w, lat, lon, now)
+  local air = airData(w, now)
+  local tas = air and air.tas or nil
+  w.air = air
+  kineticStep(w, tas, dt, now)
+  local kin = w.kin or 0
+
+  -- Vario / TE (barometrisch: Energiekompensation selbst addieren)
+  local vario = readNumber(w.vario)
+  local te
+  if vario ~= nil then
+    te = (w.varioType == 2) and (vario + w.teFactor / 100 * kin) or vario
+  end
+
+  local note
+  if not validSource(w.gps) then note = "GPS-Quelle waehlen"
+  elseif perr then note = perr
+  elseif not w.gpsOk then note = "GPS: kein Fix / keine Bewegung"
+  elseif te == nil then note = "Vario-Quelle waehlen"
+  elseif tas ~= nil and tas * KMH < w.minSpeed then note = "Fahrt unter Mindestfahrt" end
+  return te, tas, air and air.head or nil, note
+end
+
+local function wakeup(w)
+  local now = os.clock()
+  local dt = w.lastT and (now - w.lastT) or 0
+  w.lastT = now
+  if dt > 0.5 then dt = 0.5 end
+
+  -- Polare nur neu bauen, wenn sich etwas geaendert hat
+  refreshPolarFile(w, now, false)
+  local sig = table.concat({w.ballast, w.bugs, tostring(w.fileSig), tostring(w.fileFound)}, ",")
+  if sig ~= w.polarSig then
+    w.polarSig = sig
+    rebuildPolar(w)
+  end
+  if not w.polar then
+    w.valid = false
+    w.buttons = nil
+    if now - w.lastInvalidate >= 0.5 then
+      w.lastInvalidate = now
+      lcd.invalidate()
+    end
+    return
+  end
+
+  -- MC: Poti hat Vorrang, sonst Schalter-Flanken
+  local mcPot = readNumber(w.mcSrc)
+  if mcPot ~= nil then
+    local lo, hi = -1024, 1024
+    local src = w.mcSrc
+    if src.minimum and src.maximum then
+      local okMin, mn = pcall(src.minimum, src)
+      local okMax, mx = pcall(src.maximum, src)
+      if okMin and okMax and type(mn) == "number" and type(mx) == "number" and mx > mn then
+        lo, hi = mn, mx
+      end
+    end
+    local frac = clamp((mcPot - lo) / (hi - lo), 0, 1)
+    local newMc = math.floor(frac * w.mcMax + 0.5)
+    newMc = math.floor(newMc / math.max(w.mcStep, 1) + 0.5) * math.max(w.mcStep, 1)
+    if newMc ~= w.mc then w.mc = newMc; w.lastMcChange = now end
+  else
+    local up = (readNumber(w.mcUp) or 0) > 0
+    local dn = (readNumber(w.mcDn) or 0) > 0
+    if up and not w.mcUpOn then w.mc = clamp(w.mc + w.mcStep, 0, w.mcMax); w.lastMcChange = now end
+    if dn and not w.mcDnOn then w.mc = clamp(w.mc - w.mcStep, 0, w.mcMax); w.lastMcChange = now end
+    w.mcUpOn, w.mcDnOn = up, dn
+  end
+  w.mcValue = w.mc / 10
+
+  -- MC ansagen, sobald er 1.2 s stabil ist (auch Touch/Drehgeber setzen lastMcChange)
+  if w.mcAnnounced == nil then w.mcAnnounced = w.mc end
+  if w.announce and w.lastMcChange and now - w.lastMcChange > 0.8 and w.mcAnnounced ~= w.mc then
+    w.mcAnnounced = w.mc
+    sayMC(w, w.mcValue, now)
+  end
+  speakPending(w, now)
+
+  -- Modus-Schalter
+  local sw = readNumber(w.modeSw)
+  if validSource(w.modeSw) and sw ~= nil then w.modeFixed = sw > 0 else w.modeFixed = nil end
+
+  -- Eingaben
+  local te, tas, hRaw, note
+  if w.demo then
+    te, tas = demoInputs(w, now)
+    hRaw = 4 * math.sin(2 * math.pi * now / 50)
+    w.air = {gs = tas, course = 0, tas = tas, head = hRaw, wind = {spd = 14 / KMH, from = 270, age = 0}}
+  else
+    te, tas, hRaw, note = inputsStep(w, now, dt)
+  end
+  w.dataNote = note
+
+  local wasCruise = w.cruise
+  process(w, te, tas, dt, now, hRaw)
+  if w.valid and wasCruise ~= w.cruise then
+    playToneSafe(w.cruise and 700 or 500, 120)
+  end
+
+  -- Ton
+  local soundOn = w.tone
+  local ss = validSource(w.soundSw)
+  if ss then soundOn = soundOn and (readNumber(ss) or 0) > 0 end
+  local announcePending = w.announce and w.mcAnnounced ~= w.mc   -- Ansage steht noch aus: Ton still
+  if soundOn and w.valid and now >= w.nextBeep and not announcePending then
+    local f, len, gap = toneFor(w, now)
+    if f then
+      local ok, err = playToneSafe(f, len)
+      w.toneErr = (not ok) and err or nil
+      w.nextBeep = now + gap
+    end
+  end
+  w.toneState = toneReason(w, now, soundOn)
+
+  if now - w.lastInvalidate >= 0.1 then
+    w.lastInvalidate = now
+    lcd.invalidate()
+  end
+end
+
+-- ---------------------------------------------------------------- Zeichnen
+
+local function rgb(r, g, b) return lcd.RGB(r, g, b) end
+
+local function drawT(x, y, boxW, str, font, color, align)
+  lcd.font(font)
+  lcd.color(color)
+  local tw, th = lcd.getTextSize(str)
+  local px = x
+  if align == "c" then px = x + math.floor((boxW - tw) / 2)
+  elseif align == "r" then px = x + boxW - tw end
+  lcd.drawText(px, y, str)
+  return th, tw
+end
+
+local function textHeight(font)
+  lcd.font(font)
+  local _, th = lcd.getTextSize("0")
+  return th
+end
+
+local function paintNoPolar(w, W, H)
+  local DIM, RED = rgb(150, 150, 150), rgb(255, 60, 50)
+  local y = math.floor(H / 2) - 70
+  local th = drawT(0, y, W, "POLARE FEHLT", FONT_XL, RED, "c")
+  y = y + th + 8
+  th = drawT(0, y, W, "Modell: " .. tostring(w.modelName or "?"), FONT_STD, WHITE, "c")
+  y = y + th + 12
+  th = drawT(0, y, W, "Polare im MM Flight Analyzer erstellen", FONT_S, DIM, "c")
+  y = y + th + 2
+  drawT(0, y, W, "und auf den Sender schreiben.", FONT_S, DIM, "c")
+  if w.polarNote then
+    drawT(0, H - textHeight(FONT_XS) - 4, W, tostring(w.polarNote), FONT_XS, DIM, "c")
+  end
+end
+
+local function paint(w)
+  local W, H = lcd.getWindowSize()
+  local BG, DIM = rgb(0, 0, 0), rgb(150, 150, 150)
+  local GREEN, ORANGE, RED = rgb(0, 200, 80), rgb(255, 170, 0), rgb(255, 60, 50)
+  local BLUE = rgb(0, 170, 255)
+
+  lcd.color(BG)
+  lcd.drawFilledRectangle(0, 0, W, H)
+
+  if not w.polar then
+    w.buttons = nil
+    paintNoPolar(w, W, H)
+    return
+  end
+
+  local margin = 6
+  local headH = textHeight(FONT_S) + 6
+  local leftW = math.floor(W * 0.27)
+  local rightW = math.floor(W * 0.31)
+  local centerW = W - leftW - rightW
+
+  -- Kopfzeile: Modus, Ton, Demo
+  local modeText, modeColor = "GLEITEN", GREEN
+  if w.valid and not w.cruise then modeText, modeColor = "KREISEN", BLUE end
+  if not w.valid then modeText, modeColor = "KEINE DATEN", DIM end
+  drawT(0, 3, W, modeText, FONT_S, modeColor, "c")
+  local soundOn = w.tone
+  local ss = validSource(w.soundSw)
+  if ss then soundOn = soundOn and (readNumber(ss) or 0) > 0 end
+  local stateText = w.toneState or (soundOn and "" or "AUS")
+  local stateColor = DIM
+  if stateText == "spielt" then stateColor = GREEN
+  elseif stateText == "FEHLER" then stateColor = RED
+  elseif stateText == "Verzoegerung" then stateColor = ORANGE end
+  drawT(margin, 3, 140, "TON: " .. stateText, FONT_S, stateColor, "l")
+  local errText = w.toneErr or (w.announceErr and ("ANSAGE: " .. w.announceErr))
+  if errText then
+    drawT(margin, H - textHeight(FONT_XS) - 2, W - margin, string.sub(errText, 1, 70), FONT_XS, RED, "l")
+  end
+  if w.demo then drawT(0, 3, W - margin, "DEMO", FONT_S, ORANGE, "r") end
+
+  -- Linke Spalte: Netto + TE-Vario
+  local y = headH + 4
+  local th = drawT(margin, y, leftW - margin, "NETTO", FONT_S, DIM, "l")
+  y = y + th
+  local nettoStr, nettoColor = "--", DIM
+  if w.valid and w.netto then
+    nettoStr = string.format("%+.1f", w.netto)
+    nettoColor = w.netto >= 0.1 and GREEN or (w.netto <= -0.1 and RED or WHITE)
+  end
+  th = drawT(margin, y, leftW - margin, nettoStr, FONT_XL, nettoColor, "l")
+  y = y + th
+  drawT(margin, y, leftW - margin, "m/s", FONT_S, DIM, "l")
+  y = y + textHeight(FONT_S) + 10
+  drawT(margin, y, leftW - margin, "VARIO TE", FONT_S, DIM, "l")
+  y = y + textHeight(FONT_S)
+  local teStr = (w.valid and w.teFast) and string.format("%+.1f", w.teFast) or "--"
+  drawT(margin, y, leftW - margin, teStr, FONT_L, WHITE, "l")
+
+  -- Status klein unten links: Polare, Glaettung, Wind, Gegenwind
+  local xsH = textHeight(FONT_XS)
+  local sy = H - margin - (xsH + 2) * 4 - 2
+  local pname = tostring(w.fileKey or w.modelName or "?")
+  drawT(margin, sy, leftW - margin, string.format("%s %d%%", string.sub(pname, 1, 10), w.ballast), FONT_XS, GREEN, "l")
+  drawT(margin, sy + xsH + 2, leftW - margin, string.format("Glaett. %ds  Totz. +-%d", w.smoothSpd, w.dead), FONT_XS, DIM, "l")
+  local wind = w.air and w.air.wind
+  local windText, windColor = "Wind: kreisen = messen", DIM
+  if wind then
+    windText = string.format("Wind %.0f km/h aus %03d", wind.spd * KMH, math.floor(wind.from + 0.5) % 360)
+    windColor = (wind.age > 120) and ORANGE or WHITE
+  end
+  drawT(margin, sy + (xsH + 2) * 2, leftW - margin, windText, FONT_XS, windColor, "l")
+  local headText, headColor = "", DIM
+  if w.valid and w.headwind then
+    local kmh = w.headwind * KMH
+    if math.abs(kmh) < 0.5 then
+      headText = "Wind quer / 0"
+    elseif kmh > 0 then
+      headText, headColor = string.format("Gegenwind %.0f km/h", kmh), ORANGE
+    else
+      headText, headColor = string.format("Rueckenwind %.0f km/h", -kmh), GREEN
+    end
+  end
+  drawT(margin, sy + (xsH + 2) * 3, leftW - margin, headText, FONT_XS, headColor, "l")
+
+  -- Mitte: Balkeninstrument
+  local barW = math.min(math.floor(centerW * 0.42), 70)
+  local barX = leftW + math.floor((centerW - barW) / 2)
+  local barTop = headH + 6
+  local barBot = H - margin - 4
+  local barH = barBot - barTop
+  local midY = barTop + math.floor(barH / 2)
+  local range = 15
+  if w.valid and w.vstf then range = math.max(15, math.floor(w.vstf * KMH * 0.25 / 5 + 0.5) * 5) end
+  local pxPerKmh = (barH / 2 - 14) / range
+
+  lcd.color(rgb(40, 40, 40))
+  lcd.drawFilledRectangle(barX, barTop, barW, barH)
+  -- Totzone
+  local dzPx = math.floor(w.dead * pxPerKmh)
+  lcd.color(rgb(0, 70, 30))
+  lcd.drawFilledRectangle(barX, midY - dzPx, barW, math.max(dzPx * 2, 1))
+  -- Skalenstriche
+  lcd.color(rgb(90, 90, 90))
+  local tickStep = range >= 30 and 10 or 5
+  local t = tickStep
+  while t <= range do
+    local off = math.floor(t * pxPerKmh)
+    lcd.drawLine(barX, midY - off, barX + barW - 1, midY - off)
+    lcd.drawLine(barX, midY + off, barX + barW - 1, midY + off)
+    t = t + tickStep
+  end
+  -- Abweichungsbalken
+  if w.valid and w.dv then
+    local dvc = clamp(w.dv, -range, range)
+    local px = math.floor(math.abs(dvc) * pxPerKmh)
+    local excess = math.abs(w.dv) - w.dead
+    local color = GREEN
+    if excess > 0 then color = (excess > 8) and RED or ORANGE end
+    lcd.color(color)
+    if dvc >= 0 then
+      lcd.drawFilledRectangle(barX + 4, midY - px, barW - 8, math.max(px, 1))
+    else
+      lcd.drawFilledRectangle(barX + 4, midY, barW - 8, math.max(px, 1))
+    end
+  end
+  -- Mittellinie (Sollfahrt)
+  lcd.color(WHITE)
+  lcd.drawLine(barX - 6, midY, barX + barW + 5, midY)
+  lcd.drawLine(barX - 6, midY + 1, barX + barW + 5, midY + 1)
+  drawT(barX - 20, barTop + 1, barW + 40, "BREMSEN", FONT_XS, DIM, "c")
+  drawT(barX - 20, barBot - textHeight(FONT_XS) - 1, barW + 40, "SCHNELLER", FONT_XS, DIM, "c")
+  if w.valid and w.dv then
+    drawT(barX + barW + 8, midY - textHeight(FONT_S) - 4, centerW, string.format("%+.0f", w.dv), FONT_S, WHITE, "l")
+  end
+  -- Trend-Dreieck links neben der Mittellinie (Fahrt nimmt zu / ab)
+  if w.valid and w.trend and math.abs(w.trend) > 0.5 then
+    local tx, ty, s = barX - 14, midY, 7
+    lcd.color(BLUE)
+    if w.trend > 0 then
+      lcd.drawFilledTriangle(tx, ty - 14 - s, tx - s, ty - 14, tx + s, ty - 14)
+    else
+      lcd.drawFilledTriangle(tx, ty + 14 + s, tx - s, ty + 14, tx + s, ty + 14)
+    end
+  end
+
+  -- Rechte Spalte: MC, Soll, Ist
+  local rx = W - rightW + margin
+  local rw = rightW - margin * 2
+  y = headH + 4
+  local potMode = validSource(w.mcSrc) ~= nil
+  th = drawT(rx, y, rw, potMode and "MC (Poti)" or "MC", FONT_S, DIM, "c")
+  y = y + th
+  th = drawT(rx, y, rw, string.format("%.1f", w.mcValue), FONT_XL, WHITE, "c")
+  y = y + th
+  drawT(rx, y, rw, "m/s", FONT_S, DIM, "c")
+  y = y + textHeight(FONT_S) + 4
+
+  -- Touch-Buttons - / +
+  local btnH = math.min(48, math.floor(H * 0.16))
+  local btnW = math.floor((rw - 8) / 2)
+  w.buttons = {
+    minus = {x = rx, y = y, w = btnW, h = btnH},
+    plus = {x = rx + btnW + 8, y = y, w = btnW, h = btnH},
+  }
+  local btnColor = potMode and rgb(35, 35, 35) or rgb(60, 60, 60)
+  for name, b in pairs(w.buttons) do
+    lcd.color(btnColor)
+    lcd.drawFilledRectangle(b.x, b.y, b.w, b.h)
+    local label = (name == "plus") and "+" or "-"
+    local lh = textHeight(FONT_L)
+    drawT(b.x, b.y + math.floor((b.h - lh) / 2), b.w, label, FONT_L, potMode and DIM or WHITE, "c")
+  end
+  y = y + btnH + 8
+
+  local limited = w.valid and w.stfLimited
+  drawT(rx, y, rw, limited and "SOLL (MAX)" or "SOLL km/h", FONT_S, limited and ORANGE or DIM, "c")
+  y = y + textHeight(FONT_S)
+  local sollStr = (w.valid and w.vstf) and string.format("%.0f", w.vstf * KMH) or "--"
+  th = drawT(rx, y, rw, sollStr, FONT_L, limited and ORANGE or WHITE, "c")
+  y = y + th + 2
+  drawT(rx, y, rw, "IST km/h", FONT_S, DIM, "c")
+  y = y + textHeight(FONT_S)
+  local istStr, istColor = "--", DIM
+  if w.valid and w.vSlow then
+    istStr = string.format("%.0f", w.vSlow * KMH)
+    local excess = math.abs(w.dv) - w.dead
+    istColor = excess <= 0 and GREEN or ((excess > 8) and RED or ORANGE)
+  end
+  th = drawT(rx, y, rw, istStr, FONT_L, istColor, "c")
+  y = y + th
+  local annText = string.format("Ansagen: %d", w.announceCount or 0)
+  if w.announce and w.mcAnnounced ~= nil and w.mcAnnounced ~= w.mc then annText = "Ansage folgt ..."
+  elseif w.announceInfo and os.clock() - (w.announceT or 0) < 6 then annText = w.announceInfo end
+  drawT(rx, y, rw, annText, FONT_XS, DIM, "c")
+
+  -- Hinweis, warum keine Daten da sind (ganz zuletzt, ueber allem, auf dunklem Grund)
+  if not w.valid and w.dataNote then
+    local nh = textHeight(FONT_STD) + 10
+    local ny = math.floor(H / 2) - math.floor(nh / 2)
+    lcd.color(rgb(0, 0, 0))
+    lcd.drawFilledRectangle(0, ny, W, nh)
+    drawT(0, ny + 5, W, w.dataNote, FONT_STD, ORANGE, "c")
+  end
+end
+
+-- ---------------------------------------------------------------- Touch / Tasten
+
+local function inside(b, x, y)
+  return b and x >= b.x and x <= b.x + b.w and y >= b.y and y <= b.y + b.h
+end
+
+local function changeMc(w, delta)
+  if validSource(w.mcSrc) then return end
+  w.mc = clamp(w.mc + delta, 0, w.mcMax)
+  w.mcValue = w.mc / 10
+  w.lastMcChange = os.clock()
+end
+
+local function event(w, category, value, x, y)
+  if EVT_TOUCH and category == EVT_TOUCH and (TOUCH_START == nil or value == TOUCH_START) and w.buttons then
+    if inside(w.buttons.plus, x, y) then changeMc(w, w.mcStep); lcd.invalidate(); return true end
+    if inside(w.buttons.minus, x, y) then changeMc(w, -w.mcStep); lcd.invalidate(); return true end
+  end
+  if EVT_KEY and category == EVT_KEY and w.polar then
+    if KEY_ROTARY_RIGHT and value == KEY_ROTARY_RIGHT then changeMc(w, w.mcStep); lcd.invalidate(); return true end
+    if KEY_ROTARY_LEFT and value == KEY_ROTARY_LEFT then changeMc(w, -w.mcStep); lcd.invalidate(); return true end
+  end
+  return false
+end
+
+-- ---------------------------------------------------------------- Konfiguration
+
+local function addSource(w, label, prop)
+  local line = form.addLine(label)
+  return form.addSourceField(line, nil, function() return w[prop] end, function(v) w[prop] = v end)
+end
+
+local function addSwitch(w, label, prop)
+  local line = form.addLine(label)
+  return form.addSwitchField(line, nil, function() return w[prop] end, function(v) w[prop] = v end)
+end
+
+local function addNumber(w, label, prop, lo, hi)
+  local line = form.addLine(label)
+  return form.addNumberField(line, nil, lo, hi, function() return w[prop] end, function(v) w[prop] = v end)
+end
+
+local function addBool(w, label, prop)
+  local line = form.addLine(label)
+  return form.addBooleanField(line, form.getFieldSlots(line)[0], function() return w[prop] end, function(v) w[prop] = v end)
+end
+
+-- Felder fuer das barometrische Vario sind nur bei diesem Typ bedienbar.
+local function updateBaroFields(w)
+  for _, f in ipairs(w.baroFields or {}) do
+    if f and f.enable then pcall(f.enable, f, w.varioType == 2) end
+  end
+end
+
+local function configure(w)
+  w.baroFields = {}
+  refreshPolarFile(w, os.clock(), true)
+  rebuildPolar(w)
+
+  -- 1. Zeile: Polare vorhanden? Ohne Polare keine weiteren Eingaben.
+  local text, ok = polarStatus(w)
+  local line = form.addLine("Polare")
+  form.addStaticText(line, form.getFieldSlots(line)[0], text)
+  if not ok then
+    line = form.addLine("Hinweis")
+    form.addStaticText(line, form.getFieldSlots(line)[0], "MM Flight Analyzer: Polare erstellen und auf den Sender schreiben")
+    return
+  end
+
+  -- Sensoren
+  addSource(w, "GPS", "gps")
+  addSource(w, "Vario", "vario")
+  line = form.addLine("Vario-Typ")
+  form.addChoiceField(line, nil, {{"Kompensiert (TE)", 1}, {"Barometrisch", 2}},
+    function() return w.varioType end,
+    function(v) w.varioType = v; updateBaroFields(w) end)
+  w.baroFields[#w.baroFields + 1] = addNumber(w, "Barometrisch: Kompensation (%)", "teFactor", 0, 150)
+  w.baroFields[#w.baroFields + 1] = addNumber(w, "Barometrisch: Vario-Zeitkonst. (0.1 s)", "varioTau", 0, 100)
+  updateBaroFields(w)
+
+  -- MC
+  addSource(w, "MC Poti/Schieber (optional)", "mcSrc")
+  addSwitch(w, "MC+ Schalter (optional)", "mcUp")
+  addSwitch(w, "MC- Schalter (optional)", "mcDn")
+  addNumber(w, "MC Maximum (0.1 m/s)", "mcMax", 10, 100)
+  addNumber(w, "MC Schritt (0.1 m/s)", "mcStep", 1, 20)
+  addBool(w, "MC ansagen", "announce")
+  line = form.addLine("MC-Ansage")
+  form.addChoiceField(line, nil, {{"Sprache", 1}, {"Sprache + Ton", 2}, {"Nur Ton", 3}},
+    function() return w.announceMode end, function(v) w.announceMode = v end)
+
+  -- Modus und Ton
+  addSwitch(w, "Modus-Schalter (an = Gleiten)", "modeSw")
+  addNumber(w, "Steigen-Schwelle Auto (0.1 m/s)", "climbThr", 1, 30)
+  addBool(w, "Ton", "tone")
+  addSwitch(w, "Ton-Schalter (optional)", "soundSw")
+  line = form.addLine("Ton-Logik")
+  form.addChoiceField(line, nil,
+    {{"Schneller fliegen = hoeher", 1}, {"Bremsen = hoeher", 2}},
+    function() return w.toneLogic end, function(v) w.toneLogic = v end)
+
+  -- Glaettung
+  addNumber(w, "Glaettung Fahrt (s)", "smoothSpd", 1, 30)
+  addNumber(w, "Glaettung Netto (s)", "smoothNet", 1, 30)
+  addNumber(w, "Glaettung Vario (s)", "smoothVar", 0, 10)
+  addNumber(w, "Totzone (+- km/h)", "dead", 0, 20)
+  addNumber(w, "Ton-Verzoegerung (0.1 s)", "delay", 0, 100)
+  addNumber(w, "Mindestfahrt (km/h)", "minSpeed", 0, 60)
+
+  -- Modell
+  addNumber(w, "Fluggewicht (% der Polare)", "ballast", 50, 300)
+  addNumber(w, "Verschmutzung (%)", "bugs", 0, 30)
+  addBool(w, "Demo-Modus (Simulator)", "demo")
+end
+
+local function setDefaults(w)
+  for _, k in ipairs(SOURCE_KEYS) do w[k] = nil end
+  for _, d in ipairs(NUM_DEFS) do w[d.key] = d.def end
+  for _, d in ipairs(BOOL_DEFS) do w[d.key] = d.def end
+end
+
+local function read(w)
+  -- Versionsmarke zuerst: aeltere Speicherstaende (anderes Layout) werden verworfen.
+  if storage.read("ver") ~= STORE_VER then
+    setDefaults(w)
+  else
+    for _, k in ipairs(SOURCE_KEYS) do
+      w[k] = validSource(storage.read(k))
+    end
+    for _, d in ipairs(NUM_DEFS) do
+      local v = storage.read(d.key)
+      if type(v) == "number" then w[d.key] = v else w[d.key] = d.def end
+    end
+    for _, d in ipairs(BOOL_DEFS) do
+      local v = storage.read(d.key)
+      if type(v) == "boolean" then w[d.key] = v else w[d.key] = d.def end
+    end
+  end
+  w.mcValue = w.mc / 10
+  w.polarSig = nil
+  w.fileChecked = nil
+end
+
+local function write(w)
+  storage.write("ver", STORE_VER)
+  for _, k in ipairs(SOURCE_KEYS) do storage.write(k, w[k]) end
+  for _, d in ipairs(NUM_DEFS) do storage.write(d.key, w[d.key]) end
+  for _, d in ipairs(BOOL_DEFS) do storage.write(d.key, w[d.key]) end
+end
+
+local function init()
+  -- Ethos akzeptiert Widget-Schluessel nur mit weniger als 8 Zeichen.
+  system.registerWidget({
+    key = "sollf01",
+    name = "Sollfahrt",
+    create = create,
+    paint = paint,
+    wakeup = wakeup,
+    event = event,
+    configure = configure,
+    read = read,
+    write = write,
+  })
+end
+
+-- Fuer Tests ausserhalb von Ethos
+local M = {init = init}
+M._test = {
+  buildPolar = buildPolar, polarSink = polarSink, speedToFly = speedToFly,
+  process = process, toneFor = toneFor, lpf = lpf, create = create, rebuildPolar = rebuildPolar,
+  makePolar = makePolar, polarFromAbc = polarFromAbc, loadPolarFile = loadPolarFile,
+  findPolarEntry = findPolarEntry, refreshPolarFile = refreshPolarFile,
+  setPolarPaths = function(list) polarPaths = list end,
+  kasaFit = kasaFit, courseSpread = courseSpread, fitIsPlausible = fitIsPlausible,
+  extractLatLon = extractLatLon, readPosition = readPosition, gpsUpdate = gpsUpdate,
+  airData = airData, inputsStep = inputsStep, sayMC = sayMC, polarStatus = polarStatus,
+}
+return M
+</script>
+<script type="text/plain" id="simW_therm">-- Thermik-Auswertung für das Ethos-Dashboard.
+-- Jeder Steigflug (Thermik-Schalter EIN -> AUS) wird als Balken auf einer
+-- Zeitachse dargestellt. Die Balkenhöhe zeigt je nach Konfiguration die
+-- Steiggeschwindigkeit oder den Höhengewinn. Unter dem Diagramm stehen
+-- Ø Steigen, Anzahl der Steigflüge und die total gewonnene Höhe.
+
+local MODE_RATE = 1
+local MODE_HEIGHT = 2
+local MODE_DURATION = 3
+
+local MAX_BAR_WIDTH = 6
+local BAR_GAP = 1
+local MIN_DURATION = 5  -- s, kürzere Schaltphasen zählen nicht als Steigflug
+
+local function create()
+  return {
+    switchSource = nil,
+    heightSource = nil,
+    resetSource = nil,
+    viewSource = nil,
+    activeMode = nil,
+    viewActive = false,
+    viewOffset = 0,
+    configuredMode = nil,
+    demoMode = true,
+    largeLayout = false,
+    displayMode = MODE_RATE,
+    climbActive = false,
+    resetActive = false,
+    startTime = nil,
+    startHeight = nil,
+    highestHeight = nil,
+    liveGain = 0,
+    climbs = {},
+    totalHeight = 0,
+    totalDuration = 0,
+    -- Demo-Zustand
+    demoRate = 0,
+    lastInvalidate = 0
+  }
+end
+
+local function resetClimbs(widget)
+  widget.climbActive = false
+  widget.startTime = nil
+  widget.startHeight = nil
+  widget.highestHeight = nil
+  widget.liveGain = 0
+  widget.climbs = {}
+  widget.totalHeight = 0
+  widget.totalDuration = 0
+end
+
+local function addClimb(widget, duration, gain)
+  table.insert(widget.climbs, {
+    height = gain,
+    duration = duration,
+    rate = gain / duration
+  })
+  widget.totalHeight = widget.totalHeight + gain
+  widget.totalDuration = widget.totalDuration + duration
+end
+
+local function currentMode(widget)
+  return widget.activeMode or widget.displayMode
+end
+
+local function climbValue(widget, height, rate, duration)
+  local mode = currentMode(widget)
+  if mode == MODE_HEIGHT then
+    return height
+  elseif mode == MODE_DURATION then
+    return duration
+  end
+  return rate
+end
+
+-- Schöne Rasterschrittweite (1/2/5 * 10^n) für etwa vier Linien.
+local function niceStep(maximum)
+  local raw = math.max(maximum, 0.1) / 4
+  local magnitude = 10 ^ math.floor(math.log(raw, 10))
+  local fraction = raw / magnitude
+  local step
+  if fraction <= 1 then
+    step = 1
+  elseif fraction <= 2 then
+    step = 2
+  elseif fraction <= 5 then
+    step = 5
+  else
+    step = 10
+  end
+  return step * magnitude
+end
+
+local function startClimb(widget, now)
+  widget.climbActive = true
+  widget.startTime = now
+  widget.liveGain = 0
+  if widget.demoMode then
+    -- Demo: simulierter Höhengewinn mit zufälliger Steigrate.
+    widget.demoRate = 0.5 + math.random() * 4.5
+  elseif widget.heightSource then
+    widget.startHeight = widget.heightSource:value()
+    widget.highestHeight = widget.startHeight
+  end
+end
+
+local function endClimb(widget, now)
+  local duration = now - widget.startTime
+  local gain = nil
+  widget.climbActive = false
+
+  if widget.demoMode then
+    gain = widget.liveGain
+  elseif widget.startHeight ~= nil and widget.highestHeight ~= nil then
+    gain = math.max(0, widget.highestHeight - widget.startHeight)
+  end
+
+  widget.startTime = nil
+  widget.startHeight = nil
+  widget.highestHeight = nil
+  widget.liveGain = 0
+
+  if duration >= MIN_DURATION and gain ~= nil then
+    addClimb(widget, duration, gain)
+  end
+end
+
+local function paintLabelValue(x, y, label, value)
+  lcd.font(FONT_STD)
+  lcd.color(lcd.RGB(170, 170, 170))
+  lcd.drawText(x, y, label)
+  local _, labelHeight = lcd.getTextSize(label)
+  lcd.font(FONT_BOLD)
+  lcd.color(WHITE)
+  lcd.drawText(x, y + labelHeight, value)
+end
+
+local function paint(widget)
+  local width, height = lcd.getWindowSize()
+  local largeDisplay = widget.largeLayout or width > 900 or height > 300
+
+  -- Kennzahlenblock unter dem Diagramm: Höhe aus der Schrifthöhe ableiten.
+  lcd.font(FONT_STD)
+  local _, labelHeight = lcd.getTextSize("Ø")
+  lcd.font(FONT_BOLD)
+  local _, valueHeight = lcd.getTextSize("0")
+  local statsHeight = labelHeight + valueHeight + 2
+
+  local count = #widget.climbs
+  local average = 0
+  if widget.totalDuration > 0 then
+    average = widget.totalHeight / widget.totalDuration
+  end
+
+  local totalSeconds = math.floor(widget.totalDuration + 0.5)
+  local columnWidth = math.floor(width / 4)
+  local statsTop = height - statsHeight - 2
+  paintLabelValue(4, statsTop, "Ø Steigen", string.format("%.1f m/s", average))
+  paintLabelValue(4 + columnWidth, statsTop, "Steigflüge", string.format("%d", count))
+  paintLabelValue(4 + columnWidth * 2, statsTop, "Gesamthöhe", string.format("%.0f m", widget.totalHeight))
+  paintLabelValue(4 + columnWidth * 3, statsTop, "Gesamtdauer",
+    string.format("%d:%02d", math.floor(totalSeconds / 60), totalSeconds % 60))
+
+  -- Titelzeile: gewählte Ansicht mit Einheit.
+  local mode = currentMode(widget)
+  local title = "Steiggeschwindigkeit (m/s)"
+  if mode == MODE_HEIGHT then
+    title = "Erreichte Höhe (m)"
+  elseif mode == MODE_DURATION then
+    title = "Steigdauer (s)"
+  end
+  lcd.font(largeDisplay and FONT_STD or FONT_S)
+  local titleWidth, titleHeight = lcd.getTextSize(title)
+  lcd.color(WHITE)
+  lcd.drawText(math.floor((width - titleWidth) / 2), 2, title)
+
+  local graphTop = titleHeight + 8
+  local graphBottom = statsTop - 6
+  local graphHeight = graphBottom - graphTop
+  if graphHeight <= 20 then
+    return
+  end
+
+  -- Werte aller Balken (inkl. laufendem Steigflug) bestimmen.
+  local values = {}
+  local maximum = 0
+  for index, climb in ipairs(widget.climbs) do
+    values[index] = climbValue(widget, climb.height, climb.rate, climb.duration)
+    maximum = math.max(maximum, values[index])
+  end
+  local liveValue = nil
+  if widget.climbActive and widget.startTime and os.clock() - widget.startTime >= MIN_DURATION then
+    local elapsed = os.clock() - widget.startTime
+    local rate = 0
+    if elapsed > 0 then
+      rate = widget.liveGain / elapsed
+    end
+    liveValue = climbValue(widget, widget.liveGain, rate, elapsed)
+    maximum = math.max(maximum, liveValue)
+  end
+
+  -- Die Achse folgt dynamisch dem aktuellen Maximum.
+  local step = niceStep(maximum)
+  local axisMax = math.max(step, math.ceil(maximum / step - 1e-9) * step)
+  local labelFormat = step < 1 and "%.1f" or "%d"
+
+  local scaleWidth = largeDisplay and 44 or 34
+  local plotLeft = scaleWidth
+  local plotRight = width - 5
+  local plotWidth = plotRight - plotLeft
+  if plotWidth <= 10 then
+    return
+  end
+
+  lcd.font(largeDisplay and FONT_STD or FONT_S)
+  lcd.pen(DOTTED)
+  lcd.color(lcd.RGB(120, 120, 120))
+  local lines = math.floor(axisMax / step + 0.5)
+  for i = 0, lines do
+    local y = graphBottom - math.floor((i * step / axisMax) * graphHeight)
+    if i > 0 then
+      lcd.drawLine(plotLeft, y, plotRight, y)
+    end
+    local text = string.format(labelFormat, i * step)
+    local textWidth, textHeight = lcd.getTextSize(text)
+    lcd.color(WHITE)
+    lcd.drawText(plotLeft - textWidth - 4, y - textHeight / 2, text)
+    lcd.color(lcd.RGB(120, 120, 120))
+  end
+  lcd.pen(SOLID)
+  lcd.color(WHITE)
+  lcd.drawLine(plotLeft, graphBottom, plotRight, graphBottom)
+  lcd.drawLine(plotLeft, graphTop, plotLeft, graphBottom)
+
+  -- Balkenbreite: 6 px, solange alles passt, sonst bis auf 1 px verkleinern.
+  local total = count + (liveValue and 1 or 0)
+  local barWidth = 1
+  for w = MAX_BAR_WIDTH, 1, -1 do
+    if total * (w + BAR_GAP) - BAR_GAP <= plotWidth then
+      barWidth = w
+      break
+    end
+  end
+  local pitch = barWidth + BAR_GAP
+  local capacity = math.floor((plotWidth + BAR_GAP) / pitch)
+  local first = math.max(1, total - capacity + 1)
+
+  local x = plotLeft + 2
+  local function drawBar(value, color)
+    local barHeight = math.floor((value / axisMax) * graphHeight)
+    if value > 0 and barHeight < 1 then
+      barHeight = 1
+    end
+    lcd.color(color)
+    lcd.drawFilledRectangle(x, graphBottom - barHeight, barWidth, barHeight)
+    x = x + pitch
+  end
+
+  for index = first, total do
+    if index <= count then
+      drawBar(values[index], lcd.RGB(0, 170, 255))
+    else
+      drawBar(liveValue, lcd.RGB(0, 255, 0))
+    end
+  end
+
+  if total == 0 then
+    lcd.font(FONT_STD)
+    lcd.color(lcd.RGB(170, 170, 170))
+    lcd.drawText(plotLeft + 8, graphTop + 4, "Noch kein Steigflug")
+  end
+end
+
+-- storage.read() liefert für nicht gesetzte oder inkompatible Einträge
+-- unter Umständen ein boolean; nur echte Source-Objekte werden verwendet.
+local function validSource(source)
+  if source and type(source) ~= "boolean" then
+    return source
+  end
+  return nil
+end
+
+local function readSwitch(source)
+  if validSource(source) then
+    local value = source:value()
+    return type(value) == "number" and value > 0
+  end
+  return false
+end
+
+local function wakeup(widget)
+  local now = os.clock()
+
+  local resetOn = readSwitch(widget.resetSource)
+  if resetOn and not widget.resetActive then
+    resetClimbs(widget)
+    lcd.invalidate()
+  end
+  widget.resetActive = resetOn
+
+  -- Der Thermik-Schalter gilt auch im Demo-Modus; nur die Höhe wird simuliert.
+  -- Ansicht-Wechsel: jede steigende Flanke schaltet zur nächsten Ansicht
+  -- weiter, ausgehend von der konfigurierten. Eine geänderte Konfiguration
+  -- setzt wieder auf die konfigurierte Ansicht zurück.
+  if widget.configuredMode ~= widget.displayMode then
+    widget.configuredMode = widget.displayMode
+    widget.viewOffset = 0
+  end
+  local viewOn = readSwitch(widget.viewSource)
+  if viewOn and not widget.viewActive then
+    widget.viewOffset = (widget.viewOffset + 1) % 3
+  end
+  widget.viewActive = viewOn
+  local mode = (widget.displayMode - 1 + widget.viewOffset) % 3 + 1
+  if mode ~= widget.activeMode then
+    widget.activeMode = mode
+    lcd.invalidate()
+  end
+
+  local switchOn = readSwitch(widget.switchSource)
+
+  if switchOn and not widget.climbActive then
+    startClimb(widget, now)
+  elseif not switchOn and widget.climbActive then
+    endClimb(widget, now)
+    lcd.invalidate()
+    return
+  end
+
+  if widget.climbActive then
+    if widget.demoMode then
+      widget.liveGain = (now - widget.startTime) * widget.demoRate
+    elseif widget.heightSource then
+      local h = widget.heightSource:value()
+      if h ~= nil then
+        widget.highestHeight = math.max(widget.highestHeight or h, h)
+        if widget.startHeight == nil then
+          widget.startHeight = h
+        end
+        widget.liveGain = math.max(0, widget.highestHeight - widget.startHeight)
+      end
+    end
+    -- Laufenden Balken ca. 4x pro Sekunde neu zeichnen.
+    if now - widget.lastInvalidate >= 0.25 then
+      widget.lastInvalidate = now
+      lcd.invalidate()
+    end
+  end
+end
+
+local function configure(widget)
+  local line = form.addLine("HD Bildschirm")
+  form.addBooleanField(line, form.getFieldSlots(line)[0],
+    function() return widget.largeLayout end,
+    function(value) widget.largeLayout = value end)
+
+  line = form.addLine("Demo-Modus")
+  form.addBooleanField(line, form.getFieldSlots(line)[0],
+    function() return widget.demoMode end,
+    function(value)
+      widget.demoMode = value
+      resetClimbs(widget)
+      if widget.heightField then
+        widget.heightField:enable(not value)
+      end
+    end)
+
+  line = form.addLine("Thermik-Schalter")
+  form.addSwitchField(line, nil,
+    function() return widget.switchSource end,
+    function(value) widget.switchSource = value end)
+
+  line = form.addLine("Höhenquelle")
+  widget.heightField = form.addSourceField(line, nil,
+    function() return widget.heightSource end,
+    function(value) widget.heightSource = value end)
+  widget.heightField:enable(not widget.demoMode)
+
+  line = form.addLine("Balkenhöhe")
+  form.addChoiceField(line, nil,
+    {{"Steiggeschwindigkeit", MODE_RATE}, {"Erreichte Höhe", MODE_HEIGHT}, {"Steigdauer", MODE_DURATION}},
+    function() return widget.displayMode end,
+    function(value) widget.displayMode = value end)
+
+  line = form.addLine("Ansicht-Wechsel")
+  form.addSwitchField(line, nil,
+    function() return widget.viewSource end,
+    function(value) widget.viewSource = value end)
+
+  line = form.addLine("Reset-Schalter")
+  form.addSwitchField(line, nil,
+    function() return widget.resetSource end,
+    function(value) widget.resetSource = value end)
+end
+
+local function read(widget)
+  widget.switchSource = validSource(storage.read("switchSource"))
+  widget.heightSource = validSource(storage.read("heightSource"))
+  widget.resetSource = validSource(storage.read("resetSource"))
+  widget.viewSource = validSource(storage.read("viewSource"))
+  local demoMode = storage.read("demoMode")
+  if demoMode ~= nil then
+    widget.demoMode = demoMode
+  end
+  local largeLayout = storage.read("largeLayout")
+  if largeLayout ~= nil then
+    widget.largeLayout = largeLayout
+  end
+  local displayMode = storage.read("displayMode")
+  if displayMode ~= nil then
+    widget.displayMode = displayMode
+  end
+end
+
+local function write(widget)
+  storage.write("switchSource", widget.switchSource)
+  storage.write("heightSource", widget.heightSource)
+  storage.write("resetSource", widget.resetSource)
+  storage.write("viewSource", widget.viewSource)
+  storage.write("demoMode", widget.demoMode)
+  storage.write("largeLayout", widget.largeLayout)
+  storage.write("displayMode", widget.displayMode)
+end
+
+local function init()
+  -- Der key muss in Ethos kürzer als 8 Zeichen sein.
+  system.registerWidget({
+    key = "therm01",
+    name = "Thermik",
+    create = create,
+    paint = paint,
+    wakeup = wakeup,
+    configure = configure,
+    read = read,
+    write = write
+  })
+end
+
+return {init = init}
+</script>
+<script type="text/plain" id="simW_climb">-- Steigflug-Auswertung für das Ethos-Dashboard.
+
+local function create()
+  return {
+    switchSource = nil,
+    heightSource = nil,
+    resetSource = nil,
+    demoMode = true,
+    largeLayout = false,
+    climbActive = false,
+    resetActive = false,
+    startTime = nil,
+    startHeight = nil,
+    highestHeight = nil,
+    climbs = {},
+    totalHeight = 0,
+    totalDuration = 0
+  }
+end
+
+local function resetClimbs(widget)
+  widget.climbActive = false
+  widget.startTime = nil
+  widget.startHeight = nil
+  widget.highestHeight = nil
+  widget.climbs = {}
+  widget.totalHeight = 0
+  widget.totalDuration = 0
+end
+
+local function addClimb(widget, duration, height)
+  local averageSpeed = height / duration
+
+  table.insert(widget.climbs, {
+    height = height,
+    averageSpeed = averageSpeed
+  })
+  widget.totalHeight = widget.totalHeight + height
+  widget.totalDuration = widget.totalDuration + duration
+end
+
+local function paintLabelValue(x, y, label, value, valueOffset)
+  lcd.font(FONT_STD)
+  lcd.color(WHITE)
+  lcd.drawText(x, y, label)
+  lcd.font(FONT_BOLD)
+  lcd.drawText(x, y + valueOffset, value)
+end
+
+local function paint(widget)
+  local width, height = lcd.getWindowSize()
+  local largeDisplay = widget.largeLayout or width > 900 or height > 300
+  local leftWidth = math.min(210, math.floor(width * 0.27))
+  local graphLeft = leftWidth + 8
+  local graphRight = width - 5
+  local graphTop = largeDisplay and 32 or 24
+  local graphBottom = height - 10
+  local graphHeight = graphBottom - graphTop
+  local labelSpacing = largeDisplay and 70 or 46
+  local valueOffset = largeDisplay and 28 or 18
+  local globalAverage = 0
+
+  if widget.totalDuration > 0 then
+    globalAverage = widget.totalHeight / widget.totalDuration
+  end
+
+  -- Der Kennzahlenblock beginnt auf Höhe der obersten Rasterlinie.
+  paintLabelValue(4, graphTop, "Steigflüge", string.format("%d", #widget.climbs), valueOffset)
+  paintLabelValue(4, graphTop + labelSpacing, "Ø Steigen", string.format("%.1f m/s", globalAverage), valueOffset)
+  paintLabelValue(4, graphTop + labelSpacing * 2, "Gesamthöhe", string.format("%.0f m", widget.totalHeight), valueOffset)
+
+  if widget.climbActive then
+    lcd.font(FONT_STD)
+    lcd.color(lcd.RGB(0, 255, 0))
+    lcd.drawText(4, graphTop + labelSpacing * 3, "Steigflug läuft")
+  end
+
+  if graphHeight <= 20 or graphRight <= graphLeft then
+    return
+  end
+
+  if #widget.climbs == 0 then
+    lcd.font(FONT_STD)
+    lcd.color(lcd.RGB(170, 170, 170))
+    lcd.drawText(graphLeft + 4, graphTop + 4, "Noch kein Steigflug")
+    return
+  end
+
+  -- Der Diagrammbereich beginnt und endet an den auf 50 m gerundeten Werten.
+  local minimumHeight = widget.climbs[1].height
+  local maximumHeight = minimumHeight
+  for _, climb in ipairs(widget.climbs) do
+    minimumHeight = math.min(minimumHeight, climb.height)
+    maximumHeight = math.max(maximumHeight, climb.height)
+  end
+  local minimumAxis = math.floor(minimumHeight / 50) * 50
+  local maximumAxis = math.ceil(maximumHeight / 50) * 50
+  if maximumAxis == minimumAxis then
+    maximumAxis = maximumAxis + 50
+  end
+  local axisRange = maximumAxis - minimumAxis
+  -- Die Skalenwerte stehen ohne Einheit vor der Linie; 6 px bleiben als Abstand.
+  local scaleWidth = 30
+  local plotLeft = graphLeft + scaleWidth
+  local plotWidth = graphRight - plotLeft
+  local scaleTextX = largeDisplay and graphLeft - 16 or graphLeft
+
+  lcd.color(lcd.RGB(120, 120, 120))
+  lcd.pen(DOTTED)
+  for metres = minimumAxis, maximumAxis, 50 do
+    local y = graphBottom - ((metres - minimumAxis) / axisRange) * graphHeight
+    lcd.drawLine(plotLeft, y, graphRight, y)
+    lcd.font(FONT_STD)
+    lcd.drawText(scaleTextX, y - 8, string.format("%d", metres))
+  end
+  lcd.pen(SOLID)
+  lcd.color(WHITE)
+  lcd.drawLine(plotLeft, graphBottom, graphRight, graphBottom)
+
+  -- Feste Balkenbreite wie bei der ersten Widget-Version; die letzten zwölf zählen.
+  local barWidth = largeDisplay and 30 or 20
+  local gap = 5
+  local first = math.max(1, #widget.climbs - 12 + 1)
+  local shown = #widget.climbs - first + 1
+  local usedWidth = shown * barWidth + math.max(0, shown - 1) * gap
+  local x = graphRight - usedWidth
+
+  for index = first, #widget.climbs do
+    local climb = widget.climbs[index]
+    local barHeight = math.floor(((climb.height - minimumAxis) / axisRange) * graphHeight)
+    local barTop = graphBottom - barHeight
+
+    lcd.color(lcd.RGB(0, 170, 255))
+    lcd.drawFilledRectangle(x, barTop, barWidth, barHeight)
+
+    lcd.font(largeDisplay and FONT_S or FONT_XS)
+    lcd.color(WHITE)
+    local text = string.format("%.1f", climb.averageSpeed)
+    local textWidth, textHeight = lcd.getTextSize(text)
+    lcd.drawText(x + (barWidth - textWidth) / 2, math.max(0, barTop - textHeight - 2), text)
+    x = x + barWidth + gap
+  end
+
+end
+
+local function wakeup(widget)
+  local resetOn = false
+  if widget.resetSource then
+    local value = widget.resetSource:value()
+    resetOn = value ~= nil and value > 0
+  end
+
+  if resetOn and not widget.resetActive then
+    resetClimbs(widget)
+    lcd.invalidate()
+  end
+  widget.resetActive = resetOn
+
+  local switchOn = false
+  if widget.switchSource then
+    local value = widget.switchSource:value()
+    switchOn = value ~= nil and value > 0
+  end
+
+  if switchOn and not widget.climbActive then
+    widget.climbActive = true
+    widget.startTime = os.clock()
+    if not widget.demoMode and widget.heightSource then
+      widget.startHeight = widget.heightSource:value()
+      widget.highestHeight = widget.startHeight
+    end
+    lcd.invalidate()
+  elseif switchOn and widget.climbActive and not widget.demoMode and widget.heightSource then
+    local height = widget.heightSource:value()
+    if height ~= nil then
+      widget.highestHeight = math.max(widget.highestHeight or height, height)
+    end
+  elseif not switchOn and widget.climbActive then
+    local duration = os.clock() - widget.startTime
+    local climbedHeight = nil
+    widget.climbActive = false
+    widget.startTime = nil
+
+    if widget.demoMode then
+      -- Testwert: später kann jederzeit wieder in den Demo-Modus gewechselt werden.
+      climbedHeight = math.random(100, 300)
+    elseif widget.startHeight ~= nil and widget.highestHeight ~= nil then
+      climbedHeight = math.max(0, widget.highestHeight - widget.startHeight)
+    end
+    widget.startHeight = nil
+    widget.highestHeight = nil
+
+    -- Kurze Schaltimpulse oder ungültige Höhenwerte werden nicht gezählt.
+    if duration >= 1 then
+      if climbedHeight ~= nil then
+        addClimb(widget, duration, climbedHeight)
+      end
+    end
+    lcd.invalidate()
+  end
+end
+
+local function configure(widget)
+  local line = form.addLine("Steigflug-Schalter")
+  form.addSourceField(line, nil,
+    function() return widget.switchSource end,
+    function(value) widget.switchSource = value end)
+
+  line = form.addLine("Demo-Modus")
+  local demoField = form.addBooleanField(line, form.getFieldSlots(line)[0],
+    function() return widget.demoMode end,
+    function(value)
+      widget.demoMode = value
+      if widget.heightField then
+        widget.heightField:enable(not value)
+      end
+    end)
+
+  line = form.addLine("Höhenquelle")
+  widget.heightField = form.addSourceField(line, nil,
+    function() return widget.heightSource end,
+    function(value) widget.heightSource = value end)
+  widget.heightField:enable(not widget.demoMode)
+
+  line = form.addLine("HD Bildschirm")
+  form.addBooleanField(line, form.getFieldSlots(line)[0],
+    function() return widget.largeLayout end,
+    function(value) widget.largeLayout = value end)
+
+  line = form.addLine("Reset-Schalter")
+  form.addSourceField(line, nil,
+    function() return widget.resetSource end,
+    function(value) widget.resetSource = value end)
+end
+
+local function read(widget)
+  widget.switchSource = storage.read("switchSource")
+  widget.heightSource = storage.read("heightSource")
+  widget.resetSource = storage.read("resetSource")
+  local demoMode = storage.read("demoMode")
+  if demoMode ~= nil then
+    widget.demoMode = demoMode
+  end
+  local largeLayout = storage.read("largeLayout")
+  if largeLayout ~= nil then
+    widget.largeLayout = largeLayout
+  end
+end
+
+local function write(widget)
+  storage.write("switchSource", widget.switchSource)
+  storage.write("heightSource", widget.heightSource)
+  storage.write("resetSource", widget.resetSource)
+  storage.write("demoMode", widget.demoMode)
+  storage.write("largeLayout", widget.largeLayout)
+end
+
+local function init()
+  -- Der key muss in Ethos kürzer als 8 Zeichen sein.
+  system.registerWidget({
+    key = "climb01",
+    name = "Steigfluege",
+    create = create,
+    paint = paint,
+    wakeup = wakeup,
+    configure = configure,
+    read = read,
+    write = write
+  })
+end
+
+return {init = init}
+</script>
 
 <script>
 // ---------- Sprache: Deutsch ist der Quelltext, Englisch kommt aus EN; Standard = Sprache des Systems ----------
@@ -1534,7 +3799,7 @@ function drawTrack(log, ch, runs, th=[]){
 let VIEW={min:0,max:1}, TZ={z:1,px:0,py:0}, ORDER=[], CURSOR=null;
 let MARK=[], LOG=null, CH=null, RUNS=[], THERM=[], CLIMB=[], bars={}, charts=[], selected=new Set();
 function render(log, name, example){
-  LOG=log; CH=channels(log); pickMah(log,CH); addDerived(log,CH); prepGroups(log); USE=useLoad(); RUNS=motorRuns(log,CH);
+  LOG=log; window.simLogChanged?.(); CH=channels(log); pickMah(log,CH); addDerived(log,CH); prepGroups(log); USE=useLoad(); RUNS=motorRuns(log,CH);
   const dur = log.t.filter(x=>!isNaN(x)).pop()||0;
   $('#fileinfo').innerHTML = `<span class="tag ${example?'example':''}">${example?T('Beispiel: Dein Log'):T('Geladen')}</span><strong>${esc(name)}</strong><span>${esc(log.date)} · ${esc(log.clock[0])} – ${esc(log.clock[log.clock.length-1])}</span><span>${T('{n} Sensoren',{n:log.cols.filter(c=>!c.rc&&!c.derived).length})}${log.gps?' + GPS':''}</span>${log.hourJumps?`<span class="hint">${T('Die Uhrzeit im Log springt in den Stunden ({n}×), die Zeitachse ist korrigiert.',{n:log.hourJumps})}</span>`:''}`;
   renderKpis();
@@ -3126,7 +5391,7 @@ async function mcOnSync(s){
   new MutationObserver(drawPolar).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
 })();
 // ---------- Tabs ----------
-const TABS=['uebersicht','diagramme','steigen','motor','polare','karte','werte','rohdaten'];
+const TABS=['uebersicht','diagramme','steigen','motor','polare','karte','werte','rohdaten','simulator'];
 function showTab(id, focus){
   if (!TABS.includes(id)) id='uebersicht';
   document.querySelectorAll('.tab').forEach(b=>{ const on=b.dataset.tab===id; b.setAttribute('aria-selected',on); b.tabIndex=on?0:-1; if(on&&focus) b.focus(); });
@@ -3139,6 +5404,7 @@ function showTab(id, focus){
   store.set('tab',id);
   kiPing();
   try{ history.replaceState(null,'','#'+id); }catch(e){}
+  if (id==='simulator') window.simShow?.(); else window.simHide?.();
   if (!LOG) return;
   if (id==='diagramme') fitChips();
   // Diagramme in versteckten Tabs haben keine Grösse: beim Anzeigen neu ausmessen
@@ -4105,4 +6371,437 @@ async function kiSend(follow, retry){
   KS.busy=false; kiRender();
 }
 kiKeyRefresh();
+
+// Simulator-Kern: startet eine Lua-VM (fengari), lädt den Ethos-Nachbau (shim.lua) und das Widget,
+// liefert Logwerte zur Zeit t und zeichnet lcd-Aufrufe auf ein Canvas.
+(function (root) {
+  const FONT_PX = {1: 11, 2: 13, 3: 16, 4: 20, 5: 25, 6: 34, 7: 56};
+  function EthosSim(opts) {
+    const F = opts.fengari, {lua, lauxlib, lualib} = F, ls = F.to_luastring, js = F.to_jsstring;
+    const self = this;
+    let L = null, ctx = null, font = 4, pen = 0, color = '#ffffff';
+    self.w = opts.w || 388; self.h = opts.h || 316;
+    self.invalid = true; self.used = new Set(); self.written = {};
+    self.t = 0;
+    const measure = opts.measure || (s => s.length * FONT_PX[font % 10 || 4] * 0.55);
+    function fontCss() { const sz = FONT_PX[font % 10] || 20; return `${font > 10 ? 700 : 400} ${sz}px Roboto, "Segoe UI", Arial, sans-serif`; }
+    function arg(i) {
+      switch (lua.lua_type(L, i)) {
+        case lua.LUA_TNUMBER: return lua.lua_tonumber(L, i);
+        case lua.LUA_TSTRING: return js(lua.lua_tostring(L, i));
+        case lua.LUA_TBOOLEAN: return lua.lua_toboolean(L, i);
+        default: return undefined;
+      }
+    }
+    function push(v) {
+      if (v === undefined || v === null) lua.lua_pushnil(L);
+      else if (typeof v === 'number') lua.lua_pushnumber(L, v);
+      else if (typeof v === 'boolean') lua.lua_pushboolean(L, v);
+      else lua.lua_pushstring(L, ls(String(v)));
+    }
+    function reg(name, fn) {
+      lua.lua_pushjsfunction(L, function (Ls) {
+        const n = lua.lua_gettop(L), a = [];
+        for (let i = 1; i <= n; i++) a.push(arg(i));
+        const r = fn(...a);
+        if (r === undefined) return 0;
+        push(r); return 1;
+      });
+      lua.lua_setglobal(L, ls(name));
+    }
+    function call(name, ...args) {
+      lua.lua_getglobal(L, ls(name));
+      args.forEach(push);
+      const st = lua.lua_pcall(L, args.length, 1, 0);
+      const r = arg(-1); lua.lua_pop(L, 1);
+      if (st !== 0) return {err: String(r)};
+      return {val: r};
+    }
+    const C = c => '#' + (Math.max(0, Math.floor(c)) & 0xFFFFFF).toString(16).padStart(6, '0');
+    function lcdOp(op, a, b, c, d, e, f) {
+      if (op === 'invalidate') { self.invalid = true; return; }
+      if (op === 'color') { color = C(a); return; }
+      if (op === 'font') { font = a; return; }
+      if (op === 'pen') { pen = a; return; }
+      if (!ctx) return;
+      ctx.fillStyle = ctx.strokeStyle = color; ctx.lineWidth = 1; ctx.setLineDash(pen ? [2, 3] : []);
+      if (op === 'rect') ctx.fillRect(a, b, c, d);
+      else if (op === 'frame') { ctx.lineWidth = e || 1; ctx.strokeRect(a + .5, b + .5, c - 1, d - 1); }
+      else if (op === 'line') { ctx.beginPath(); ctx.moveTo(a + .5, b + .5); ctx.lineTo(c + .5, d + .5); ctx.stroke(); }
+      else if (op === 'circle') { ctx.beginPath(); ctx.arc(a, b, c, 0, Math.PI * 2); d ? ctx.fill() : ctx.stroke(); }
+      else if (op === 'tri') { ctx.beginPath(); ctx.moveTo(a, b); ctx.lineTo(c, d); ctx.lineTo(e, f); ctx.closePath(); ctx.fill(); }
+      else if (op === 'text') {
+        ctx.font = fontCss(); ctx.textBaseline = 'top';
+        ctx.textAlign = (d & 3) === 1 ? 'center' : (d & 3) === 2 ? 'right' : 'left';
+        ctx.fillText(c, a, b);
+      }
+    }
+    self.load = function (code) {
+      L = lauxlib.luaL_newstate(); lualib.luaL_openlibs(L);
+      self.used = new Set(); self.written = {};
+      reg('__lcd', lcdOp);
+      reg('__val', n => { self.used.add(n); return n in self.written ? self.written[n] : opts.value(n, self.t); });
+      reg('__unit', n => opts.unit(n));
+      reg('__setval', (n, v) => { self.written[n] = v; });
+      reg('__log', (k, s, u) => opts.log(k, s, self.t, u));
+      reg('__tone', (f, ms) => opts.tone && opts.tone(f, ms, self.t));
+      reg('__fs_get', p => opts.fs.get(p));
+      reg('__fs_put', (p, s) => opts.fs.put(p, s));
+      reg('__clock', () => self.t);
+      reg('__epoch', () => (opts.epoch || 0) + self.t);
+      reg('__tw', s => { if (ctx) { ctx.font = fontCss(); return Math.round(ctx.measureText(s).width); } return measure(s); });
+      reg('__th', () => Math.round((FONT_PX[font % 10] || 20) * 1.2));
+      reg('__info', k => k === 'w' ? self.w : k === 'h' ? self.h : k === 'model' ? opts.model() : k.startsWith('has:') ? opts.has(k.slice(4)) : undefined);
+      if (lauxlib.luaL_dostring(L, ls(opts.shim)) !== 0) return 'Nachbau: ' + js(lua.lua_tostring(L, -1));
+      let r = call('__init', code); if (r.val) return r.val;
+      self.name = call('__widgetName').val;
+      return null;
+    };
+    self.create = () => call('__create').val || null;
+    self.read = store => { call('__storeLoad', store || ''); return call('__read').val || null; };
+    self.write = () => { const e = call('__write').val; return {err: e || null, store: call('__storeDump').val || ''}; };
+    self.event = (c, v, x, y) => call('__event', c, v, x, y).val || null;
+    self.wakeup = () => call('__wakeup').val || null;
+    self.paint = (c) => {
+      ctx = c; font = 4; pen = 0; color = '#ffffff';
+      const e = call('__paint').val || null; ctx = null; self.invalid = false; return e;
+    };
+    self.configure = () => {
+      const e = call('__configure').val; if (e) return {err: e, fields: []};
+      const txt = call('__formList').val || '';
+      const fields = txt ? txt.split('\x1e').map(row => {
+        const [i, kind, label, value, enabled, extra] = row.split('\x1f');
+        return {i: +i, kind, label, value, enabled: enabled === '1', extra};
+      }) : [];
+      return {err: null, fields};
+    };
+    self.formSet = (i, v) => call('__formSet', i, String(v)).val || null;
+  }
+  if (typeof module !== 'undefined') module.exports = EthosSim; else root.EthosSim = EthosSim;
+})(this);
+
+// ---------- Simulator: Ethos-Lua-Widgets mit dem gewählten Log abspielen ----------
+// Lua läuft in fengari (Lua-VM in JavaScript). Der Ethos-Nachbau steht in #simShim, die Brücke in EthosSim.
+(() => {
+const g = id => document.getElementById(id);
+const SAMPLE = {'sollfahrt/main.lua': g('simW_sollf').textContent, 'thermik/main.lua': g('simW_therm').textContent,
+  'steigfluege/main.lua': g('simW_climb').textContent};
+// Startwerte, falls ein Widget noch nie konfiguriert wurde (nach registriertem Namen)
+const DEFS = {Sollfahrt:[['GPS','GPS'],['Vario','Steigr. Vario']],
+  Thermik:[['Demo-Modus','0'],['Thermik-Schalter','SB'],['Höhenquelle','Altitude']],
+  Steigfluege:[['Demo-Modus','0'],['Steigflug-Schalter','LS9'],['Höhenquelle','Altitude']]};
+const SW_RE = /^(S[A-Z]|LS\d+)$/i;
+let FS = {}, ORIG = {}, fsTag = 'beispiel', fsDir = null, fsDesk = false, WIDGETS = [], cur = null, code = '';
+let SL = null, slFor = null, sim = null, playing = false, speed = 1, err = null, busy = false, started = false, visible = false;
+let W = 784, H = 316;
+
+// ---------- Log: Werte genau wie im Log (keine Einheiten-Umrechnung), GPS als "lat lon" ----------
+function simLog(){
+  if (slFor === LOG) return SL;
+  slFor = LOG; SL = null;
+  const f = FILES[CUR];
+  if (!LOG || !LOG.header || !LOG.raw || f?.jeti) return null;
+  const ti = LOG.header.findIndex(h => /^(time|zeit)$/i.test(h)), di = LOG.header.findIndex(h => /^(date|datum)$/i.test(h));
+  const cols = {}, names = [], seen = {};
+  LOG.header.forEach((h, i) => {
+    if (i === ti || i === di || !h) return;
+    const su = splitUnit(h); seen[su.name] = (seen[su.name] || 0) + 1;
+    const n = seen[su.name] > 1 ? su.name + ' #' + seen[su.name] : su.name, sw = SW_RE.test(su.name);
+    const v = LOG.raw.map(r => { const x = (r[i] ?? '').trim(); if (x === '') return null; const k = +x; return isNaN(k) ? x : (sw ? k * 1024 : k); });
+    cols[n] = {unit: su.unit || '', v, sw}; names.push(n);
+  });
+  SL = {t: LOG.t, cols, names, model: f?.mid ?? f?.model ?? '', dur: LOG.t.filter(x => !isNaN(x)).pop() || 0};
+  return SL;
+}
+let ki = 0;
+function idx(t){ const T = SL.t; if (ki >= T.length || !(T[ki] <= t)) ki = 0;
+  if (t - T[ki] > 30){ let lo = ki, hi = T.length - 1; while (lo < hi){ const m = (lo + hi + 1) >> 1; if (T[m] <= t) lo = m; else hi = m - 1; } ki = lo; }
+  while (ki + 1 < T.length && T[ki + 1] <= t) ki++; return ki; }
+const val = (n, t) => { const c = SL.cols[n]; return c ? c.v[idx(t)] : undefined; };
+const fmt = s => { s = Math.max(0, Math.floor(s)); return String(Math.floor(s / 60)).padStart(2, '0') + ':' + String(s % 60).padStart(2, '0'); };
+
+// ---------- scripts-Ordner ----------
+function scan(){ WIDGETS = Object.keys(FS).filter(k => /^[^/]+\/main\.lua$/i.test(k)).sort().map(k => ({id: fsTag + ':' + k, dir: k.split('/')[0], file: k})); }
+function resolve(p){
+  p = String(p).replace(/\\/g, '/');
+  let parts;
+  if (/^\/?scripts\//i.test(p)) parts = p.replace(/^\/?scripts\//i, '').split('/');
+  else if (p.startsWith('/')) parts = p.slice(1).split('/');
+  else parts = ((cur ? cur.dir + '/' : '') + p).split('/');
+  const out = []; for (const x of parts){ if (x === '..') out.pop(); else if (x && x !== '.') out.push(x); }
+  const key = out.join('/'); if (key in FS) return key;
+  const low = key.toLowerCase(); return Object.keys(FS).find(k => k.toLowerCase() === low) || key;
+}
+// polaren.lua: liegt sie nicht im Ordner, kommt sie aus dem Tab Polare
+function fsGet(p){ const k = resolve(p); if (k in FS) return FS[k]; if (/^maccready\/polaren\.lua$/i.test(k) && typeof mcFileText === 'function') return mcFileText(); return null; }
+function setFS(files, tag, dir, desk){
+  FS = {...files}; ORIG = {...files}; fsTag = tag; fsDir = dir; fsDesk = !!desk;
+  for (const k in FS){ const v = store.get('sim.fs.' + tag + '.' + k); if (v) FS[k] = v; }
+  scan(); fillSel(); fillSd();
+  g('simSave').hidden = !fsDesk;
+  g('simSenderBtn').hidden = !(window.ethosDesktop && fsTag === 'ordner');
+  g('simDirInfo').textContent = fsTag === 'beispiel'
+    ? T('Beispiel-Widgets: sollfahrt, thermik, steigfluege. Wähle den Ordner scripts auf dem Sender oder Deinem Rechner, dann erscheinen hier alle Widgets darin.')
+    : T('{n} Widgets aus {d}', {n: WIDGETS.length, d: dir || T('dem gewählten Ordner')});
+}
+async function loadDesktop(opts){
+  if (!window.ethosDesktop?.simScripts) return false;
+  try {
+    const r = await ethosDesktop.simScripts(opts || {});
+    if (!r || !r.files || !Object.keys(r.files).length){ if (r?.error) log('hinweis', r.error); return false; }
+    setFS(r.files, r.source === 'sender' ? 'sender' : 'ordner', r.dir, true);
+    return true;
+  } catch(e){ log('fehler', e.message || String(e)); return false; }
+}
+function fillSel(){ const s = g('simSel'); s.innerHTML = ''; WIDGETS.forEach(w => s.append(new Option(w.dir + '/main.lua', w.id))); if (cur && WIDGETS.some(w => w.id === cur.id)) s.value = cur.id; }
+function fillSd(){ const s = g('simSdSel'), v = s.value; s.innerHTML = ''; const keys = Object.keys(FS).sort(); if (!keys.some(k => /^maccready\/polaren\.lua$/i.test(k))) keys.push('maccready/polaren.lua');
+  keys.forEach(k => s.append(new Option('/scripts/' + k + (k in FS ? '' : ' ' + T('(aus dem Tab Polare)')), k)));
+  s.value = keys.includes(v) ? v : (keys.find(k => /polaren/.test(k)) || keys[0] || ''); g('simSdTxt').value = fsGet(s.value) ?? ''; }
+
+// ---------- Ausgabe, Ton, Sprache ----------
+const out = g('simLog'); let outN = 0, actx = null;
+const audioOk = () => g('simSnd').checked && playing && speed <= 2;
+function tone(f, ms){
+  if (!audioOk() || !f) return;
+  try { actx = actx || new AudioContext(); const o = actx.createOscillator(), gn = actx.createGain(), t0 = actx.currentTime, d = ms / 1000 / speed;
+    o.type = 'square'; o.frequency.value = f; gn.gain.setValueAtTime(0.05, t0); gn.gain.setValueAtTime(0, t0 + d);
+    o.connect(gn).connect(actx.destination); o.start(t0); o.stop(t0 + d + .02); } catch(e){}
+}
+const UNIT_TXT = {4:['km/h','Kilometer pro Stunde'], 5:['m/s','Meter pro Sekunde'], 3:['m','Meter'], 1:['V','Volt'], 2:['A','Ampere'], 6:['%','Prozent']};
+function log(kind, text, t, unit){
+  if (kind === 'ansage' && unit !== undefined){
+    if (audioOk()) try { const u = new SpeechSynthesisUtterance(String(text).replace('.', ',') + ' ' + (UNIT_TXT[unit]?.[1] || '')); u.lang = 'de-DE'; speechSynthesis.speak(u); } catch(e){}
+    text += ' ' + (UNIT_TXT[unit]?.[0] || '');
+  }
+  const d = document.createElement('div'); d.className = kind;
+  const lab = {ansage: T('Ansage: '), hinweis: T('Hinweis: '), fehler: T('Fehler: ')}[kind] || '';
+  d.innerHTML = `<span class="t">${fmt(t ?? sim?.t ?? 0)}</span> `; d.append(lab + text);
+  out.append(d); if (++outN > 400){ out.firstChild.remove(); outN--; }
+  out.scrollTop = out.scrollHeight;
+}
+function showErr(e){
+  err = e; const b = g('simErr');
+  if (!e){ b.hidden = true; return; }
+  b.hidden = false; b.textContent = e.replace(/\[string "@?main\.lua"\]|@main\.lua/g, 'main.lua');
+  log('fehler', e.split('\n')[0]); pause();
+}
+
+// ---------- Widget-VM ----------
+const scr = g('simScr'), sctx = scr.getContext('2d');
+function newSim(){
+  sim = new EthosSim({fengari, shim: g('simShim').textContent, w: W, h: H, model: () => SL.model,
+    value: val, unit: n => SL.cols[n] ? SL.cols[n].unit : undefined, has: n => !!SL.cols[n], log, tone,
+    epoch: 0, fs: {get: fsGet, put: (p, s) => { const k = resolve(p); FS[k] = s; log('info', '/scripts/' + k + ' ' + T('geschrieben (nur im Simulator)')); fillSd(); }}});
+  let e = sim.load(code) || sim.create();
+  if (!e){
+    const st = store.get('sim.w.' + cur.id); e = sim.read(st || '');
+    const def = DEFS[sim.name];
+    if (!st && !e && def){ const c = sim.configure(); for (const [lab, v] of def){ const f = c.fields.find(f => f.label === lab); if (f && SL.cols[v] !== undefined || f && !isNaN(+v)) sim.formSet(f.i, v); } saveCfg(); }
+  }
+  showErr(e); return !e;
+}
+function saveCfg(){ const r = sim.write(); if (r.err) return showErr(r.err); store.set('sim.w.' + cur.id, r.store); }
+function paint(){
+  if (!sim) return;
+  const dpr = Math.min(2, window.devicePixelRatio || 1);
+  if (scr.width !== W * dpr || scr.height !== H * dpr){ scr.width = W * dpr; scr.height = H * dpr; scr.style.width = W + 'px'; }
+  sctx.setTransform(dpr, 0, 0, dpr, 0, 0); sctx.fillStyle = '#1c232c'; sctx.fillRect(0, 0, W, H);
+  const e = sim.paint(sctx); if (e) showErr(e);
+  sctx.setTransform(1, 0, 0, 1, 0, 0);
+}
+// wakeup auf festem Raster in Logzeit (Ethos: etwa alle 50 ms), unabhängig von der Bildrate
+function step(to, dt){
+  if (sim.nw == null || sim.nw < sim.t) sim.nw = sim.t + dt;
+  while (sim.nw <= to + 1e-9){ sim.t = sim.nw; sim.nw += dt; const e = sim.wakeup(); if (e){ showErr(e); return false; } }
+  sim.t = to; return true;
+}
+async function seek(to){
+  if (!sim || busy) return;
+  to = Math.max(0, Math.min(SL.dur, to));
+  const was = playing; pause();
+  if (!g('simReplay').checked){ sim.t = to; sim.wakeup(); return redraw(); }
+  if (to < sim.t){ if (!newSim()) return; sim.t = 0; }
+  busy = true; const p = g('simProg'), big = to - sim.t > 20;
+  while (sim.t < to && !err){
+    if (!step(Math.min(to, sim.t + 60), big ? 0.2 : 0.05)) break;
+    if (big){ p.hidden = false; p.textContent = T('Rechne nach … {t}', {t: fmt(sim.t)}); await new Promise(r => setTimeout(r)); }
+  }
+  p.hidden = true; busy = false; sim.invalid = true; redraw();
+  if (was && !err) play();
+}
+function restart(){ if (!sim) return start(0); const t = sim.t; if (newSim()){ renderForm(); sim.t = 0; seek(t); } }
+function redraw(){ paint(); drawTl(); updClock(); updSrc(); }
+function updClock(){
+  g('simTime').textContent = `${fmt(sim.t)} / ${fmt(SL.dur)}`;
+  g('simClock').textContent = String(LOG.clock?.[idx(sim.t)] || '').slice(0, 8);
+}
+let lastFrame = 0, lastUi = 0;
+function frame(ts){
+  if (!playing) return;
+  const dt = Math.min(.25, (ts - lastFrame) / 1000) * speed; lastFrame = ts;
+  if (step(Math.min(SL.dur, sim.t + dt), 0.05) && sim.invalid) paint();
+  if (ts - lastUi > 120){ lastUi = ts; drawTl(); updClock(); updSrc(); }
+  if (sim.t >= SL.dur){ pause(); return; }
+  if (playing) requestAnimationFrame(frame);
+}
+function play(){ if (!sim || err || busy) return; if (sim.t >= SL.dur){ seek(0).then(play); return; }
+  playing = true; g('simPlay').textContent = '⏸ ' + T('Pause'); lastFrame = performance.now(); requestAnimationFrame(frame); }
+function pause(){ playing = false; g('simPlay').textContent = '▶ ' + T('Abspielen'); }
+
+// ---------- Konfiguration wie in Ethos ----------
+function srcOptions(sel, onlySw, value){
+  sel.innerHTML = ''; sel.append(new Option('---', ''));
+  const a = SL.names.filter(n => SL.cols[n].sw), b = SL.names.filter(n => !SL.cols[n].sw);
+  const grp = (lab, list) => { if (!list.length) return; const o = document.createElement('optgroup'); o.label = lab; list.forEach(n => o.append(new Option(n + (SL.cols[n].unit ? ` (${SL.cols[n].unit})` : ''), n))); sel.append(o); };
+  if (onlySw){ grp(T('Schalter'), a); grp(T('Weitere Quellen'), b); } else { grp(T('Telemetrie und Geber'), b); grp(T('Schalter'), a); }
+  if (value && !SL.cols[value]) sel.append(new Option(value + ' ' + T('(nicht im Log)'), value));
+  sel.value = value || '';
+}
+function renderForm(){
+  g('simTitle').textContent = sim?.name || cur?.dir || T('Widget');
+  const box = g('simRows'); box.innerHTML = '';
+  if (!sim) return;
+  const c = sim.configure(); if (c.err) return showErr(c.err);
+  if (!c.fields.length){ box.innerHTML = `<div class="eempty">${T('Dieses Widget hat keine Einstellungen.')}</div>`; return; }
+  const set = (f, v) => { const e = sim.formSet(f.i, v); if (e) return showErr(e); saveCfg(); if (!playing){ sim.wakeup(); paint(); } renderForm(); updSrc(); };
+  let last = null, row = null;
+  for (const f of c.fields){
+    if (f.label !== last || !row){ row = document.createElement('div'); row.className = 'erow' + (f.enabled ? '' : ' off'); const l = document.createElement('div'); l.className = 'el'; l.textContent = f.label; row.append(l); box.append(row); last = f.label; }
+    let el;
+    if (f.kind === 'bool'){ el = document.createElement('button'); el.type = 'button'; el.className = 'etog'; el.setAttribute('role', 'switch'); el.setAttribute('aria-checked', f.value === 'true'); el.onclick = () => set(f, f.value === 'true' ? 0 : 1); }
+    else if (f.kind === 'source' || f.kind === 'switch'){ el = document.createElement('select'); srcOptions(el, f.kind === 'switch', f.value); el.onchange = () => set(f, el.value); }
+    else if (f.kind === 'choice'){ el = document.createElement('select'); f.extra.split(';').forEach(p => { const k = p.lastIndexOf('='); el.append(new Option(p.slice(0, k), p.slice(k + 1))); }); el.value = f.value; el.onchange = () => set(f, el.value); }
+    else if (f.kind === 'number'){
+      const [mn, mx, dec, suf] = f.extra.split(';'); const d = +dec || 0, k = 10 ** d;
+      el = document.createElement('div'); el.className = 'enum';
+      const inp = document.createElement('input'); inp.type = 'number'; inp.min = mn / k; inp.max = mx / k; inp.step = 1 / k; inp.value = (+f.value / k).toFixed(d);
+      inp.setAttribute('aria-label', f.label); if (!f.enabled) inp.disabled = true;
+      inp.onchange = () => { let v = Math.round(+inp.value * k); v = Math.max(+mn, Math.min(+mx, v)); set(f, v); };
+      el.append(inp); if (suf && suf !== 'nil'){ const s = document.createElement('span'); s.textContent = suf.trim(); el.append(s); }
+    }
+    else if (f.kind === 'button'){ el = document.createElement('button'); el.type = 'button'; el.className = 'zb'; el.textContent = f.value; el.onclick = () => set(f, ''); }
+    else if (f.kind === 'text'){ el = document.createElement('input'); el.type = 'text'; el.value = f.value; el.onchange = () => set(f, el.value); }
+    else { el = document.createElement('div'); el.className = 'es'; el.textContent = f.value; }
+    if (!f.enabled && 'disabled' in el) el.disabled = true;
+    el.setAttribute('aria-label', f.label);
+    row.append(el);
+  }
+}
+function updSrc(){
+  if (g('simSrc').hidden || !sim) return;
+  const rows = [...sim.used].sort().map(n => { let v = n in sim.written ? sim.written[n] : val(n, sim.t); const u = SL.cols[n]?.unit || '';
+    v = v == null ? '---' : typeof v === 'number' ? (+v.toFixed(3)) + (u ? ' ' + u : '') : v; return `<tr><td>${esc(n)}</td><td class="num">${esc(v)}</td></tr>`; });
+  g('simSrcBody').innerHTML = rows.join('') || `<tr><td colspan="2">${T('Das Widget hat noch keine Quelle gelesen.')}</td></tr>`;
+}
+// ---------- Zeitstrahl ----------
+const tl = g('simTl'), tctx = tl.getContext('2d'); let tlImg = null, tlFor = null;
+function tlBase(){
+  const dpr = Math.min(2, devicePixelRatio || 1), w = tl.clientWidth || 600, h = 64; tl.width = w * dpr; tl.height = h * dpr;
+  const c = document.createElement('canvas'); c.width = tl.width; c.height = tl.height; const x = c.getContext('2d'); x.scale(dpr, dpr);
+  const cs = getComputedStyle(document.documentElement), T_ = SL.t, dur = SL.dur || 1;
+  x.fillStyle = cs.getPropertyValue('--sim-therm');
+  (THERM || []).forEach(r => { const a = T_[r.s] / dur * w, b = T_[r.e] / dur * w; x.fillRect(a, 0, Math.max(1, b - a), h); });
+  const alt = CH?.alt?.vals;
+  if (alt){ let mx = 1; alt.forEach(v => { if (v > mx) mx = v; }); x.strokeStyle = cs.getPropertyValue('--accent'); x.lineWidth = 1.4; x.beginPath();
+    for (let i = 0; i < T_.length; i += 2){ const px = T_[i] / dur * w, py = h - 6 - Math.max(0, alt[i] || 0) / mx * (h - 14); i ? x.lineTo(px, py) : x.moveTo(px, py); } x.stroke();
+    x.fillStyle = cs.getPropertyValue('--muted'); x.font = '11px sans-serif'; x.fillText(T('Höhe, max {m} m', {m: Math.round(mx)}), 6, 12); }
+  tlImg = c; tlFor = LOG;
+}
+function drawTl(){
+  if (!SL) return;
+  const dpr = Math.min(2, devicePixelRatio || 1), w = tl.clientWidth || 600;
+  if (!tlImg || tlFor !== LOG || tlImg.width !== Math.round(w * dpr)) tlBase();
+  tctx.setTransform(1, 0, 0, 1, 0, 0); tctx.clearRect(0, 0, tl.width, tl.height); tctx.drawImage(tlImg, 0, 0);
+  tctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  tctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--fg'); tctx.fillRect((sim ? sim.t : 0) / (SL.dur || 1) * w - 1, 0, 2, 64);
+}
+tl.addEventListener('pointerup', e => { if (!SL) return; const r = tl.getBoundingClientRect(); seek((e.clientX - r.left) / r.width * SL.dur); });
+addEventListener('resize', () => { tlImg = null; if (visible) drawTl(); });
+
+// ---------- Widget laden ----------
+function loadWidget(w, t){
+  pause(); cur = w; code = FS[w.file]; g('simCodeTxt').value = code; store.set('sim.last', w.file); g('simCodeMsg').textContent = '';
+  out.innerHTML = ''; outN = 0; log('info', w.dir + '/main.lua ' + T('geladen'));
+  if (newSim()){ renderForm(); sim.t = 0; seek(t ?? 0); } else g('simRows').innerHTML = '';
+}
+function start(t){
+  if (!simLog()){ g('simNoLog').hidden = false; pause(); sim = null; return; }
+  g('simNoLog').hidden = true; g('simModel').textContent = SL.model;
+  if (typeof fengari === 'undefined'){ showErr(T('Die Lua-VM (fengari) konnte nicht geladen werden.')); return; }
+  const w = (cur && WIDGETS.find(x => x.id === cur.id)) || WIDGETS.find(x => x.file === store.get('sim.last')) || WIDGETS.find(x => /soll/i.test(x.dir)) || WIDGETS[0];
+  if (!w){ log('hinweis', T('Im scripts-Ordner liegt kein Unterordner mit main.lua.')); return; }
+  g('simSel').value = w.id; loadWidget(w, t);
+}
+// ---------- Bedienung ----------
+g('simSel').onchange = () => { const w = WIDGETS.find(x => x.id === g('simSel').value); if (w && SL) loadWidget(w, sim ? sim.t : 0); };
+g('simDirBtn').onclick = async () => {
+  if (window.ethosDesktop?.simScripts){ if (await loadDesktop({pick: true})){ cur = null; start(sim ? sim.t : 0); } }
+  else g('simDirIn').click();
+};
+g('simSenderBtn').onclick = async () => { if (await loadDesktop({sender: true})){ cur = null; start(sim ? sim.t : 0); } };
+g('simDirIn').onchange = async e => {
+  const list = [...e.target.files]; if (!list.length) return;
+  const files = {};
+  for (const f of list){
+    let rel = (f.webkitRelativePath || f.name).replace(/\\/g, '/');
+    const i = rel.toLowerCase().indexOf('scripts/'); rel = i >= 0 ? rel.slice(i + 8) : rel.split('/').slice(1).join('/');
+    if (!rel || !/\.(lua|txt|json|csv|cfg|ini)$/i.test(rel) || f.size > 2e6) continue;
+    files[rel] = await f.text();
+  }
+  setFS(files, 'ordner', list[0].webkitRelativePath.split('/')[0], false); cur = null; start(sim ? sim.t : 0);
+  e.target.value = '';
+};
+g('simSdSel').onchange = () => { g('simSdTxt').value = fsGet(g('simSdSel').value) ?? ''; };
+g('simSdSave').onclick = () => { const k = g('simSdSel').value; if (!k) return; FS[k] = g('simSdTxt').value; store.set('sim.fs.' + fsTag + '.' + k, FS[k]);
+  if (cur && k === cur.file){ code = FS[k]; g('simCodeTxt').value = code; } restart(); };
+g('simPlay').onclick = () => playing ? pause() : play();
+g('simStart').onclick = () => seek(0);
+g('simBack').onclick = () => sim && seek(sim.t - 10);
+g('simFwd').onclick = () => sim && seek(sim.t + 10);
+g('simCur').onclick = () => { if (CURSOR != null && LOG) seek(LOG.t[CURSOR] || 0); };
+g('simGoto').onsubmit = e => { e.preventDefault(); const p = g('simGotoIn').value.trim().split(':').map(Number); const s = p.length > 1 ? p[0] * 60 + p[1] : p[0] * 60; if (!isNaN(s)) seek(s); };
+[0.25, 0.5, 1, 2, 4, 8, 16, 32].forEach(s => { const b = document.createElement('button'); b.type = 'button'; b.textContent = ({0.25: '¼', 0.5: '½'}[s] || s) + '×'; b.setAttribute('aria-pressed', s === speed);
+  b.onclick = () => { speed = s; [...g('simSpeed').children].forEach(x => x.setAttribute('aria-pressed', x === b)); }; g('simSpeed').append(b); });
+document.addEventListener('keydown', e => { if (!visible || e.target.closest('input,textarea,select,button')) return; if (e.code === 'Space'){ e.preventDefault(); playing ? pause() : play(); } });
+document.querySelectorAll('.simtabs button').forEach(b => b.onclick = () => { document.querySelectorAll('.simtabs button').forEach(x => { x.setAttribute('aria-selected', x === b); g(x.dataset.t).hidden = x !== b; }); updSrc(); });
+g('simApply').onclick = () => { code = g('simCodeTxt').value; FS[cur.file] = code; store.set('sim.fs.' + fsTag + '.' + cur.file, code); g('simCodeMsg').textContent = T('Übernommen, Widget neu gestartet.'); restart(); };
+g('simOrig').onclick = () => { if (!cur) return; store.del?.('sim.fs.' + fsTag + '.' + cur.file); FS[cur.file] = ORIG[cur.file] ?? code; g('simCodeTxt').value = FS[cur.file]; code = FS[cur.file]; restart(); g('simCodeMsg').textContent = T('Original geladen.'); };
+g('simCopy').onclick = async () => { try { await navigator.clipboard.writeText(g('simCodeTxt').value); g('simCodeMsg').textContent = T('Kopiert.'); } catch(e){ g('simCodeTxt').select(); g('simCodeMsg').textContent = T('Markiert, mit Strg+C kopieren.'); } };
+g('simSave').onclick = async () => {
+  if (!cur || !window.ethosDesktop?.simWrite) return;
+  try { const p = await ethosDesktop.simWrite(cur.file, g('simCodeTxt').value); ORIG[cur.file] = FS[cur.file] = g('simCodeTxt').value; store.del?.('sim.fs.' + fsTag + '.' + cur.file);
+    g('simCodeMsg').textContent = T('Gespeichert: {p} (alte Datei als main.lua.bak)', {p}); }
+  catch(e){ g('simCodeMsg').textContent = T('Speichern ging nicht: {e}', {e: e.message || e}); }
+};
+g('simSize').onchange = () => { [W, H] = g('simSize').value.split('x').map(Number); store.set('sim.size', g('simSize').value); restart(); };
+// Touch und Drehgeber
+const evAt = e => { const r = scr.getBoundingClientRect(); return [Math.round((e.clientX - r.left) / r.width * W), Math.round((e.clientY - r.top) / r.height * H)]; };
+let rfT = 0; const formSoon = () => { clearTimeout(rfT); rfT = setTimeout(renderForm, 300); };
+scr.addEventListener('pointerdown', e => { if (!sim) return; const [x, y] = evAt(e); const er = sim.event(2, 16, x, y); if (er) return showErr(er); sim.event(2, 18, x, y); saveCfg(); paint(); formSoon(); });
+scr.addEventListener('wheel', e => { if (!sim) return; e.preventDefault(); const er = sim.event(1, e.deltaY < 0 ? 101 : 100, 0, 0); if (er) return showErr(er); saveCfg(); paint(); formSoon(); }, {passive: false});
+
+// ---------- Anbindung an die App ----------
+const sz = store.get('sim.size'); if (sz && [...g('simSize').options].some(o => o.value === sz)) g('simSize').value = sz;
+[W, H] = g('simSize').value.split('x').map(Number);
+setFS(SAMPLE, 'beispiel', null, false);
+let deskTried = false;
+// Polaren aus dem Tab Polare: hat sich die Datei geändert (Polare neu angesehen), Widget neu starten
+let polSeen = null;
+const polText = () => fsGet('maccready/polaren.lua');
+function polHint(){
+  if (!SL || Object.keys(FS).some(k => /^maccready\/polaren\.lua$/i.test(k))) return;
+  let all = {}; try{ all = JSON.parse(store.get('mc.polars') || '{}'); }catch(e){}
+  if (!all[SL.model]) log('hinweis', T('Für {m} gibt es noch keine Polare. Öffne einmal den Tab Polare, dann steht sie dem Widget in polaren.lua zur Verfügung.', {m: SL.model}));
+}
+window.simShow = async () => {
+  visible = true;
+  if (!deskTried){ deskTried = true; await loadDesktop({}); }
+  if (!started || slFor !== LOG){ started = true; polSeen = polText(); start(CURSOR != null && LOG ? LOG.t[CURSOR] || 0 : 0); polHint(); }
+  else if (polText() !== polSeen){ polSeen = polText(); fillSd(); restart(); }
+  else redraw();
+};
+window.simHide = () => { visible = false; pause(); };
+window.simLogChanged = () => { pause(); started = false; if (visible) setTimeout(() => { if (visible && !started){ started = true; start(0); } }); };
+if (!g('pane-simulator').hidden) window.simShow();
+})();
 </script>

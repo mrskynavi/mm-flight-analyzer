@@ -184,3 +184,17 @@ test('Watcher merkt sich den Ethos-Ordner für polaren.lua', async () => {
   await w.poll(true);
   assert.deepEqual(w.ethosRoots, [path.join(root, 'RADIO')]);
 });
+
+test('Simulator: scripts-Ordner lesen und Widget zurückschreiben', async () => {
+  const dir = tmp();
+  put(path.join(dir, 'sollfahrt', 'main.lua'), 'return {}');
+  put(path.join(dir, 'maccready', 'polaren.lua'), 'return {}');
+  put(path.join(dir, 'sollfahrt', 'bild.png'), 'x');
+  const files = await S.readScripts(dir);
+  assert.deepEqual(Object.keys(files).sort(), ['maccready/polaren.lua', 'sollfahrt/main.lua']);
+  await S.writeScript(dir, 'sollfahrt/main.lua', '-- neu');
+  assert.equal(fs.readFileSync(path.join(dir, 'sollfahrt', 'main.lua'), 'utf8'), '-- neu');
+  assert.equal(fs.readFileSync(path.join(dir, 'sollfahrt', 'main.lua.bak'), 'utf8'), 'return {}');
+  await assert.rejects(S.writeScript(dir, '../x.lua', ''));
+  await assert.rejects(S.writeScript(dir, 'sollfahrt/main.txt', ''));
+});

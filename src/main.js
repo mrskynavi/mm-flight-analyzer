@@ -80,6 +80,29 @@ ipcMain.handle('sender:polars', async (_, text) => {
   for (const r of roots) out.push(await S.writePolars(r, text));
   return out;
 });
+// Simulator: scripts-Ordner des angeschlossenen Ethos-Senders oder ein selbst gewählter Ordner
+let simDir = null;
+async function simScriptsDir(opts) {
+  if (opts?.pick) {
+    const r = await dialog.showOpenDialog(win, { defaultPath: settings.simScripts || undefined, properties: ['openDirectory'] });
+    if (r.canceled) return null;
+    saveSettings({ simScripts: r.filePaths[0] });
+  }
+  if (opts?.sender) saveSettings({ simScripts: '' });
+  if (settings.simScripts && fs.existsSync(settings.simScripts)) return { dir: settings.simScripts, source: 'ordner' };
+  for (const r of watcher.ethosRoots || []) { const d = path.join(r, 'scripts'); if (fs.existsSync(d)) return { dir: d, source: 'sender' }; }
+  return null;
+}
+ipcMain.handle('scripts:read', async (_, opts) => {
+  const t = await simScriptsDir(opts || {});
+  if (!t) { simDir = null; return { files: {}, error: opts?.sender ? 'Kein Ethos-Sender mit scripts-Ordner angeschlossen.' : null }; }
+  simDir = t.dir;
+  return { ...t, files: await S.readScripts(t.dir) };
+});
+ipcMain.handle('scripts:write', (_, rel, text) => {
+  if (!simDir) throw new Error('Kein scripts-Ordner gewählt.');
+  return S.writeScript(simDir, String(rel), text);
+});
 ipcMain.handle('archive:list', () => S.listArchive(settings.archiveDir));
 ipcMain.handle('archive:save', (_, name, bytes) => S.archiveFile(settings.archiveDir, name, Buffer.from(bytes)));
 ipcMain.handle('archive:open', () => { fs.mkdirSync(settings.archiveDir, { recursive: true }); return shell.openPath(settings.archiveDir); });

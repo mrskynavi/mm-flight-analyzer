@@ -26,4 +26,6 @@ contextBridge.exposeInMainWorld('ethosDesktop', {
   copyText: t => ipcRenderer.invoke('clipboard:write', t),
   polarsTarget: () => ipcRenderer.invoke('sender:polarsTarget'),
   writePolars: text => ipcRenderer.invoke('sender:polars', text),
+  simScripts: opts => ipcRenderer.invoke('scripts:read', opts),
+  simWrite: (rel, text) => ipcRenderer.invoke('scripts:write', rel, text),
 });
