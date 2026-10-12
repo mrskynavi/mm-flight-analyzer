@@ -358,8 +358,21 @@ td.mut{color:var(--muted)}
 :root{--e-bezel:#0a0d11;--e-bar:#11161d;--e-bg:#1c232c;--e-row:#232c37;--e-rowalt:#28323e;--e-fg:#e6eaf0;--e-muted:#8d99a6;--e-focus:#2f7fd8;--e-line:#36414e;--sim-therm:rgba(31,122,77,.18)}
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--sim-therm:rgba(76,195,138,.18)}}
 :root[data-theme="dark"]{--sim-therm:rgba(76,195,138,.18)}
-.simgrid{display:grid;grid-template-columns:minmax(0,340px) minmax(0,1fr);gap:14px;align-items:start}
-@media (max-width:900px){.simgrid{grid-template-columns:minmax(0,1fr)}}
+.simbar{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;margin-bottom:10px}
+.simbar h2{margin:0}
+.simbar .simfl{display:flex;gap:6px;align-items:center}
+.simbar .simfl select{max-width:260px}
+.simbar .hint{margin:0}
+.simtop{display:grid;grid-template-columns:minmax(240px,1fr) auto;gap:14px;align-items:start;margin-bottom:12px}
+.simtop .eform{height:var(--simh,auto);min-height:260px;overflow:auto}
+.simtop .eform .ehead{position:sticky;top:0;z-index:1}
+@media (max-width:900px){.simtop{grid-template-columns:minmax(0,1fr)}.simtop .eform{height:auto;max-height:60vh;order:2}}
+.simcharts{display:grid;gap:10px}
+.simch{display:grid;gap:4px}
+.simchh{display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}
+.simchh select{font:inherit;font-size:.85rem;color:var(--fg);background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:4px 8px;max-width:100%}
+.simchv{font:600 1.05rem var(--mono);font-variant-numeric:tabular-nums}
+.simch canvas{width:100%;height:130px;display:block;border-radius:6px;background:var(--panel);border:1px solid var(--line);cursor:pointer;touch-action:none}
 .simside,.simmain{display:grid;gap:12px;min-width:0}
 .simfl{display:grid;gap:3px;font-size:.82rem;color:var(--muted)}
 .simfl select{font:inherit;color:var(--fg);background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:5px 8px;min-width:0}
@@ -379,7 +392,7 @@ td.mut{color:var(--muted)}
 .etog[aria-checked="true"]{background:var(--e-focus)} .etog[aria-checked="true"]::after{left:25px}
 .enum{display:flex;align-items:center;gap:4px} .enum span{color:var(--e-muted);font-size:13px;white-space:nowrap}
 .eempty{padding:14px 12px;color:var(--e-muted);font-size:14px}
-.simtx{background:var(--e-bezel);border-radius:18px;padding:14px;justify-self:center;max-width:100%}
+.simtx{background:var(--e-bezel);border-radius:18px;padding:14px;justify-self:end;max-width:100%;min-width:0}
 .simtxbar{display:flex;justify-content:space-between;gap:10px;font:500 13px Roboto,"Segoe UI",Arial,sans-serif;color:var(--e-muted);padding:0 4px 8px}
 .simtxbar b{color:var(--e-fg)}
 #simScr{display:block;background:var(--e-bg);border-radius:4px;max-width:100%;height:auto;cursor:pointer}
@@ -988,44 +1001,45 @@ pre.code{background:var(--bg);border:1px solid var(--line);border-radius:8px;pad
   </section>
   </div>
   <div class="pane" role="tabpanel" id="pane-simulator" data-tab="simulator" aria-labelledby="tab-simulator" hidden>
-  <div class="simgrid">
-    <section class="simside">
-      <h2 class="hi">Simulator <button type="button" class="iconbtn sm" data-info="info-sim" aria-expanded="false" aria-controls="info-sim" aria-label="So funktioniert es">i</button></h2>
-      <div class="infopop" id="info-sim" hidden>
+  <div class="simbar">
+    <h2 class="hi">Simulator <button type="button" class="iconbtn sm" data-info="info-sim" aria-expanded="false" aria-controls="info-sim" aria-label="So funktioniert es">i</button></h2>
+    <label class="simfl">Widget <select id="simSel"></select></label>
+    <button type="button" class="zb" id="simDirBtn">scripts-Ordner wählen …</button>
+    <input type="file" id="simDirIn" webkitdirectory multiple hidden>
+    <button type="button" class="zb" id="simSenderBtn" hidden>Sender verwenden</button>
+    <span class="hint" id="simDirInfo"></span>
+    <label class="simfl">Bildschirm
+      <select id="simSize">
+        <option value="784x316">X20 · ganzer Bildschirm (784 × 316)</option>
+        <option value="388x316">X20 · halber Bildschirm (388 × 316)</option>
+        <option value="388x154">X20 · Viertel (388 × 154)</option>
+        <option value="256x100">X20 · Sechstel (256 × 100)</option>
+        <option value="472x208">X18 · ganzer Bildschirm (472 × 208)</option>
+        <option value="234x208">X18 · halber Bildschirm (234 × 208)</option>
+      </select></label>
+  </div>
+  <div class="infopop" id="info-sim" hidden>
         <p>Der Simulator führt Deine Ethos-Widgets aus, genau die Lua-Datei main.lua, die auf dem Sender liegt, und spielt dazu das gewählte Log ab. So testest Du ein Widget am Schreibtisch und überträgst die Erkenntnisse direkt ins Lua.</p>
         <p>Nachgebaut sind lcd, system, form, model, storage, io und loadfile. <code>wakeup</code> läuft alle 50 ms in Logzeit, <code>os.clock()</code> läuft mit dem Log. Die Werte kommen genau so, wie sie im Log stehen; Schalter liefern −1024 / 0 / 1024 wie am Sender, GPS die Position als lat/lon.</p>
         <p>Klick auf den Bildschirm = Touch, Mausrad = Drehgeber. <code>playTone</code> und <code>playNumber</code> sind bis 2× Tempo hörbar. Eine Änderung in der Konfiguration gilt sofort, das Log läuft weiter. Beim Zurückspringen startet das Widget neu und rechnet bis zur Stelle nach.</p>
         <p>In der Desktop-App beobachtet der Simulator den scripts-Ordner. Wird main.lua oder eine Datei, die das Widget lädt, im Hintergrund neu geschrieben (Editor, git pull, Sync), startet das Widget mit dem neuen Code an der gleichen Stelle neu. Die Konfiguration bleibt, die Wiedergabe läuft weiter. Ist die Datei fehlerhaft, hält der Simulator an und läuft nach dem nächsten Speichern von selbst weiter.</p>
+        <p>Die Widget-Liste zeigt jeden Unterordner mit main.lua. Wähle den Ordner scripts auf dem Sender oder Deinem Rechner. Ohne Ordner laufen die Beispiel-Widgets Sollfahrt, Thermik und Steigflüge.</p>
+        <p>Die zwei Diagramme unter dem Widget zeigen frei wählbare Werte um die aktuelle Stelle, die Zahl daneben ist der Wert jetzt. Klick ins Diagramm springt an die Stelle.</p>
         <p>Noch nicht nachgebaut: Bilder (lcd.loadBitmap), weitere Tasten, Telemetrie senden. Schriften und Bildschirmgrössen sind angenähert.</p>
       </div>
-      <label class="simfl">Widget<select id="simSel"></select></label>
-      <div class="simrow">
-        <button type="button" class="zb" id="simDirBtn">scripts-Ordner wählen …</button>
-        <input type="file" id="simDirIn" webkitdirectory multiple hidden>
-        <button type="button" class="zb" id="simSenderBtn" hidden>Sender verwenden</button>
-      </div>
-      <p class="hint" id="simDirInfo"></p>
-      <label class="simfl">Bildschirm
-        <select id="simSize">
-          <option value="784x316">X20 · ganzer Bildschirm (784 × 316)</option>
-          <option value="388x316">X20 · halber Bildschirm (388 × 316)</option>
-          <option value="388x154">X20 · Viertel (388 × 154)</option>
-          <option value="256x100">X20 · Sechstel (256 × 100)</option>
-          <option value="472x208">X18 · ganzer Bildschirm (472 × 208)</option>
-          <option value="234x208">X18 · halber Bildschirm (234 × 208)</option>
-        </select></label>
-      <div class="eform" aria-label="Widget-Konfiguration wie in Ethos">
-        <div class="ehead"><span id="simTitle">Widget</span><span>Konfigurieren</span></div>
-        <div id="simRows"></div>
-      </div>
-    </section>
+  <p class="hint" id="simNoLog" hidden>Der Simulator braucht ein Ethos-Log (CSV). Wähle oben ein Log aus.</p>
+  <div class="simtop">
+    <div class="eform" id="simForm" aria-label="Widget-Konfiguration wie in Ethos">
+      <div class="ehead"><span id="simTitle">Widget</span><span>Konfigurieren</span></div>
+      <div id="simRows"></div>
+    </div>
+    <div class="simtx" id="simTx">
+      <div class="simtxbar"><b id="simModel">–</b><span id="simClock">--:--:--</span><span>Simulator</span></div>
+      <canvas id="simScr" width="784" height="316" aria-label="Widget wie auf dem Sender. Klick = Touch, Mausrad = Drehgeber."></canvas>
+    </div>
+  </div>
     <div class="simmain">
       <section>
-        <p class="hint" id="simNoLog" hidden>Der Simulator braucht ein Ethos-Log (CSV). Wähle oben ein Log aus.</p>
-        <div class="simtx">
-          <div class="simtxbar"><b id="simModel">–</b><span id="simClock">--:--:--</span><span>Simulator</span></div>
-          <canvas id="simScr" width="784" height="316" aria-label="Widget wie auf dem Sender. Klick = Touch, Mausrad = Drehgeber."></canvas>
-        </div>
         <div id="simErr" class="simerr" hidden></div>
         <canvas id="simTl" aria-label="Zeitstrahl: Höhe, grün = Thermik. Klicken springt an die Stelle."></canvas>
         <div class="simctl">
@@ -1043,6 +1057,11 @@ pre.code{background:var(--bg);border:1px solid var(--line);border-radius:8px;pad
           <label class="simchk"><input type="checkbox" id="simSnd" checked> Ton und Ansagen hörbar (bis 2×)</label>
           <span class="simprog" id="simProg" hidden></span>
         </div>
+      </section>
+      <section class="simcharts" aria-label="Diagramme zum Widget">
+        <div class="simctl"><span class="hint">Diagramme, Ausschnitt</span><span class="simseg" id="simWin" role="group" aria-label="Ausschnitt"></span></div>
+        <div class="simch"><div class="simchh"><select id="simC1" aria-label="Wert im Diagramm 1"></select><b class="simchv" id="simV1">–</b></div><canvas id="simK1" aria-label="Diagramm 1, Klick springt an die Stelle"></canvas></div>
+        <div class="simch"><div class="simchh"><select id="simC2" aria-label="Wert im Diagramm 2"></select><b class="simchv" id="simV2">–</b></div><canvas id="simK2" aria-label="Diagramm 2, Klick springt an die Stelle"></canvas></div>
       </section>
       <section>
         <div class="simtabs" role="tablist">
@@ -1066,7 +1085,6 @@ pre.code{background:var(--bg);border:1px solid var(--line);border-radius:8px;pad
         </div>
       </section>
     </div>
-  </div>
   </div>
 </div>
 
@@ -6535,15 +6553,18 @@ function resolve(p){
 }
 // polaren.lua: liegt sie nicht im Ordner, kommt sie aus dem Tab Polare
 function fsGet(p){ const k = resolve(p); if (k in FS) return FS[k]; if (/^maccready\/polaren\.lua$/i.test(k) && typeof mcFileText === 'function') return mcFileText(); return null; }
+function dirInfo(){
+  const el = g('simDirInfo'), base = fsDir ? String(fsDir).replace(/[\\/]+$/, '').split(/[\\/]/).slice(-2).join('/') : T('gewählter Ordner');
+  el.textContent = fsTag === 'beispiel' ? T('Beispiel-Widgets') : T('{n} Widgets aus {d}', {n: WIDGETS.length, d: base});
+  el.title = fsDir || '';
+}
 function setFS(files, tag, dir, desk){
   FS = {...files}; ORIG = {...files}; fsTag = tag; fsDir = dir; fsDesk = !!desk;
   for (const k in FS){ const v = store.get('sim.fs.' + tag + '.' + k); if (v) FS[k] = v; }
   scan(); fillSel(); fillSd();
   g('simSave').hidden = !fsDesk;
   g('simSenderBtn').hidden = !(window.ethosDesktop && fsTag === 'ordner');
-  g('simDirInfo').textContent = fsTag === 'beispiel'
-    ? T('Beispiel-Widgets: sollfahrt, thermik, steigfluege. Wähle den Ordner scripts auf dem Sender oder Deinem Rechner, dann erscheinen hier alle Widgets darin.')
-    : T('{n} Widgets aus {d}', {n: WIDGETS.length, d: dir || T('dem gewählten Ordner')});
+  dirInfo();
 }
 async function loadDesktop(opts){
   if (!window.ethosDesktop?.simScripts) return false;
@@ -6631,7 +6652,7 @@ async function seek(to){
   if (was && !err) play();
 }
 function restart(){ if (!sim) return start(0); const t = sim.t; if (newSim()){ renderForm(); sim.t = 0; seek(t); } }
-function redraw(){ paint(); drawTl(); updClock(); updSrc(); }
+function redraw(){ paint(); drawTl(); updClock(); updSrc(); kDraw(); }
 function updClock(){
   g('simTime').textContent = `${fmt(sim.t)} / ${fmt(SL.dur)}`;
   g('simClock').textContent = String(LOG.clock?.[idx(sim.t)] || '').slice(0, 8);
@@ -6641,7 +6662,7 @@ function frame(ts){
   if (!playing) return;
   const dt = Math.min(.25, (ts - lastFrame) / 1000) * speed; lastFrame = ts;
   if (step(Math.min(SL.dur, sim.t + dt), 0.05) && sim.invalid) paint();
-  if (ts - lastUi > 120){ lastUi = ts; drawTl(); updClock(); updSrc(); }
+  if (ts - lastUi > 120){ lastUi = ts; drawTl(); updClock(); updSrc(); kDraw(); }
   if (sim.t >= SL.dur){ pause(); return; }
   if (playing) requestAnimationFrame(frame);
 }
@@ -6717,7 +6738,73 @@ function drawTl(){
   tctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--fg'); tctx.fillRect((sim ? sim.t : 0) / (SL.dur || 1) * w - 1, 0, 2, 64);
 }
 tl.addEventListener('pointerup', e => { if (!SL) return; const r = tl.getBoundingClientRect(); seek((e.clientX - r.left) / r.width * SL.dur); });
-addEventListener('resize', () => { tlImg = null; if (visible) drawTl(); });
+addEventListener('resize', () => { tlImg = null; if (visible){ drawTl(); kDraw(); } });
+
+// ---------- Zwei frei wählbare Diagramme unter dem Widget ----------
+const WINS = [[60, '1 min'], [120, '2 min'], [300, '5 min'], [600, '10 min'], [0, T('Alles')]];
+let kWin = +(store.get('sim.win') ?? 120), kFor = null;
+WINS.forEach(([v, l]) => { const b = document.createElement('button'); b.type = 'button'; b.textContent = l; b.setAttribute('aria-pressed', v === kWin);
+  b.onclick = () => { kWin = v; store.set('sim.win', v); [...g('simWin').children].forEach(x => x.setAttribute('aria-pressed', x === b)); kDraw(); }; g('simWin').append(b); });
+const kCol = i => (LOG?.cols || []).find(c => c.raw === g('simC' + i).value);
+function kFill(){
+  kFor = LOG; const cols = (LOG?.cols || []).filter(c => c.vals?.some(Number.isFinite));
+  const def = [/vario|steig/i, /^(gps.*)?(speed|geschw)|tas|fahrt/i];
+  [1, 2].forEach(i => {
+    const sel = g('simC' + i), want = store.get('sim.c' + i);
+    sel.innerHTML = ''; sel.append(new Option(T('– kein –'), ''));
+    [[T('Sensoren'), c => !c.rc && !c.derived], [T('berechnet'), c => c.derived], [T('Sender'), c => c.rc && !c.derived]].forEach(([lab, f]) => {
+      const list = cols.filter(f); if (!list.length) return;
+      const og = document.createElement('optgroup'); og.label = lab; list.forEach(c => og.append(new Option(c.raw, c.raw))); sel.append(og); });
+    const pick = cols.find(c => c.raw === want) || cols.find(c => !c.rc && def[i - 1].test(c.name)) || cols[i - 1];
+    sel.value = pick ? pick.raw : '';
+  });
+}
+const kFmt = v => !Number.isFinite(v) ? '---' : (+v.toFixed(Math.abs(v) >= 100 ? 0 : Math.abs(v) >= 10 ? 1 : 2)).toLocaleString('de-CH');
+function kRange(){
+  const dur = SL?.dur || 1, t = sim ? sim.t : 0;
+  if (!kWin || kWin >= dur) return [0, dur];
+  let a = t - kWin / 2; a = Math.max(0, Math.min(dur - kWin, a)); return [a, a + kWin];
+}
+function kIdx(t){ const T_ = LOG.t; let lo = 0, hi = T_.length - 1; while (lo < hi){ const m = (lo + hi + 1) >> 1; if (T_[m] <= t) lo = m; else hi = m - 1; } return lo; }
+function kDraw(){
+  if (!LOG || !SL) return;
+  if (kFor !== LOG) kFill();
+  const cs = getComputedStyle(document.documentElement), dpr = Math.min(2, devicePixelRatio || 1), t = sim ? sim.t : 0, [a, b] = kRange();
+  [1, 2].forEach(i => {
+    const cv = g('simK' + i), c = kCol(i), w = cv.clientWidth || 600, h = cv.clientHeight || 130;
+    if (cv.width !== Math.round(w * dpr) || cv.height !== Math.round(h * dpr)){ cv.width = Math.round(w * dpr); cv.height = Math.round(h * dpr); }
+    const x = cv.getContext('2d'); x.setTransform(dpr, 0, 0, dpr, 0, 0); x.clearRect(0, 0, w, h);
+    const X = s => (s - a) / (b - a || 1) * w;
+    x.fillStyle = cs.getPropertyValue('--sim-therm');
+    (THERM || []).forEach(r => { const p = LOG.t[r.s], q = LOG.t[r.e]; if (q < a || p > b) return; x.fillRect(X(p), 0, Math.max(1, X(q) - X(p)), h); });
+    if (!c){ g('simV' + i).textContent = '–'; return; }
+    const ia = kIdx(a), ib = Math.min(LOG.t.length - 1, kIdx(b) + 1), st = Math.max(1, Math.floor((ib - ia) / (w * 2)));
+    let lo = Infinity, hi = -Infinity;
+    for (let k = ia; k <= ib; k++){ const v = c.vals[k]; if (Number.isFinite(v)){ if (v < lo) lo = v; if (v > hi) hi = v; } }
+    const now = c.vals[kIdx(t)];
+    g('simV' + i).textContent = kFmt(now) + (Number.isFinite(now) && c.unit ? ' ' + c.unit : '');
+    if (lo > hi){ x.fillStyle = cs.getPropertyValue('--muted'); x.font = '12px ' + cs.getPropertyValue('--body'); x.fillText(T('keine Werte in diesem Ausschnitt'), 8, 18); return; }
+    if (lo === hi){ lo -= 1; hi += 1; } const pad = (hi - lo) * .08; lo -= pad; hi += pad;
+    const Y = v => h - (v - lo) / (hi - lo) * h;
+    x.strokeStyle = cs.getPropertyValue('--line'); x.lineWidth = 1;
+    if (lo < 0 && hi > 0){ x.beginPath(); x.moveTo(0, Y(0)); x.lineTo(w, Y(0)); x.stroke(); }
+    x.strokeStyle = cs.getPropertyValue(i === 1 ? '--accent' : '--warn'); x.lineWidth = 1.5; x.beginPath();
+    let on = false;
+    for (let k = ia; k <= ib; k += st){ const v = c.vals[k]; if (!Number.isFinite(v)){ on = false; continue; } const px = X(LOG.t[k]), py = Y(v); on ? x.lineTo(px, py) : x.moveTo(px, py); on = true; }
+    x.stroke();
+    x.fillStyle = cs.getPropertyValue('--muted'); x.font = '11px ' + cs.getPropertyValue('--mono');
+    x.fillText(kFmt(hi - pad), 6, 12); x.fillText(kFmt(lo + pad), 6, h - 5);
+    x.textAlign = 'right'; x.fillText(fmt(a) + ' – ' + fmt(b), w - 6, h - 5); x.textAlign = 'left';
+    x.fillStyle = cs.getPropertyValue('--fg'); x.fillRect(X(t) - 1, 0, 2, h);
+    if (Number.isFinite(now)){ x.beginPath(); x.arc(X(t), Y(now), 3.5, 0, 7); x.fill(); }
+  });
+}
+[1, 2].forEach(i => {
+  g('simC' + i).onchange = () => { store.set('sim.c' + i, g('simC' + i).value); kDraw(); };
+  g('simK' + i).addEventListener('pointerup', e => { if (!SL) return; const r = e.currentTarget.getBoundingClientRect(), [a, b] = kRange(); seek(a + (e.clientX - r.left) / r.width * (b - a)); });
+});
+// Konfiguration so hoch wie der Senderbildschirm
+new ResizeObserver(() => { const h = g('simTx').offsetHeight; if (h) g('simForm').parentElement.style.setProperty('--simh', h + 'px'); }).observe(g('simTx'));
 
 // ---------- Widget laden ----------
 function loadWidget(w, t){
@@ -6802,7 +6889,7 @@ function fsChanged(r){
   if (!ch.length) return;
   const was = playing || fsResume;
   scan(); fillSel(); fillSd();
-  g('simDirInfo').textContent = T('{n} Widgets aus {d}', {n: WIDGETS.length, d: fsDir});
+  dirInfo();
   if (!cur || !SL) return;
   if (!(cur.file in FS)){ log('hinweis', cur.file + ' ' + T('ist nicht mehr im Ordner.')); return; }
   // main.lua des Widgets oder eine Datei, die es lädt (polaren.lua, require …): neu starten
