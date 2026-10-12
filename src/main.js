@@ -96,9 +96,30 @@ async function simScriptsDir(opts) {
 ipcMain.handle('scripts:read', async (_, opts) => {
   const t = await simScriptsDir(opts || {});
   if (!t) { simDir = null; return { files: {}, error: opts?.sender ? 'Kein Ethos-Sender mit scripts-Ordner angeschlossen.' : null }; }
-  simDir = t.dir;
+  simDir = t.dir; simWatch(t.dir);
   return { ...t, files: await S.readScripts(t.dir) };
 });
+// scripts-Ordner beobachten: wird ein Widget im Hintergrund neu geschrieben (Editor, git pull, Sync),
+// bekommt der Simulator den neuen Stand und startet das Widget an der gleichen Stelle neu
+let simWatcher = null, simWatchT = null;
+function simWatch(dir) {
+  if (simWatcher?.dir === dir) return;
+  simWatcher?.close(); simWatcher = null;
+  try {
+    const w = fs.watch(dir, { recursive: true }, (_, name) => {
+      const rel = String(name || '').replace(/\\/g, '/');
+      if (rel && rel.split('/').some(x => x.startsWith('.'))) return;   // .git, Editor-Temp
+      if (rel && !/\.(lua|txt|json|csv|cfg|ini)$/i.test(rel) && /\.[^/]+$/.test(rel)) return;
+      clearTimeout(simWatchT);
+      simWatchT = setTimeout(async () => {   // warten, bis fertig geschrieben ist
+        if (simDir !== dir || !win || win.isDestroyed()) return;
+        win.webContents.send('scripts:changed', { dir, files: await S.readScripts(dir) });
+      }, 400);
+    });
+    w.on('error', () => {});
+    w.dir = dir; simWatcher = w;
+  } catch { /* Ordner ohne Beobachtung: Änderungen erst nach erneutem Wählen */ }
+}
 ipcMain.handle('scripts:write', (_, rel, text) => {
   if (!simDir) throw new Error('Kein scripts-Ordner gewählt.');
   return S.writeScript(simDir, String(rel), text);
