@@ -195,9 +195,10 @@ dialog#settingsDlg::backdrop{background:color-mix(in srgb,#000 45%,transparent)}
 @media (max-width:640px){.cbox .ct{flex-wrap:wrap;row-gap:2px}.cbox .ct .meta{margin-left:auto}}
 .olegend .vst{opacity:.85}
 .rawwrap tbody tr.off td:not(:first-child){color:var(--muted);opacity:.55}
-.rawwrap{height:min(70vh,640px);overflow:auto;background:var(--panel);border:1px solid var(--line);border-radius:10px;overscroll-behavior:contain}
-.rawwrap table{width:auto;min-width:100%}
-.rawwrap th,.rawwrap td{height:26px;padding:0 10px;font-size:.8rem;line-height:26px}
+.rawwrap{height:min(70vh,640px);overflow:auto;background:var(--panel);border:1px solid var(--line);border-radius:10px;overscroll-behavior:contain;contain:strict}
+/* feste Spaltenbreiten: beim Scrollen muss der Browser die 140 Spalten nicht jedes Mal neu ausmessen */
+.rawwrap table{width:auto;min-width:100%;table-layout:fixed;font-family:var(--mono);font-size:.8rem}
+.rawwrap th,.rawwrap td{height:26px;padding:0 10px;font-size:.8rem;line-height:26px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .rawwrap td{font-family:var(--mono)}
 .rawwrap thead th{position:sticky;top:0;background:var(--panel);z-index:2;text-transform:none;letter-spacing:0;box-shadow:0 1px 0 var(--line)}
 .rawwrap th:first-child,.rawwrap td:first-child{position:sticky;left:0;background:var(--panel);z-index:1;color:var(--muted)}
@@ -206,6 +207,7 @@ dialog#settingsDlg::backdrop{background:color-mix(in srgb,#000 45%,transparent)}
 .rawwrap tbody tr[data-i]:hover td{background:var(--accent-soft)}
 .rawwrap tbody tr.cur td{background:color-mix(in srgb,var(--warn) 18%,var(--panel));font-weight:600}
 .rawwrap tr.sp td{padding:0;border:0;height:auto}
+.rawwrap .gap{padding:0}
 .hint{color:var(--muted);font-size:.85rem;margin:0}
 .tablewrap{overflow-x:auto;background:var(--panel);border:1px solid var(--line);border-radius:10px}
 table{border-collapse:collapse;width:100%;font-size:.88rem;font-variant-numeric:tabular-nums}
@@ -1455,7 +1457,7 @@ function render(log, name, example){
   carryFilters(); computeActive(); renderFilters();
   renderStatsTable();
   fillWindAlt(); renderWindHeight();
-  $('#rawtable thead').innerHTML = `<tr><th>#</th>${log.header.map(h=>`<th>${esc(h)}</th>`).join('')}</tr>`;
+  rawHead(log);
   rawCount();
   $('#rawwrap').scrollTop=0; rawFirst=-1; renderRaw();
   drawCharts(); drawTrack(log,CH,CLIMB,THERM); drawBars(); renderCursor(); kiPing(true);
@@ -1489,7 +1491,8 @@ function fillSelects(){
   const hOpts  = optGroups(LOG.cols.filter(c=>!c.rc));
   for (const [k,w] of Object.entries(W)){
     $(w.sw).innerHTML=swOpts; $(w.h).innerHTML=hOpts;
-    const savedSw=mstore.get(k+'.sw'), savedH=mstore.get(k+'.h');
+    // Schalter nur pro Modell: der zuletzt bei einem anderen Modell gewählte Schalter passt meist nicht (Lak-17 SC, SB-10 SB)
+    const savedSw=store.get(mkey(k+'.sw')), savedH=mstore.get(k+'.h');
     if (k==='climb' && CH.cur) $(w.sw).querySelector('option').insertAdjacentHTML('afterend',`<option value="${CUR_SW}">${esc(T('{n} (automatisch)',{n:CH.cur.name}))}</option>`);
     let sw = savedSw===CUR_SW && CH.cur ? CUR_SW : (savedSw && colBy(savedSw)) ? savedSw : null;
     if (!sw){ const d=w.def.map(n=>LOG.cols.find(c=>c.name===n)).find(c=>c && c.vals.some(v=>v>0));
@@ -2571,17 +2574,51 @@ function renderCursor(){
   const bar=$('#curbar'); const upd=()=>document.documentElement.style.setProperty('--curbar-h', (bar.classList.contains('inzoom')?0:bar.offsetHeight)+'px');
   try{ new ResizeObserver(upd).observe(bar); }catch(e){} upd();
 })();
-// ---------- Rohdaten: nur die sichtbaren Zeilen werden erzeugt ----------
-const RAW_H=26; let rawFirst=-1, rawLast=-1;
+// ---------- Rohdaten: nur die sichtbaren Zeilen und Spalten werden erzeugt ----------
+// Grosse Logs haben über 100 Spalten; alle Zellen auf einmal kosten den Browser beim Scrollen Sekunden.
+// Darum feste Spaltenbreiten und nur der sichtbare Ausschnitt (plus Rand), neu gezeichnet in Blöcken.
+// RAW_H ist die gemessene Zeilenhöhe, RAW_W die Breite jeder Log-Spalte in px, RAW_X deren linker Rand.
+const RAW_STEP=40, RAW_CM=6; let RAW_H=26, RAW_W=[], RAW_X=[], RAW_N0=0, rawFirst=-1, rawLast=-1, rawC0=-1, rawC1=-1;
+function rawHead(log){
+  const n=log.raw.length, st=Math.max(1,Math.floor(n/300)), w=log.header.map(h=>h.length);
+  for (let i=0;i<n;i+=st){ const r=log.raw[i]; for (let j=0;j<w.length;j++){ const l=(r[j]??'').length; if (l>w[j]) w[j]=l; } }
+  const cs=getComputedStyle($('#rawtable')), ctx=document.createElement('canvas').getContext('2d');
+  ctx.font=`${cs.fontSize} ${cs.fontFamily}`; const cw=ctx.measureText('0000000000').width/10||8;
+  const px=x=>Math.ceil((Math.min(x,40)+1)*cw+20);
+  RAW_N0=px(String(n).length); RAW_W=w.map(px); RAW_X=[]; let x=0; for (const v of RAW_W){ RAW_X.push(x); x+=v; }
+  $('#rawtable').style.width=(RAW_N0+x)+'px';
+  rawC0=rawC1=-1;
+}
 function renderRaw(){
-  const box=$('#rawwrap'); if (!LOG || !LOG.raw || box.offsetParent===null) return;
-  const n=LOG.raw.length, first=Math.max(0,Math.floor(box.scrollTop/RAW_H)-30), last=Math.min(n, first+Math.ceil(box.clientHeight/RAW_H)+60);
-  if (first!==rawFirst || last!==rawLast){
-    rawFirst=first; rawLast=last; const cols=LOG.header.length; let h='';
-    if (first) h+=`<tr class="sp"><td colspan="${cols+1}" style="height:${first*RAW_H}px"></td></tr>`;
-    for (let i=first;i<last;i++){ const r=LOG.raw[i]; h+=`<tr data-i="${i}"${isOn(i)?'':' class="off"'}><td>${i+1}</td>${LOG.header.map((_,j)=>`<td>${esc(r[j]??'')}</td>`).join('')}</tr>`; }
-    if (last<n) h+=`<tr class="sp"><td colspan="${cols+1}" style="height:${(n-last)*RAW_H}px"></td></tr>`;
+  const box=$('#rawwrap'); if (!LOG || !LOG.raw || box.offsetParent===null || !RAW_W.length) return;
+  const n=LOG.raw.length, nc=RAW_W.length, vis=Math.floor(box.scrollTop/RAW_H), rows=Math.ceil(box.clientHeight/RAW_H);
+  const xl=box.scrollLeft, xr=xl+box.clientWidth-RAW_N0;
+  let v0=0; while (v0<nc-1 && RAW_X[v0]+RAW_W[v0]<=xl) v0++;
+  let v1=v0; while (v1<nc-1 && RAW_X[v1+1]<xr) v1++;
+  const colsNew = rawC0<0 || v0<rawC0 || v1>=rawC1;
+  if (colsNew){
+    rawC0=Math.max(0,v0-RAW_CM); rawC1=Math.min(nc,v1+1+RAW_CM); rawFirst=-1;
+    const L=RAW_X[rawC0], R=(RAW_X[nc-1]+RAW_W[nc-1])-(RAW_X[rawC1-1]+RAW_W[rawC1-1]);
+    const cols=[`<col style="width:${RAW_N0}px"><col style="width:${L}px">`];
+    for (let j=rawC0;j<rawC1;j++) cols.push(`<col style="width:${RAW_W[j]}px">`);
+    cols.push(`<col style="width:${R}px">`);
+    $('#rawtable').querySelector('colgroup')?.remove();
+    $('#rawtable').insertAdjacentHTML('afterbegin', `<colgroup>${cols.join('')}</colgroup>`);
+    let h='<tr><th>#</th><th class="gap"></th>';
+    for (let j=rawC0;j<rawC1;j++){ const t=esc(LOG.header[j]); h+=`<th title="${t}">${t}</th>`; }
+    $('#rawtable thead').innerHTML=h+'<th class="gap"></th></tr>';
+  }
+  if (rawFirst<0 || vis<rawFirst || vis+rows>rawLast){
+    const first=Math.max(0, Math.floor(vis/RAW_STEP)*RAW_STEP-RAW_STEP), last=Math.min(n, first+rows+3*RAW_STEP);
+    rawFirst=first; rawLast=last; const span=rawC1-rawC0+3; let h='';
+    if (first) h+=`<tr class="sp"><td colspan="${span}" style="height:${first*RAW_H}px"></td></tr>`;
+    for (let i=first;i<last;i++){ const r=LOG.raw[i]; h+=`<tr data-i="${i}"${isOn(i)?'':' class="off"'}><td>${i+1}</td><td class="gap"></td>`;
+      for (let j=rawC0;j<rawC1;j++) h+=`<td>${esc(r[j]??'')}</td>`;
+      h+='<td class="gap"></td></tr>'; }
+    if (last<n) h+=`<tr class="sp"><td colspan="${span}" style="height:${(n-last)*RAW_H}px"></td></tr>`;
     $('#rawtable tbody').innerHTML=h;
+    const rh=box.querySelector('tr[data-i]')?.getBoundingClientRect().height;
+    if (rh && Math.abs(rh-RAW_H)>0.01){ RAW_H=rh; rawFirst=-1; return renderRaw(); }
   }
   box.querySelector('tr.cur')?.classList.remove('cur');
   if (CURSOR!=null) box.querySelector(`tr[data-i="${CURSOR}"]`)?.classList.add('cur');
@@ -2943,6 +2980,18 @@ function fillInfo(info, txt, tail){
   if (!info.date) info.date=first.split(/[,;]/)[0]||'';
   if (!info.time) info.time=(first.split(/[,;]/)[1]||'').slice(0,8);
   Object.assign(info, headerInfo(txt, info.size));
+  // Springt die Stunde im Log (Uhr vom GPS gestellt, s. parseCSV), stimmt "letzte minus erste Uhrzeit" um volle
+  // Stunden nicht. Dann zählen nur die vollen Stunden, die Zeilenzahl × Zeilenabstand nahelegt.
+  if (info.dur!=null && info.rows){
+    const ts=l=>l.map(x=>parseTime(x.split(/[,;]/)[1]||'')).filter(x=>x!=null);
+    const head=ts(txt.split(/\r?\n/).slice(1,-1)), tl=ts(tail.trim().split(/\r?\n/).slice(1));
+    let jump=false; const steps=[];
+    for (const q of [head,tl]) for (let i=1;i<q.length;i++){ const d=q[i]-q[i-1], m=((d%3600)+3600)%3600;
+      if (Math.abs(d)>=1800 && (m<=600 || m>=3000)) jump=true; else if (d>0 && d<=2) steps.push(d); }
+    if (jump && steps.length){ steps.sort((x,y)=>x-y);
+      const est=info.rows*steps[steps.length>>1], k=Math.round((info.dur-est)/3600);
+      if (k && info.dur-k*3600>=0) info.dur-=k*3600; }
+  }
 }
 async function addFiles(list){
   const csv=[...list].filter(f=>/\.(csv|log)$/i.test(f.name) && !f.name.startsWith('._'));
@@ -3131,11 +3180,12 @@ $('#setForm').addEventListener('submit', async e=>{ e.preventDefault();
     POLAR_CACHE.clear(); if (FILES[CUR]) openLog(CUR); }
   $('#settingsDlg').close();
   if (DESK){ await loadArchive(); renderSync(await DESK.syncStatus()); } });
-// Details (Dauer, Sensoren) je Datei werden gemerkt: Cloud-Ordner laden sonst jede Datei herunter
+// Details (Dauer, Sensoren) je Datei werden gemerkt: Cloud-Ordner laden sonst jede Datei herunter.
+// 'peek2': ab 2026.10.2 stimmt die Dauer bei Logs mit springender Stunde, alte Einträge werden neu gelesen
 let peekCache=null;
-function peekGet(){ if(!peekCache){ try{ peekCache=JSON.parse(store.get('peek')||'{}'); }catch(e){ peekCache={}; } } return peekCache; }
+function peekGet(){ if(!peekCache){ try{ peekCache=JSON.parse(store.get('peek2')||'{}'); }catch(e){ peekCache={}; } } return peekCache; }
 let peekSave=0;
-function peekPut(k,v){ peekGet()[k]=v; clearTimeout(peekSave); peekSave=setTimeout(()=>store.set('peek',JSON.stringify(peekCache)),1000); }
+function peekPut(k,v){ peekGet()[k]=v; clearTimeout(peekSave); peekSave=setTimeout(()=>store.set('peek2',JSON.stringify(peekCache)),1000); }
 async function loadArchive(){
   const list = await DESK.listArchive(), cache=peekGet(), todo=[];
   const infos = list.map(a=>{
