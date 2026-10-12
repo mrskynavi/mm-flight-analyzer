@@ -3707,7 +3707,12 @@ function gpsCourse(log){
 // Wind Estimator: Ringpuffer der letzten 40 Bodenvektoren (alle 0,7 s), Kasa-Kreisfit jede Sekunde,
 // nur bei genügend Kursstreuung und plausiblem Ergebnis. Das Log wird in 0,1-s-Schritten "abgespielt",
 // wie Ethos wakeup() aufruft; zwischen zwei Logzeilen gelten die letzten Werte.
-const WIND = {windowSize:40, sampleInterval:0.7, minSpeed:2 /* km/h */, minSamples:10, fitInterval:1.0, maxSpreadR:0.85, maxTasFactor:2.0, maxWindFactor:1.0, maxResidualFrac:0.25, tick:0.1};
+// Sperren gegen falschen Wind: der erste Fit braucht ein volles Fenster (beim Start passt mit wenigen Stützwerten
+// oft ein falscher Kreis), und der Wind ist der Median (Ost und Nord getrennt) der letzten `median` guten Fits,
+// damit einzelne Ausreisser nicht durchschlagen.
+const WIND = {windowSize:40, sampleInterval:0.7, minSpeed:2 /* km/h */, minSamples:10, fitInterval:1.0, maxSpreadR:0.85, maxTasFactor:2.0, maxWindFactor:1.0, maxResidualFrac:0.25, tick:0.1,
+  median:5};
+const med = a => { const b=[...a].sort((x,y)=>x-y), m=b.length>>1; return b.length%2 ? b[m] : (b[m-1]+b[m])/2; };
 function kasaFit(x, y, n){
   let sx=0, sy=0; for (let i=0;i<n;i++){ sx+=x[i]; sy+=y[i]; }
   const mx=sx/n, my=sy/n; let Suu=0,Svv=0,Suv=0,Suuu=0,Svvv=0,Suvv=0,Svuu=0;
@@ -3734,6 +3739,7 @@ function windEstimator(log, speed, course){
   const t=log.t, n=t.length, W=new Array(n).fill(NaN), D=new Array(n).fill(NaN), TAS=new Array(n).fill(NaN);
   const bx=[], by=[]; let bufN=0, head=0, lastSample=-Infinity, lastFit=-Infinity;
   let windSpeed=0, windDirFrom=0, haveFit=false, tas=NaN, fits=0, row=0; const fitList=[];
+  const recent=[];
   const tEndV=t.filter(x=>!isNaN(x)).pop()||0;
   const ticks=Math.ceil(tEndV/WIND.tick)+1;
   for (let k=0; k<=ticks; k++){ const now=k*WIND.tick;
@@ -3743,13 +3749,15 @@ function windEstimator(log, speed, course){
       bx[head]=sp*Math.sin(cs*D2R); by[head]=sp*Math.cos(cs*D2R);
       head=(head+1)%WIND.windowSize; if (bufN<WIND.windowSize) bufN++; lastSample=now;
     }
-    if (now-lastFit>=WIND.fitInterval && bufN>=WIND.minSamples){
+    if (now-lastFit>=WIND.fitInterval && bufN>=(haveFit?WIND.minSamples:WIND.windowSize)){
       lastFit=now;
       if (courseSpreadOk(bx,by,bufN)){
         const f=kasaFit(bx,by,bufN);
         if (fitIsPlausible(f,bx,by,bufN)){
-          windSpeed=Math.hypot(f.cx,f.cy);
-          let to=Math.atan2(f.cx,f.cy)*R2D; if (to<0) to+=360;
+          recent.push(f); if (recent.length>WIND.median) recent.shift();
+          const cx=med(recent.map(q=>q.cx)), cy=med(recent.map(q=>q.cy));
+          windSpeed=Math.hypot(cx,cy);
+          let to=Math.atan2(cx,cy)*R2D; if (to<0) to+=360;
           windDirFrom=(to+180)%360; haveFit=true; fits++; fitList.push({row, w:windSpeed, d:windDirFrom});
         }
       }
