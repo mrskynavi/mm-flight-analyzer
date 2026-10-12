@@ -1021,7 +1021,7 @@ pre.code{background:var(--bg);border:1px solid var(--line);border-radius:8px;pad
   <div class="infopop" id="info-sim" hidden>
         <p>Der Simulator führt Deine Ethos-Widgets aus, genau die Lua-Datei main.lua, die auf dem Sender liegt, und spielt dazu das gewählte Log ab. So testest Du ein Widget am Schreibtisch und überträgst die Erkenntnisse direkt ins Lua.</p>
         <p>Nachgebaut sind lcd, system, form, model, storage, io und loadfile. <code>wakeup</code> läuft alle 50 ms in Logzeit, <code>os.clock()</code> läuft mit dem Log. Die Werte kommen genau so, wie sie im Log stehen; Schalter liefern −1024 / 0 / 1024 wie am Sender, GPS die Position als lat/lon.</p>
-        <p>Klick auf den Bildschirm = Touch, Mausrad = Drehgeber. <code>playTone</code> und <code>playNumber</code> sind bis 2× Tempo hörbar. Eine Änderung in der Konfiguration gilt sofort, das Log läuft weiter. Beim Zurückspringen startet das Widget neu und rechnet bis zur Stelle nach.</p>
+        <p>Klick auf den Bildschirm = Touch, Mausrad = Drehgeber. <code>playTone</code> und <code>playNumber</code> sind bis 2× Tempo hörbar. Eine Änderung in der Konfiguration gilt sofort, das Log läuft weiter. Die Konfiguration speichert der Simulator wie Ethos pro Modell. Beim Zurückspringen startet das Widget neu und rechnet bis zur Stelle nach.</p>
         <p>In der Desktop-App beobachtet der Simulator den scripts-Ordner. Wird main.lua oder eine Datei, die das Widget lädt, im Hintergrund neu geschrieben (Editor, git pull, Sync), startet das Widget mit dem neuen Code an der gleichen Stelle neu. Die Konfiguration bleibt, die Wiedergabe läuft weiter. Ist die Datei fehlerhaft, hält der Simulator an und läuft nach dem nächsten Speichern von selbst weiter.</p>
         <p>Die Widget-Liste zeigt jeden Unterordner mit main.lua. Wähle den Ordner scripts auf dem Sender oder Deinem Rechner. Ohne Ordner laufen die Beispiel-Widgets Sollfahrt, Thermik und Steigflüge.</p>
         <p>Die zwei Diagramme unter dem Widget zeigen frei wählbare Werte um die aktuelle Stelle, die Zahl daneben ist der Wert jetzt. Klick ins Diagramm springt an die Stelle.</p>
@@ -6776,13 +6776,15 @@ function newSim(){
     epoch: 0, fs: {get: fsGet, put: (p, s) => { const k = resolve(p); FS[k] = s; log('info', '/scripts/' + k + ' ' + T('geschrieben (nur im Simulator)')); fillSd(); }}});
   let e = sim.load(code) || sim.create();
   if (!e){
-    const st = store.get('sim.w.' + cur.id); e = sim.read(st || '');
+    const st = store.get(cfgKey()) ?? store.get('sim.w.' + cur.id); e = sim.read(st || '');   // alter Stand (ohne Modell) als Vorlage
     const def = DEFS[sim.name];
     if (!st && !e && def){ const c = sim.configure(); for (const [lab, v] of def){ const f = c.fields.find(f => f.label === lab); if (f && SL.cols[v] !== undefined || f && !isNaN(+v)) sim.formSet(f.i, v); } saveCfg(); }
   }
   showErr(e); return !e;
 }
-function saveCfg(){ const r = sim.write(); if (r.err) return showErr(r.err); store.set('sim.w.' + cur.id, r.store); }
+// Konfiguration pro Modell und Widget, wie in Ethos (dort gehört ein Widget zum Bildschirm eines Modells)
+const cfgKey = () => 'sim.w.' + (SL?.model || '') + '|' + cur.id;
+function saveCfg(){ const r = sim.write(); if (r.err) return showErr(r.err); store.set(cfgKey(), r.store); }
 function paint(){
   if (!sim) return;
   const dpr = Math.min(2, window.devicePixelRatio || 1);
