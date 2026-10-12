@@ -1402,8 +1402,9 @@ end
 --   Kreisfit (Kasa) ueber die GPS-Geschwindigkeitsvektoren der letzten ~28 s: Kreismittelpunkt =
 --   Windvektor, Radius = Fluggeschwindigkeit. Mit GPS-Geschw. wie im MM Flight Analyzer: alle 0.7 s
 --   ein Bodenvektor (Sensor-Geschwindigkeit in Richtung GPS-Kurs), Fit jede Sekunde, gleiche
---   Plausibilitaetsgrenzen. Vor dem ersten Fit: Wind 0, TAS = Grundgeschwindigkeit. Der erste gute Fit gilt als Startwert fuer ALLE
---   Hoehen ("~" in der Anzeige). Jeder weitere Fit ergaenzt/ueberschreibt nur die 100-m-Schichten
+--   Plausibilitaetsgrenzen. Vor dem ersten Fit: Wind 0, TAS = Grundgeschwindigkeit. Der erste Fit
+--   braucht ein volles Fenster (40 Stuetzwerte), damit der Start keinen falschen Wind liefert.
+--   Der erste gute Fit gilt als Startwert fuer ALLE Hoehen ("~" in der Anzeige). Jeder weitere Fit ergaenzt/ueberschreibt nur die 100-m-Schichten
 --   seines Hoehenbereichs (gleitend, 30 % pro Fit). Die Fluggeschwindigkeit fuer Polare und Netto
 --   ist |Grundgeschwindigkeit - Wind der aktuellen Hoehe| (linear zwischen den Schichten), auch
 --   im Geradeausflug und sofort nach einem Hoehenwechsel. Die Hoehe kommt vom Sensor "GPS Hoehe"
@@ -1690,6 +1691,10 @@ local BIN_ALPHA = 0.3                           -- Gewicht eines neuen Fits in e
 local function binOf(alt) return clamp(math.floor((alt + BIN_OFF) / BIN_H) + 1, 1, BINS) end
 local function binCenter(i) return (i - 1) * BIN_H - BIN_OFF + BIN_H / 2 end
 
+-- Der erste Fit gilt fuer ALLE Hoehen, deshalb braucht er ein volles Fenster (~28 s). Mit wenigen
+-- Stuetzwerten passt beim Start (Beschleunigen, erste Kurve) oft ein falscher Kreis.
+local function minSamples(w) return w.wt.filled and MIN_SAMPLES or WINDOW end
+
 local function windApply(w, cx, cy, lo, hi, now)
   local t = w.wt
   if not t.filled then
@@ -1827,7 +1832,7 @@ local function gpsUpdate(w, lat, lon, now)
       if #win > WINDOW then table.remove(win, 1) end
     end
     -- Kreisfit
-    if #win >= MIN_SAMPLES and (w.fitT == nil or now - w.fitT >= FIT_INTERVAL) then
+    if #win >= minSamples(w) and (w.fitT == nil or now - w.fitT >= FIT_INTERVAL) then
       w.fitT = now
       local cx, cy, r, res = kasaFit(win)
       if cx and courseSpread(win) <= MAX_SPREAD_R and fitIsPlausible(cx, cy, r, res, win) then
@@ -1942,7 +1947,7 @@ local function sensorUpdate(w, lat, lon, spd, now)
     win[#win + 1] = {x = w.gve, y = w.gvn, alt = w.alt or 0}
     if #win > WINDOW then table.remove(win, 1) end
   end
-  if #win >= MIN_SAMPLES and (w.fitT == nil or now - w.fitT >= FIT_INTERVAL) then
+  if #win >= minSamples(w) and (w.fitT == nil or now - w.fitT >= FIT_INTERVAL) then
     w.fitT = now
     if courseSpread(win) < MAX_SPREAD_R then
       local cx, cy, r, res = kasaFit(win)
