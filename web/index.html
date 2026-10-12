@@ -1021,7 +1021,7 @@ pre.code{background:var(--bg);border:1px solid var(--line);border-radius:8px;pad
   <div class="infopop" id="info-sim" hidden>
         <p>Der Simulator führt Deine Ethos-Widgets aus, genau die Lua-Datei main.lua, die auf dem Sender liegt, und spielt dazu das gewählte Log ab. So testest Du ein Widget am Schreibtisch und überträgst die Erkenntnisse direkt ins Lua.</p>
         <p>Nachgebaut sind lcd, system, form, model, storage, io und loadfile. <code>wakeup</code> läuft alle 50 ms in Logzeit, <code>os.clock()</code> läuft mit dem Log. Die Werte kommen genau so, wie sie im Log stehen; Schalter liefern −1024 / 0 / 1024 wie am Sender, GPS die Position als lat/lon.</p>
-        <p>Klick auf den Bildschirm = Touch, Mausrad = Drehgeber. <code>playTone</code> und <code>playNumber</code> sind bis 2× Tempo hörbar. Eine Änderung in der Konfiguration gilt sofort, das Log läuft weiter. Die Konfiguration speichert der Simulator wie Ethos pro Modell. Beim Zurückspringen startet das Widget neu und rechnet bis zur Stelle nach.</p>
+        <p>Klick auf den Bildschirm = Touch, Mausrad = Drehgeber. <code>playTone</code> und <code>playNumber</code> sind bis 2× Tempo hörbar. Eine Änderung in der Konfiguration gilt sofort, das Log läuft weiter. Die Konfiguration speichert der Simulator wie Ethos pro Modell. Als Quellen stehen auch die berechneten Werte der App (ƒ, z. B. TAS, Wind, Vario TEK, Netto-Vario) zur Wahl; am Sender gibt es sie nicht, sie helfen beim Vergleichen. Beim Zurückspringen startet das Widget neu und rechnet bis zur Stelle nach.</p>
         <p>In der Desktop-App beobachtet der Simulator den scripts-Ordner. Wird main.lua oder eine Datei, die das Widget lädt, im Hintergrund neu geschrieben (Editor, git pull, Sync), startet das Widget mit dem neuen Code an der gleichen Stelle neu. Die Konfiguration bleibt, die Wiedergabe läuft weiter. Ist die Datei fehlerhaft, hält der Simulator an und läuft nach dem nächsten Speichern von selbst weiter.</p>
         <p>Die Widget-Liste zeigt jeden Unterordner mit main.lua. Wähle den Ordner scripts auf dem Sender oder Deinem Rechner. Ohne Ordner laufen die Beispiel-Widgets Sollfahrt, Thermik und Steigflüge.</p>
         <p>Die zwei Diagramme unter dem Widget zeigen frei wählbare Werte um die aktuelle Stelle, die Zahl daneben ist der Wert jetzt. Klick ins Diagramm springt an die Stelle.</p>
@@ -6676,7 +6676,8 @@ let W = 784, H = 316;
 
 // ---------- Log: Werte genau wie im Log (keine Einheiten-Umrechnung), GPS als "lat lon" ----------
 function simLog(){
-  if (slFor === LOG) return SL;
+  const der = LOG?.cols?.filter(c => c.derived) || [];
+  if (slFor === LOG && SL && SL.der.length === der.length && SL.der.every((c, i) => c === der[i])) return SL;
   slFor = LOG; SL = null;
   const f = FILES[CUR];
   if (!LOG || !LOG.header || !LOG.raw || f?.jeti) return null;
@@ -6689,7 +6690,9 @@ function simLog(){
     const v = LOG.raw.map(r => { const x = (r[i] ?? '').trim(); if (x === '') return null; const k = +x; return isNaN(k) ? x : (sw ? k * 1024 : k); });
     cols[n] = {unit: su.unit || '', v, sw}; names.push(n);
   });
-  SL = {t: LOG.t, cols, names, model: f?.mid ?? f?.model ?? '', dur: LOG.t.filter(x => !isNaN(x)).pop() || 0};
+  // berechnete Werte der App (TAS, Wind, TEK, Netto …) als Quellen mit ƒ; am Sender gibt es sie nicht
+  der.forEach(c => { const n = 'ƒ ' + c.name; if (cols[n]) return; cols[n] = {unit: c.unit || '', v: c.vals.map(x => Number.isFinite(x) ? x : null), sw: false, calc: true}; names.push(n); });
+  SL = {t: LOG.t, cols, names, der, model: f?.mid ?? f?.model ?? '', dur: LOG.t.filter(x => !isNaN(x)).pop() || 0};
   return SL;
 }
 let ki = 0;
@@ -6835,9 +6838,9 @@ function pause(){ playing = false; g('simPlay').textContent = '▶ ' + T('Abspie
 // ---------- Konfiguration wie in Ethos ----------
 function srcOptions(sel, onlySw, value){
   sel.innerHTML = ''; sel.append(new Option('---', ''));
-  const a = SL.names.filter(n => SL.cols[n].sw), b = SL.names.filter(n => !SL.cols[n].sw);
+  const a = SL.names.filter(n => SL.cols[n].sw), b = SL.names.filter(n => !SL.cols[n].sw && !SL.cols[n].calc), cc = SL.names.filter(n => SL.cols[n].calc);
   const grp = (lab, list) => { if (!list.length) return; const o = document.createElement('optgroup'); o.label = lab; list.forEach(n => o.append(new Option(n + (SL.cols[n].unit ? ` (${SL.cols[n].unit})` : ''), n))); sel.append(o); };
-  if (onlySw){ grp(T('Schalter'), a); grp(T('Weitere Quellen'), b); } else { grp(T('Telemetrie und Geber'), b); grp(T('Schalter'), a); }
+  if (onlySw){ grp(T('Schalter'), a); grp(T('Weitere Quellen'), b); grp(T('Berechnet in der App (nicht am Sender)'), cc); } else { grp(T('Telemetrie und Geber'), b); grp(T('Berechnet in der App (nicht am Sender)'), cc); grp(T('Schalter'), a); }
   if (value && !SL.cols[value]) sel.append(new Option(value + ' ' + T('(nicht im Log)'), value));
   sel.value = value || '';
 }
