@@ -208,6 +208,48 @@ async function archiveFile(archive, name, data) {
   return { path: dest, existed: false };
 }
 
+// Polaren fürs MacCready-Widget auf den Sender: scripts/maccready/polaren.lua neben dem Widget
+const POLAR_FILE = ['scripts', 'maccready', 'polaren.lua'];
+async function writePolars(root, text) {
+  const s = String(text || '');
+  if (!s.startsWith('--') || s.length > 200000) throw new Error('Ungültiger Inhalt');
+  const dest = path.join(root, ...POLAR_FILE);
+  await fsp.mkdir(path.dirname(dest), { recursive: true });
+  await fsp.writeFile(dest, s, 'utf8');
+  return dest;
+}
+
+// Simulator: Textdateien aus einem scripts-Ordner (Widgets, polaren.lua …), Pfade relativ zum Ordner
+const SCRIPT_EXT = /\.(lua|txt|json|csv|cfg|ini)$/i;
+async function readScripts(dir, max = 600) {
+  const files = {};
+  let n = 0;
+  const walk = async (d, rel, depth) => {
+    let ents; try { ents = await fsp.readdir(d, { withFileTypes: true }); } catch { return; }
+    for (const e of ents) {
+      if (n >= max || e.name.startsWith('.')) continue;
+      const p = path.join(d, e.name), r = rel ? rel + '/' + e.name : e.name;
+      if (e.isDirectory()) { if (depth < 4) await walk(p, r, depth + 1); continue; }
+      if (!SCRIPT_EXT.test(e.name)) continue;
+      const st = await fsp.stat(p).catch(() => null);
+      if (!st || st.size > 2e6) continue;
+      files[r] = decodeText(await fsp.readFile(p)); n++;
+    }
+  };
+  await walk(dir, '', 0);
+  return files;
+}
+// Widget-Datei zurückschreiben; nur .lua innerhalb des Ordners, die alte Datei bleibt als .bak
+async function writeScript(dir, rel, text) {
+  const s = String(text ?? '');
+  if (!/\.lua$/i.test(rel) || s.length > 2e6) throw new Error('Ungültige Datei');
+  const base = path.resolve(dir) + path.sep, dest = path.resolve(dir, rel);
+  if (!dest.startsWith(base)) throw new Error('Pfad ausserhalb des scripts-Ordners');
+  if (fs.existsSync(dest)) await fsp.copyFile(dest, dest + '.bak');
+  await fsp.writeFile(dest, s, 'utf8');
+  return dest;
+}
+
 // Alle Logs im Archiv (Modell-Ordner und lose CSVs in der Wurzel)
 async function listArchive(archive) {
   const out = [];
@@ -261,7 +303,9 @@ class SyncWatcher extends EventEmitter {
     this.busy = false;
     this.status = { state: 'idle' };
     this.roots = [];        // Laufwerke der zuletzt gefundenen Sender
+    this.ethosRoots = [];   // Ethos: Ordner über logs, dorthin geht scripts/maccready/polaren.lua
     this.paused = false;    // während dem Auswerfen nicht auf den Sender zugreifen
+    this.afterEthos = opts.afterEthos || null;   // nach dem Log-Sync: eigene Widgets auf den Sender (Ordner über logs)
   }
   start() { this.stop(); this.timer = setInterval(() => this.poll(), this.interval); this.poll(); }
   stop() { clearInterval(this.timer); this.timer = null; }
@@ -277,6 +321,7 @@ class SyncWatcher extends EventEmitter {
       const jeti = st.jetiSync === false ? [] : (await findJetiDirs(vols, force)).filter(d => !ethos.includes(d));
       const dirs = [...ethos, ...jeti];
       this.roots = [...new Set(dirs.map(d => rootOf(d, vols)))];
+      this.ethosRoots = [...new Set(ethos.map(d => path.dirname(d)))];   // Ordner über logs, dort liegt auch scripts
       for (const d of [...this.synced]) if (!dirs.includes(d)) this.synced.delete(d);
       if (!dirs.length) {
         // Sender abgezogen: das letzte Ergebnis bleibt sichtbar
@@ -304,6 +349,12 @@ class SyncWatcher extends EventEmitter {
         all.sources.push(d); all.copied.push(...r.copied); all.errors.push(...r.errors);
         all.skipped += r.skipped; all.total += r.total;
       }
+      const fresh = [...new Set(todo.filter(d => ethos.includes(d) && this.synced.has(d)).map(d => path.dirname(d)))];
+      if (this.afterEthos && fresh.length) {
+        this.set({ state: 'widgets', source: fresh[0] });
+        try { all.widgets = await this.afterEthos(fresh); }
+        catch (e) { all.widgets = { error: isDenied(e) ? 'Keine Berechtigung zum Schreiben auf den Sender.' : e.message }; }
+      }
       this.set(all);
       return all;
     } catch (e) {
@@ -313,4 +364,4 @@ class SyncWatcher extends EventEmitter {
   }
 }
 
-module.exports = { denied, modelOf, safeDir, decodeText, volumes, findSenderDirs, findJetiDirs, listCsv, listJeti, syncDir, archiveFile, listArchive, defaultArchive, SyncWatcher };
+module.exports = { denied, modelOf, safeDir, decodeText, volumes, findSenderDirs, findJetiDirs, listCsv, listJeti, syncDir, archiveFile, writePolars, readScripts, writeScript, listArchive, defaultArchive, SyncWatcher };

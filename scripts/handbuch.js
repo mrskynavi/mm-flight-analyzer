@@ -15,6 +15,7 @@ const VERSION = require(path.join(ROOT, 'package.json')).version;
 const NEXT = VERSION.split('.').map((n, i) => i === 1 ? +n + 1 : i === 2 ? 0 : n).join('.');
 const CSV = fs.readFileSync(path.join(WEB, 'beispiel.csv'), 'utf8');
 const CHART = fs.readFileSync(path.join(ROOT, 'node_modules', 'chart.js', 'dist', 'chart.umd.js'), 'utf8');
+const LUA = fs.readFileSync(path.join(ROOT, 'node_modules', 'fengari-web', 'dist', 'fengari-web.js'), 'utf8');
 const MOCK = fs.readFileSync(path.join(SRC, 'mock.js'), 'utf8');
 let browser;
 
@@ -45,6 +46,7 @@ async function open(opts = {}) {
   await ctx.route('**/*', async r => {
     const u = new URL(r.request().url());
     if (u.hostname === 'cdnjs.cloudflare.com') return r.fulfill({ body: CHART, contentType: 'application/javascript' });
+    if (u.hostname === 'cdn.jsdelivr.net' && u.pathname.includes('fengari-web')) return r.fulfill({ body: LUA, contentType: 'application/javascript' });
     if (u.hostname === 'app.local') {
       const f = u.pathname === '/' ? 'index.html' : u.pathname.slice(1);
       if (f === 'beispiel.csv') return r.fulfill({ body: CSV, contentType: 'text/csv' });
@@ -172,6 +174,26 @@ async function screenshots() {
   // Rohdaten
   await p.click('#tab-rohdaten'); await p.waitForTimeout(800);
   await shot(p, '15-rohdaten', { ...(await from(p, '#curbar')), height: 640 });
+  // Polare mit dem Block für MacCready (legt auch die Polare fürs Sollfahrt-Widget im Simulator ab)
+  await p.click('#tab-polare'); await p.waitForTimeout(1500);
+  await shot(p, '25-polare', { ...(await from(p, '#curbar')), height: 900 });
+  await p.evaluate(() => { const r = document.querySelector('#mcMc'); r.value = 1; r.dispatchEvent(new Event('input', { bubbles: true })); });
+  await p.waitForTimeout(600);
+  await shot(p, '26-maccready', { ...(await clipOf(p, '#mcBox', 8)), height: 700 });
+  // Simulator: Sollfahrt-Widget mit dem Beispiel-Log bei 20:00
+  await p.click('#tab-simulator'); await p.waitForTimeout(1500);
+  await p.evaluate(() => { const s = document.querySelector('#simSel'); const o = [...s.options].find(o => /sollfahrt/i.test(o.text)); if (o) { s.value = o.value; s.dispatchEvent(new Event('change')); } });
+  await p.waitForTimeout(800);
+  await p.fill('#simGotoIn', '20:00'); await p.press('#simGotoIn', 'Enter');
+  await p.waitForFunction(() => document.querySelector('#simProg').hidden, null, { timeout: 120000 }); await p.waitForTimeout(1500);
+  await badges(p, [['#simSrcSeg', 1, 'b'], ['#simSel', 2, 'b'], ['#simSize', 3, 'b'], ['#simForm', 4, 'l'], ['#simScr', 5, 'tl'], ['#simTl', 6, 'l'], ['#simPlay', 7, 'b'], ['#simSpeed', 8, 'br']]);
+  await shot(p, '27-simulator', { ...(await from(p, '.simbar')), height: 780 });
+  await badges(p, []);
+  // Eigene Widgets (Dialog unter ⚙)
+  await p.click('#openSettings'); await p.waitForTimeout(300);
+  await p.click('#openWgt'); await p.waitForTimeout(400); await p.evaluate(() => document.activeElement.blur());
+  await shot(p, '28-widgets', await clipOf(p, '#wgtDlg', 20));
+  await p.evaluate(() => { for (const d of document.querySelectorAll('dialog[open]')) d.close(); });
   await p.context().close();
 
   // Sync-Zustände
@@ -220,6 +242,8 @@ async function main() {
   try {
     await screenshots();
     fs.copyFileSync(path.join(ROOT, 'build', 'icon.png'), path.join(BILDER, 'icon.png'));
+    // feste Bilder (z. B. Widgets am Sender), die nicht aus der App kommen
+    for (const f of fs.readdirSync(path.join(SRC, 'fest'))) fs.copyFileSync(path.join(SRC, 'fest', f), path.join(BILDER, f));
     const html = fs.readFileSync(path.join(SRC, 'handbuch.html'), 'utf8')
       .replaceAll('{{VERSION}}', VERSION).replaceAll('{{STAND}}', stand()).replace('{{CHANGELOG}}', changelog());
     if (html.includes('{{')) throw new Error('Platzhalter in handbuch.html nicht ersetzt');

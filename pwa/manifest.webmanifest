@@ -1,7 +1,7 @@
 {
   "name": "MM Flight Analyzer",
-  "short_name": "Ethos Logs",
-  "description": "Telemetrie-Logs vom Ethos-Sender auswerten",
+  "short_name": "MM Flight Analyzer",
+  "description": "Flüge aus Ethos- und Jeti-Logs auswerten",
   "id": "./",
   "start_url": "./",
   "scope": "./",

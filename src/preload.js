@@ -24,4 +24,12 @@ contextBridge.exposeInMainWorld('ethosDesktop', {
   aiCreate: body => ipcRenderer.invoke('ai:create', body),
   mcpInfo: () => ipcRenderer.invoke('mcp:info'),
   copyText: t => ipcRenderer.invoke('clipboard:write', t),
+  polarsTarget: () => ipcRenderer.invoke('sender:polarsTarget'),
+  writePolars: text => ipcRenderer.invoke('sender:polars', text),
+  simScripts: opts => ipcRenderer.invoke('scripts:read', opts),
+  simWrite: (rel, text) => ipcRenderer.invoke('scripts:write', rel, text),
+  onSimChanged: cb => ipcRenderer.on('scripts:changed', (_, r) => cb(r)),
+  widgetInfo: () => ipcRenderer.invoke('widgets:info'),
+  widgetFetch: () => ipcRenderer.invoke('widgets:fetch'),
+  widgetCopy: () => ipcRenderer.invoke('widgets:copy'),
 });

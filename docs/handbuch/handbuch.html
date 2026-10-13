@@ -84,20 +84,23 @@ a { color: var(--acc); }
   <li><a href="#k8">Welche Sensoren braucht es für eine sinnvolle Auswertung?</a></li>
   <li><a href="#k9">Tab „Übersicht“</a></li>
   <li><a href="#k10">Tab „Diagramme“</a></li>
-  <li><a href="#k11">Tab „Thermik &amp; Steigflüge“</a></li>
+  <li><a href="#k11">Tabs „Thermik“ und „Motorsteigflüge“</a></li>
   <li><a href="#k12">Tab „Polare“</a></li>
   <li><a href="#k13">Tab „Karte &amp; Wind“</a></li>
   <li><a href="#k14">Tab „Alle Werte“</a></li>
   <li><a href="#k15">Tab „Rohdaten“</a></li>
-  <li><a href="#k16">KI-Auswertung</a></li>
-  <li><a href="#k17">So kommst Du zu einem Anthropic-API-Schlüssel</a></li>
-  <li><a href="#k18">Beispielfragen für die KI</a></li>
-  <li><a href="#k19">MCP-Server: die App aus Claude bedienen</a></li>
-  <li><a href="#k20">Darstellung, Sprache und Web-Version</a></li>
-  <li><a href="#k21">Was die App speichert</a></li>
-  <li><a href="#k22">Troubleshooting und FAQ</a></li>
-  <li><a href="#k23">Kurzreferenz Maus und Tastatur</a></li>
-  <li><a href="#k24">Änderungen pro Version</a></li>
+  <li><a href="#k16">Tab „Simulator“: Widgets am Computer testen</a></li>
+  <li><a href="#k17">Eigene Widgets von GitHub auf den Sender</a></li>
+  <li><a href="#k18">Polare erfliegen und das Modell optimal einstellen</a></li>
+  <li><a href="#k19">KI-Auswertung</a></li>
+  <li><a href="#k20">So kommst Du zu einem Anthropic-API-Schlüssel</a></li>
+  <li><a href="#k21">Beispielfragen für die KI</a></li>
+  <li><a href="#k22">MCP-Server: die App aus Claude bedienen</a></li>
+  <li><a href="#k23">Darstellung, Sprache und Web-Version</a></li>
+  <li><a href="#k24">Was die App speichert</a></li>
+  <li><a href="#k25">Troubleshooting und FAQ</a></li>
+  <li><a href="#k26">Kurzreferenz Maus und Tastatur</a></li>
+  <li><a href="#k27">Änderungen pro Version</a></li>
 </ol>
 </div>
 
@@ -110,6 +113,7 @@ a { color: var(--acc); }
 <tr><td><b>Desktop-App</b> für Windows und Mac</td><td>Alle Auswertungen und zusätzlich der <b>automatische Sync</b>: Sobald Du den Sender per USB anschliesst, kopiert die App neue Logs in Dein Archiv, ein Ordner pro Modell. Dazu kommen „Archiv öffnen“, „Auswerfen“ und der Update-Hinweis.</td></tr>
 <tr><td><b>Web-Version</b> im Browser</td><td>Dieselbe Oberfläche mit allen Auswertungen. Logs lädst Du von Hand über „Import …“ oder per Ziehen ins Fenster. Kein Sync, kein Archiv.</td></tr>
 </table>
+<p>Dazu kommen Werkzeuge für den Sender: Der Tab <b>Simulator</b> führt Ethos-Lua-Widgets mit Deinen echten Logs am Computer aus (<a href="#k16">Kapitel 16</a>), die Desktop-App bringt Widgets von GitHub automatisch auf den Sender (<a href="#k17">Kapitel 17</a>), und mit den Widgets Polarflug und Sollfahrt erfliegst Du die Polare Deines Modells und nutzt sie im Flug (<a href="#k18">Kapitel 18</a>).</p>
 <h2>Auswerten mit KI: einfach fragen</h2>
 <p>Das Besondere am MM Flight Analyzer ist die <b>KI-Auswertung</b>. Du musst keine Diagramme deuten und keine Sensoren kennen: Du stellst eine Frage in normaler Sprache, und Claude, die KI von Anthropic, schaut sich den Flug für Dich an. Die Antwort kommt als verständlicher Text, mit Zeitangaben, die Du anklicken kannst, um die Stelle im Diagramm zu sehen. So bekommen auch alle, die keine Datenprofis sind, eine fundierte Analyse ihres Fluges.</p>
 <table>
@@ -122,10 +126,10 @@ a { color: var(--acc); }
 <tr><td><b>Die App für Dich bedienen</b></td><td>„Erstelle eine Polare ohne Thermik“ oder „Zoome auf den zweiten Steigflug und zeig Höhe, Vario und Strom“. Die KI setzt Filter, Zeitbereich und Diagramme selbst, und alles lässt sich rückgängig machen.</td></tr>
 </table>
 <div class="tip"><b>Ein Beispiel</b>Du fragst: „Wie war meine Thermik heute?“ Die KI antwortet etwa: „Du hattest drei Thermik-Phasen. Die beste bei 12:40 brachte 140 m in 2 Minuten, im Schnitt 1,2 m/s. Bei 18:05 bist Du nach 30 s aus einem guten Bart geflogen, das Vario zeigte noch 1,5 m/s.“ Ein Klick auf 12:40 zeigt die Stelle in den Diagrammen.</div>
-<p>Die KI-Auswertung ist freiwillig und braucht einen eigenen API-Schlüssel von Anthropic; eine Auswertung kostet meist nur wenige Rappen. Wie Du zum Schlüssel kommst, steht Schritt für Schritt in <a href="#k17">Kapitel 17</a>, viele Fragen zum Ausprobieren in <a href="#k18">Kapitel 18</a>, alles zur Bedienung in <a href="#k16">Kapitel 16</a>. Nutzt Du Claude Desktop, kannst Du die App auch ohne Schlüssel direkt aus dem Chat bedienen, über den MCP-Server (<a href="#k19">Kapitel 19</a>).</p>
+<p>Die KI-Auswertung ist freiwillig und braucht einen eigenen API-Schlüssel von Anthropic; eine Auswertung kostet meist nur wenige Rappen. Wie Du zum Schlüssel kommst, steht Schritt für Schritt in <a href="#k20">Kapitel 20</a>, viele Fragen zum Ausprobieren in <a href="#k21">Kapitel 21</a>, alles zur Bedienung in <a href="#k19">Kapitel 19</a>. Nutzt Du Claude Desktop, kannst Du die App auch ohne Schlüssel direkt aus dem Chat bedienen, über den MCP-Server (<a href="#k22">Kapitel 22</a>).</p>
 <p>Die Logs bleiben immer auf Deinem Gerät bzw. in Deinem eigenen Archivordner. Die App schickt keine Logdaten ins Internet, ausser Du startest eine KI-Auswertung: Dann gehen nur die gewählten Kanäle als zusammengefasste Zahlenreihen an Claude, nie die Logdatei selbst.</p>
 <div class="note"><b>Hinweis</b>Der MM Flight Analyzer ist ein Werkzeug von Mächler Modelle. Er ist nicht mit den Herstellern von Ethos oder Jeti verbunden. Ethos ist eine Marke ihres Inhabers.</div>
-<p>Diese Anleitung beschreibt Version {{VERSION}}. Was sich in welcher Version geändert hat, steht in <a href="#k24">Kapitel 24</a>. Die Screenshots zeigen die Desktop-App in der dunklen Darstellung mit dem Beispiel-Log eines Elektroseglers (SB-10).</p>
+<p>Diese Anleitung beschreibt Version {{VERSION}}. Was sich in welcher Version geändert hat, steht in <a href="#k27">Kapitel 27</a>. Die Screenshots zeigen die Desktop-App in der dunklen Darstellung mit dem Beispiel-Log eines Elektroseglers (SB-10).</p>
 
 <!-- 2 -->
 <h1 id="k2"><span class="n">2</span>Installation</h1>
@@ -153,7 +157,7 @@ a { color: var(--acc); }
 <li>Lade <code>MM-Flight-Analyzer-{{VERSION}}.dmg</code> herunter und öffne die Datei per Doppelklick.</li>
 <li>Ziehe <b>MM Flight Analyzer</b> in den Ordner <b>Programme</b>.</li>
 <li>Beim ersten Start blockiert macOS die App, weil sie nicht von einem registrierten Entwickler stammt. Öffne <b>Systemeinstellungen → Datenschutz &amp; Sicherheit</b>, scrolle nach unten und klicke bei „MM Flight Analyzer wurde blockiert“ auf <b>Dennoch öffnen</b>. Bestätige danach noch einmal mit „Öffnen“.</li>
-<li>Wenn Du den Sender zum ersten Mal anschliesst, fragt macOS, ob die App auf <b>Wechselmedien</b> zugreifen darf. Wähle <b>Erlauben</b>. Ohne diese Erlaubnis kann die App keine Logs vom Sender holen (siehe <a href="#k22">Troubleshooting</a>).</li>
+<li>Wenn Du den Sender zum ersten Mal anschliesst, fragt macOS, ob die App auf <b>Wechselmedien</b> zugreifen darf. Wähle <b>Erlauben</b>. Ohne diese Erlaubnis kann die App keine Logs vom Sender holen (siehe <a href="#k25">Troubleshooting</a>).</li>
 </ol>
 <div class="tip"><b>Tipp</b>macOS merkt sich die Erlaubnis. Die Frage kommt nur einmal, nicht für jede Datei.</div>
 
@@ -186,8 +190,9 @@ a { color: var(--acc); }
 <tr><td><b>Archiv-Ordner</b></td><td>Wohin die Logs kopiert werden. <span class="btn">Wählen …</span> öffnet die Ordnerauswahl. Am besten ein Ordner in Google Drive oder OneDrive, dann hast Du die Logs auf allen Geräten. Pro Modell entsteht ein Unterordner.</td></tr>
 <tr><td><b>Automatisch synchronisieren …</b></td><td>Ein: Sobald der Sender angeschlossen ist, holt die App neue Logs. Aus: Die Sync-Zeile zeigt „Automatischer Sync aus“.</td></tr>
 <tr><td><b>Importierte Logs immer ins Archiv kopieren</b></td><td>Logs, die Du über „Import …“ öffnest, landen dann automatisch auch im Archiv.</td></tr>
-<tr><td><b>KI-Auswertung …</b></td><td>API-Schlüssel, Modell und Optionen für die KI-Auswertung (<a href="#k16">Kapitel 16</a>). Daneben steht, ob ein Schlüssel hinterlegt ist.</td></tr>
-<tr><td><b>MCP …</b></td><td>Nur Desktop-App: MCP-Server ein- und ausschalten, damit Claude Desktop die App bedienen kann (<a href="#k19">Kapitel 19</a>). Standard aus.</td></tr>
+<tr><td><b>KI-Auswertung …</b></td><td>API-Schlüssel, Modell und Optionen für die KI-Auswertung (<a href="#k19">Kapitel 19</a>). Daneben steht, ob ein Schlüssel hinterlegt ist.</td></tr>
+<tr><td><b>MCP …</b></td><td>Nur Desktop-App: MCP-Server ein- und ausschalten, damit Claude Desktop die App bedienen kann (<a href="#k22">Kapitel 22</a>). Standard aus.</td></tr>
+<tr><td><b>Eigene Widgets</b></td><td>Nur Desktop-App: Widgets von GitHub holen und beim Anschliessen auf den Sender kopieren (<a href="#k17">Kapitel 17</a>).</td></tr>
 <tr><td><b>Version</b> und <b>Nach Updates suchen</b></td><td>Zeigt die installierte Version und sucht auf Knopfdruck nach einer neueren (siehe <a href="#k2">Kapitel 2.4</a>).</td></tr>
 </table>
 <p><span class="btn">Speichern</span> übernimmt die Änderungen, <span class="btn">Abbrechen</span> verwirft sie. Wechselst Du den Archiv-Ordner, lädt die App die Liste der Modelle und Logs neu.</p>
@@ -207,9 +212,9 @@ a { color: var(--acc); }
 <tr><td class="c"><span class="num">8</span></td><td>Sync-Zeile</td><td>Zustand des Senders und des letzten Syncs. Der Punkt ist grün, wenn alles gut ist, orange bei Warnungen und rot bei Fehlern (<a href="#k6">Kapitel 6</a>). Nur in der Desktop-App.</td></tr>
 <tr><td class="c"><span class="num">9</span></td><td>⏏ Auswerfen</td><td>Wirft den Sender sicher aus, damit Du das USB-Kabel ziehen kannst. Erscheint nur, solange der Sender angeschlossen und der Sync fertig ist.</td></tr>
 <tr><td class="c"><span class="num">10</span></td><td>Archiv öffnen</td><td>Öffnet den Archivordner im Explorer bzw. Finder.</td></tr>
-<tr><td class="c"><span class="num">11</span></td><td>Tabs</td><td>Übersicht, Diagramme, Thermik &amp; Steigflüge, Polare, Karte &amp; Wind, Alle Werte, Rohdaten. Die App merkt sich den zuletzt offenen Tab.</td></tr>
+<tr><td class="c"><span class="num">11</span></td><td>Tabs</td><td>Übersicht, Diagramme, Thermik, Motorsteigflüge, Polare, Karte &amp; Wind, Alle Werte, Rohdaten. Die App merkt sich den zuletzt offenen Tab.</td></tr>
 <tr><td class="c"><span class="num">12</span></td><td>Dateizeile</td><td>Herkunft (<b>Archiv</b>, <b>Geladen</b> oder <b>Beispiel: Dein Log</b>), Dateiname, Zeitraum und Anzahl Sensoren. Bei importierten Logs steht hier der Knopf „Im Archiv sichern“.</td></tr>
-<tr><td class="c"><span class="num">13</span></td><td>✦ KI-Auswertung</td><td>Öffnet rechts das Panel der KI-Auswertung, in jedem Tab. Erscheint nur, wenn ein API-Schlüssel hinterlegt ist (<a href="#k16">Kapitel 16</a>).</td></tr>
+<tr><td class="c"><span class="num">13</span></td><td>✦ KI-Auswertung</td><td>Öffnet rechts das Panel der KI-Auswertung, in jedem Tab. Erscheint nur, wenn ein API-Schlüssel hinterlegt ist (<a href="#k19">Kapitel 19</a>).</td></tr>
 </table>
 <div class="tip"><b>Tipp</b>Ist noch kein Log vorhanden, öffnet die App ein Beispiel-Log. Daran kannst Du alles ausprobieren. Sobald Logs im Archiv liegen, verschwindet das Beispiel.</div>
 
@@ -388,7 +393,7 @@ a { color: var(--acc); }
 </ul>
 <p>Alle Diagramme teilen denselben Ausschnitt. Die Zeitachse zählt Minuten ab Logbeginn. Kopfzeile jedes Diagramms: Name, Einheit sowie Min, Ø und Max des sichtbaren Ausschnitts. Diese drei Werte laufen beim Zoomen und Verschieben mit und zählen nur aktive Einträge (siehe Filter).</p>
 <h2>Farbige Hintergründe</h2>
-<p><b>Blau</b> hinterlegt sind Steigflüge, <b>grün</b> Thermikphasen und <b>rot</b> die Zeiten des unter „Rot markieren“ gewählten Schalterzustands. Steigflüge und Thermik kommen aus dem Tab „Thermik &amp; Steigflüge“.</p>
+<p><b>Blau</b> hinterlegt sind Steigflüge, <b>grün</b> Thermikphasen und <b>rot</b> die Zeiten des unter „Rot markieren“ gewählten Schalterzustands. Steigflüge und Thermik kommen aus den Tabs „Thermik“ und „Motorsteigflüge“.</p>
 <h2>Rot markieren</h2>
 <p>Wähle einen Schalter (SA …) oder logischen Schalter (LS …) und den Zustand, zum Beispiel <b>SB</b> und <b>oben (−1)</b>. Ohne eigene Wahl stellt die App das automatisch ein: derselbe Schalter wie für die Thermik, aber in der Gegenstellung. Ist SB unten = Thermik, wird SB oben rot markiert. Dann steht „automatisch“ daneben. Deine Wahl merkt sich die App pro Modell; der Link „automatisch“ setzt sie zurück.</p>
 <h2>Überlagert</h2>
@@ -401,6 +406,7 @@ a { color: var(--acc); }
 <li><b>Steuerkurs (windkorr.)</b> = Richtung, in die die Nase zeigt (Bodenvektor minus Windvektor). <b>Drift</b> = Kurs über Grund minus Steuerkurs, positiv heisst nach rechts versetzt. <b>Gegenwind</b> = Windanteil gegen die Flugrichtung, negativ heisst Rückenwind.</li>
 <li><b>Distanz zum Start</b> = waagrechte Distanz zum ersten GPS-Fix. <b>Effektive Distanz</b> = schräg vom Startpunkt zum Modell, mit der Höhe über dem Start.</li>
 <li><b>Winkel zum Start</b> = Winkel zwischen der Längsachse des Modells (Steuerkurs, ohne Wind der GPS Kurs) und der Linie vom Modell zum Startort. 0° heisst, die Nase zeigt zum Start, ±180° das Heck, ±90° fliegt das Modell quer dazu. Positiv: Der Start liegt rechts. Nützlich zum Beispiel, um Empfangseinbrüche mit der Lage der Antennen zu vergleichen. Unter 10 m Abstand zum Start gibt es keinen Wert.</li>
+<li><b>Vario TEK</b> = Vario plus Änderung der Fahrt umgerechnet in Höhe (TAS²/2g), also ohne die Stösse vom Ziehen und Drücken. <b>Netto-Vario</b> = Vario TEK plus Eigensinken aus der Polare des Modells (<a href="#k12">Kapitel 12</a>); es zeigt, wie die Luft steigt oder sinkt. Ohne gespeicherte Polare nimmt die App eine aus dem offenen Log. Während der Motor läuft und 15 s danach bleiben beide leer.</li>
 <li><b>Gleitzahl</b> = geflogene Strecke durch Höhenverlust, jeweils über 10 s gerechnet (5 s vor und nach dem Zeitpunkt). Die Strecke kommt aus der TAS, also durch die Luft; ohne Wind aus der GPS-Geschwindigkeit. Werte gibt es nur im Gleitflug, also mit Motor aus und mindestens 0,2 m/s Sinken; beim Steigen und mit Motor bleibt die Kurve leer. Gleitzahl 20 heisst 20 m weit pro Meter Höhe. Im Steigen der Thermik wird sie gross, weil die Luft mitträgt; aussagekräftig sind ruhige Gleitstrecken.</li>
 </ul>
 <p>Diese Erklärungen findest Du in der App auch hinter dem <span class="btn">ⓘ</span> neben „Kanäle“.</p>
@@ -416,28 +422,49 @@ a { color: var(--acc); }
 </ul>
 
 <!-- 10 -->
-<h1 id="k11"><span class="n">11</span>Tab „Thermik &amp; Steigflüge“</h1>
-<figure><img src="bilder/12-thermik.png" alt=""><figcaption>Thermik links, Steigflüge rechts</figcaption></figure>
-<p>Der Tab rechnet wie die Sender-Widgets „Thermik“ und „Steigfluege“: Eine Phase läuft, solange der gewählte Schalter EIN ist (Wert über 0).</p>
+<h1 id="k11"><span class="n">11</span>Tabs „Thermik“ und „Motorsteigflüge“</h1>
+<p>Beide Tabs rechnen wie die Sender-Widgets „Thermik“ und „Steigfluege“: Eine Phase läuft, solange der gewählte Schalter EIN ist (Wert über 0). Der Tab Thermik zeigt links Kennzahlen, Balken und Tabelle, rechts die Karte der gewählten Thermik. Die Motorsteigflüge haben einen eigenen Tab.</p>
 <h2>Einstellungen</h2>
 <table>
 <tr><th>Feld</th><th>Bedeutung</th></tr>
 <tr><td>Thermik-Schalter</td><td>Schalter, mit dem Du im Flug die Thermik markierst. Vorschlag: SB.</td></tr>
-<tr><td>Steigflug-Schalter</td><td>Schalter für den Steigflug (Motor). Vorschlag: LS9. Gibt es keinen passenden Schalter, wählt die App <b>„ESC Strom (automatisch)“</b>: Motor an, solange der Strom über der Schwelle liegt. Die Schwelle stellst Du im Feld „ab … A“ ein (Standard 3 A); kurze Lücken bis 1 s zählen mit.</td></tr>
-<tr><td>Höhenquelle</td><td>Welcher Höhensensor gerechnet wird, zum Beispiel Altitude (Vario) oder GAlt (GPS).</td></tr>
-<tr><td>Verbrauch</td><td>Welcher Sensor den verbrauchten Akku in mAh misst. Die App schlägt einen vor („automatisch“); passt er nicht, wählst Du einen anderen Sensor mit mAh oder „– kein –“, wenn das Modell keinen Verbrauch misst. Die Wahl gilt auch für die Kennzahl „Verbraucht“ in der Übersicht und wird nur für dieses Modell gespeichert, ein neues Modell startet wieder mit dem Vorschlag.</td></tr>
+<tr><td>Steigflug-Schalter</td><td>Im Tab Motorsteigflüge: Schalter für den Steigflug (Motor). Vorschlag: LS9. Gibt es keinen passenden Schalter, wählt die App <b>„ESC Strom (automatisch)“</b>: Motor an, solange der Strom über der Schwelle liegt. Die Schwelle stellst Du im Feld „ab … A“ ein (Standard 3 A); kurze Lücken bis 1 s zählen mit.</td></tr>
+<tr><td>Höhenquelle</td><td>Welcher Höhensensor gerechnet wird, zum Beispiel Altitude (Vario) oder GAlt (GPS). Jeder Tab hat seine eigene.</td></tr>
+<tr><td>Verbrauch</td><td>Im Tab Motorsteigflüge: welcher Sensor den verbrauchten Akku in mAh misst. Die App schlägt einen vor („automatisch“); passt er nicht, wählst Du einen anderen Sensor mit mAh oder „– kein –“, wenn das Modell keinen Verbrauch misst. Die Wahl gilt auch für die Kennzahl „Verbraucht“ in der Übersicht und wird nur für dieses Modell gespeichert, ein neues Modell startet wieder mit dem Vorschlag.</td></tr>
 <tr><td>Balkenhöhe</td><td>Was die Balken der Thermik zeigen: Steiggeschwindigkeit, erreichte Höhe oder Steigdauer.</td></tr>
+<tr><td>Ohne Motor</td><td>Steigen mit Motor zählt nicht als Thermik (Standard: an). Läuft der Motor während einer Thermik-Phase, endet sie beim Motorstart und beginnt erst 5 s nach Motor aus wieder. Als Motorlauf gilt Drehzahl über 300 U/min, ohne Drehzahl-Sensor ESC-Strom über 3 A. Daneben steht, wie viele Phasen gekürzt sind; ohne Häkchen, wie viele mit Motor waren. Das Feld erscheint nur, wenn das Log Drehzahl oder Strom des Motors enthält.</td></tr>
 </table>
 <p>Alle Einstellungen bleiben pro Modell gespeichert.</p>
-<h2>Kennzahlen, Balken und Tabelle</h2>
+<h2>Thermik: Kennzahlen</h2>
 <ul>
-<li><b>Ø Steigen</b> = gesamter Höhengewinn durch gesamte Dauer, dazu Anzahl, Gesamthöhe und Gesamtdauer.</li>
-<li>Jeder Balken ist eine Phase. Bei den Steigflügen zeigt die Zahl über dem Balken das Ø Steigen in m/s.</li>
-<li>Die Tabelle listet jede Phase mit Uhrzeit, Dauer, Start- und Höchsthöhe, Gewinn und Ø Steigen, bei den Steigflügen auch den Verbrauch in mAh.</li>
-<li>Die Phase, in der der Zeitpunkt liegt, ist in Balken und Tabelle hervorgehoben.</li>
+<li><b>Ausnutzung</b> zeigt, wie gut Du eine Thermik ausgenutzt hast: Ø Steigen über die ganze Phase (Endhöhe minus Starthöhe, geteilt durch die Dauer) im Verhältnis zum besten Steigen über 30 s in derselben Thermik. Der Tageswert ist zeitgewichtet über die aktiven Thermiken mit Höhengewinn. Ab 70 % gut, 50–70 % mittel, unter 50 % schwach. Phasen unter 30 s bekommen keinen Wert. Wird eine Thermik nach oben stärker, sinkt die Ausnutzung, auch wenn Du gut zentriert hast.</li>
+<li><b>Trefferquote</b> = wie viele der aktiven Phasen Höhe gebracht haben. <b>Fehlversuche</b> = Anteil der Thermikzeit in Phasen ohne Höhengewinn.</li>
+<li><b>Ø Steigen</b>, <b>Gesamthöhe</b> und <b>Gesamtdauer</b> rechnen wie das Widget mit dem Gewinn bis zur höchsten Höhe der Phase.</li>
+</ul>
+<h2>Thermik: Balken und Tabelle</h2>
+<ul>
+<li>Jeder Balken ist eine Phase: grün mit Höhengewinn, rot ohne. Die Farbe zeigt Steigen, Netto oder Sinken.</li>
+<li>Die Tabelle listet jede Phase mit Uhrzeit, Dauer, Start- und Endhöhe, Gewinn, Ø Steigen und Ausnutzung. Mit dem <b>Häkchen</b> nimmst Du eine Phase aus Kennzahlen, Balken und Heatmap; die Auswahl wird pro Log gemerkt.</li>
+<li><b>Netto bis … m</b> nimmt Phasen bis zu diesem Gewinn heraus, <span class="btn">Erfolglose inaktiv</span> alle ohne Höhengewinn, <span class="btn">Alle aktiv</span> setzt zurück.</li>
+<li>Ein Klick auf Balken oder Zeile wählt die Thermik für die Karte; mit <span class="btn">◀</span> <span class="btn">▶</span> blätterst Du weiter.</li>
+</ul>
+<h2>Thermik: Karte</h2>
+<ul>
+<li><b>Spur:</b> Die Spur der gewählten Thermik ist nach dem Netto-Vario (Steigen der Luft, 10 s gemittelt) eingefärbt, gestrichelt wo die Luft sinkt; ohne Polare nach dem Vario. Den Wind liest die App am Versatz Deiner Kreise ab (ab zwei Kreisen), sonst nimmt sie das Mittel des Flugs.</li>
+<li><b>Ideale Spur</b> kreist mit Deinem Radius und Deiner Fahrt sauber um den Bartkern (Netto 3 s) und wandert mit dem Wind mit.</li>
+<li><b>Ursprung (geschätzt):</b> Die App rechnet zurück, wo die Luft am Boden losgestiegen ist: von der Einstiegshöhe mit dem mittleren positiven Netto-Steigen, mit dem Wind getrieben, plus 20 %, weil Thermik nahe am Boden langsamer steigt. Mit <b>Gelände</b> rechnet sie mit der Höhe über dem Boden am Ursprung (Höhenmodell AWS Terrain Tiles, weltweit). Der orange Bereich reicht von 0,8- bis 1,4-mal dieser Distanz entlang der Windlinie. Such darin nach Auslösern wie Baumreihen, Höfen, Feldrändern oder Dämmen. Unter 0,5 m/s ist die Schätzung unsicher.</li>
+<li><b>Heatmap</b> legt die Ursprungsbereiche aller aktiven Thermiken übereinander. Wo es rot wird, lösen sich an diesem Tag vermutlich immer wieder Bärte ab.</li>
+<li><b>Luftbild:</b> in der Schweiz von swisstopo, im Ausland von Esri. Für Esri brauchst Du einen eigenen Schlüssel unter <span class="btn">⚙</span> → <b>Luftbild im Ausland (Esri-Schlüssel)</b> (<a href="#k23">Kapitel 23</a>).</li>
+<li>Mausrad oder zwei Finger zoomen, Ziehen verschiebt, Doppelklick zeigt wieder alles.</li>
+</ul>
+<h2>Motorsteigflüge</h2>
+<ul>
+<li>Kennzahlen: Anzahl, Gesamthöhe, Gesamtdauer, Ø Steigen unter Motor, Verbrauch und <b>Höhe pro 100 mAh</b>. Diese zeigt, wie viel Höhe Dir der Akku bringt; ein Vergleich über mehrere Flüge zeigt Luftschraube, Akku und Steigwinkel.</li>
+<li><b>Gipfel</b> = höchste Höhe bis 20 s nach dem Abschalten, <b>Gewinn</b> = Gipfel minus Höhe beim Einschalten; das Ausgleiten zählt also mit. Ø Steigen rechnet nur über die Motorlaufzeit.</li>
+<li>Jeder Balken ist ein Steigflug, die Zahl darüber das Ø Steigen in m/s. Die Tabelle zeigt pro Steigflug auch Ausgleiten, höchsten Strom und Verbrauch in mAh.</li>
 </ul>
 <h2>So wird gerechnet</h2>
-<p>Gewinn = höchste Höhe während der Phase minus Starthöhe. Thermik zählt ab 5 s Dauer, Steigflüge ab 1 s. Eine Phase, die beim Logende noch läuft, zählt wie im Widget nicht. Die Zeiten sind so genau wie das Log (etwa 0,5 s).</p>
+<p>Thermik zählt ab 5 s Dauer, Steigflüge ab 1 s. Mit „Ohne Motor“ zählen Motorlauf und die 5 s danach nicht zur Thermik; bleibt von einer Phase weniger als 5 s übrig, fällt dieser Rest weg. Eine Phase, die beim Logende noch läuft, zählt wie im Widget nicht. Die Zeiten sind so genau wie das Log (etwa 0,5 s).</p>
 <div class="tip"><b>Tipp</b>Steht „Kein Steigflug. Prüfe, ob der richtige Schalter gewählt ist.“, stimmt meist der Schalter nicht. Probiere den logischen Schalter, den Du am Sender für „Motor an“ nutzt, oder „ESC Strom (automatisch)“.</div>
 
 <!-- 11 -->
@@ -448,13 +475,23 @@ a { color: var(--acc); }
 <h2>Kennzahlen und Diagramm</h2>
 <ul>
 <li>Oben stehen die <b>beste Gleitzahl</b> und das <b>geringste Sinken</b>, jeweils mit der Geschwindigkeit, bei der sie erreicht werden.</li>
-<li><b>Ansicht:</b> „Sinken“ zeigt das Sinken in m/s über der Fahrt, „Gleitzahl“ die Gleitzahl über der Fahrt.</li>
+<li><b>Ansicht:</b> „Sinken“ zeigt das Vario in m/s über der Fahrt, Sinken negativ wie auf dem Vario (−0,6 m/s = 0,6 m/s Sinken); „Gleitzahl“ zeigt die Gleitzahl über der Fahrt.</li>
 <li><b>Glättung:</b> „Physikalisch“ legt die Kurve Sinken = A·v³ + B/v durch die Mediane, „Median“ zeigt die geglätteten Mediane pro 4-km/h-Klasse, „Aus“ zeichnet keine Kurve.</li>
 <li><b>Punkte</b> zeigt jede gezählte Sekunde, <b>Streuung</b> das Band der mittleren Hälfte der Punkte, <b>Einzel-Logs</b> die Polare jedes Logs zum Vergleich.</li>
 <li><b>Filter anwenden:</b> Es zählen nur Einträge, die bei allen Filtern im Tab Diagramme im Bereich liegen (<a href="#k10">Kapitel 10</a>), und zwar in allen gewählten Logs des Modells. So entsteht z. B. eine Polare nur aus ruhiger Luft oder nur aus einem Höhenbereich. Ändern sich die Filter, rechnet die Polare neu.</li>
 </ul>
 <h2>So wird gerechnet</h2>
 <p>Jeder Punkt ist eine Sekunde Gleitflug: Motor aus (und 15 s danach), geradeaus (Kursänderung unter 8°/s) und ohne starkes Beschleunigen. Die Fahrt ist die TAS, ohne Wind die GPS-Geschwindigkeit; das Sinken kommt vom Vario, korrigiert um Fahrtänderungen. Pro 4-km/h-Klasse zählt der Median. Details stehen im ⓘ neben „Polare“.</p>
+<h2>Für MacCready / Lua-Widget</h2>
+<p>Unter dem Diagramm stehen die Kennzahlen für ein MacCready-Widget auf dem Sender. Die App nähert die physikalische Polare im Fahrtbereich mit Gleitpunkten durch eine Parabel an: <b>Vario = a·v² + b·v + c</b>, Ergebnis in m/s mit Sinken negativ. Mit <span class="btn">m/s</span> oder <span class="btn">km/h</span> wählst Du, für welche Einheit von v die Koeffizienten gelten; jeder Wert hat einen Knopf <span class="btn">Kopieren</span>. Darunter stehen der gültige Bereich, geringstes Sinken und beste Gleitzahl der Parabel, die Abweichung zur Polare und eine 3-Punkte-Polare.</p>
+<ul>
+<li><b>Sollfahrt nach MacCready:</b> Mit den Reglern MC-Wert, Wind (+ Gegenwind), Netto (Steigen der Luft), Ballast (in % des Fluggewichts beim Loggen) und Verschmutzung (Sinken um so viel % grösser) siehst Du die Sollfahrt. Im Diagramm erscheinen die angepasste Polare violett und die Tangente vom Punkt (Gegenwind, −MC) an die Kurve. Die Tabelle zeigt MC 0 bis 3 mit Sollfahrt, Vario und Schnitt; ein Klick auf eine Zeile setzt den MC-Wert. Liegt die Sollfahrt über dem gültigen Bereich, steht dort „über Bereich“, und das Widget sagt die höchste gültige Fahrt an. Die App startet immer mit MC 0, <span class="btn">Alles zurücksetzen</span> stellt alle Regler auf 0.</li>
+<li><b>Auf den Sender:</b> Die Datei <b>polaren.lua</b> enthält alle Ethos-Modelle, deren Polare Du im Tab Polare schon angesehen hast, mit dem Modellnamen wie auf dem Sender. In der Desktop-App schreibt <span class="btn">Auf Sender schreiben</span> sie in den Ordner <b>scripts/maccready</b> des angeschlossenen Senders (neben dem Ordner logs). Mit dem Häkchen „Beim Sync automatisch aktualisieren“ (Standard an) passiert das bei jedem Sync von selbst. In der Web-Version speichert <span class="btn">Datei speichern</span> die Datei, und Du kopierst sie selbst auf den Sender. Jeti-Modelle kommen nicht in die Datei.</li>
+<li><b>Im Widget lesen:</b> Der gezeigte Lua-Code liest polaren.lua neben main.lua des Widgets (Ordner scripts/maccready), sucht das aktive Modell mit model.name() und rechnet mit sollfahrt(mc, netto, wind, ballast, mueck) die Sollfahrt in km/h. <span class="btn">Code kopieren</span> und <span class="btn">Werte als JSON kopieren</span> legen Code oder Werte in die Zwischenablage.</li>
+</ul>
+<figure><img src="bilder/25-polare.png" alt=""><figcaption>Tab Polare mit allen Logs des Modells</figcaption></figure>
+<p>Wie Du die Polare gezielt erfliegst und damit Sollfahrt und Modelleinstellung verbesserst, steht in <a href="#k18">Kapitel 18</a>.</p>
+<div class="tip"><b>Tipp</b>Damit die Kennzahlen erscheinen, braucht es Gleitflug über einen breiten Fahrtbereich, z. B. 30 bis 70 km/h. Liegen alle Gleitpunkte in einem schmalen Bereich, zeigt der Block einen Hinweis statt Werten.</div>
 
 <!-- 12 -->
 <h1 id="k13"><span class="n">13</span>Tab „Karte &amp; Wind“</h1>
@@ -481,11 +518,133 @@ a { color: var(--acc); }
 <figure><img src="bilder/15-rohdaten.png" alt=""><figcaption>Rohdaten mit hervorgehobener Zeile des Zeitpunkts</figcaption></figure>
 <p>Alle Zeilen und Spalten so, wie sie im Log stehen, auch bei grossen Logs flüssig. Oben steht die Anzahl Zeilen und Spalten. Ein Klick auf eine Zeile setzt den Zeitpunkt; die Zeile des gewählten Zeitpunkts ist hervorgehoben und wird beim Öffnen des Tabs ins Bild geholt. Zum Lesen breiter Logs scrollst Du in der Tabelle seitwärts.</p>
 
+<!-- 16 -->
+<h1 id="k16"><span class="n">16</span>Tab „Simulator“: Widgets am Computer testen</h1>
+<p>Der Simulator führt Deine Ethos-Lua-Widgets am Computer aus, genau die Datei <b>main.lua</b>, die auch auf dem Sender liegt, und spielt dazu ein echtes Log ab. Das Widget sieht die Sensorwerte so, als wärst Du gerade geflogen: Höhe, Vario, GPS, Motorstrom, Schalter. Es zeichnet, piepst und sagt an wie am Sender.</p>
+<figure><img src="bilder/27-simulator.png" alt=""><figcaption>Simulator mit dem Sollfahrt-Widget, Beispiel-Log bei Minute 20</figcaption></figure>
+<table>
+<tr><th class="c">Nr.</th><th>Element</th><th>Funktion</th></tr>
+<tr><td class="c"><span class="num">1</span></td><td>Quelle</td><td><b>Intern</b>: die Beispiel-Widgets, die mit der App kommen (Sollfahrt, Thermik, Steigflüge). <b>Meine Widgets</b>: die Widgets im Benutzerverzeichnis, also Deine Kopie von GitHub (<a href="#k17">Kapitel 17</a>) und eigene Ordner dort. In der Web-Version wählst Du dafür einen scripts-Ordner.</td></tr>
+<tr><td class="c"><span class="num">2</span></td><td>Widget</td><td>Jeder Unterordner mit einer main.lua, mit Name und Version.</td></tr>
+<tr><td class="c"><span class="num">3</span></td><td>Bildschirm</td><td>Hohe Auflösung (800 × 480, z. B. X20) oder niedrige (480 × 320, z. B. X18). Das Widget bekommt die Fläche eines Vollbild-Widgets.</td></tr>
+<tr><td class="c"><span class="num">4</span></td><td>Konfiguration</td><td>Die Felder des Widgets wie in Ethos unter „Widget konfigurieren“: Quellen, Zahlen, Auswahl. Eine Änderung gilt sofort, das Log läuft weiter. Die Konfiguration wird wie in Ethos pro Modell gespeichert.</td></tr>
+<tr><td class="c"><span class="num">5</span></td><td>Widget</td><td>Die Anzeige wie am Sender. Ein Klick ist ein Fingertipp (Touch), das Mausrad der Drehgeber.</td></tr>
+<tr><td class="c"><span class="num">6</span></td><td>Zeitstrahl</td><td>Höhe über den ganzen Flug, grün die Thermik. Ein Klick springt an die Stelle.</td></tr>
+<tr><td class="c"><span class="num">7</span></td><td>Wiedergabe</td><td><span class="btn">⏮</span> an den Anfang, <span class="btn">−10 s</span> / <span class="btn">+10 s</span>, <span class="btn">▶ Abspielen</span> und Pause. „Springen zu“ nimmt eine Zeit wie 20:00, <span class="btn">Zum Zeitpunkt</span> übernimmt den Zeitpunkt aus den anderen Tabs.</td></tr>
+<tr><td class="c"><span class="num">8</span></td><td>Tempo</td><td>¼× bis 32×. Ein Flug von 50 Minuten läuft mit 32× in gut anderthalb Minuten durch. Töne und Ansagen sind bis 2× hörbar.</td></tr>
+</table>
+<p>Unter dem Widget zeigen zwei frei wählbare Diagramme beliebige Werte um die aktuelle Stelle (Ausschnitt 1 bis 10 Minuten oder das ganze Log), daneben den Wert jetzt. Als Quellen stehen auch die berechneten Werte der App zur Wahl (ƒ, z. B. TAS, Wind, Vario TEK, Netto-Vario). Am Sender gibt es sie nicht, im Simulator helfen sie beim Vergleichen. Darunter liegen die Reiter <b>Ausgabe</b> (print-Ausgaben und Fehler des Widgets), <b>Quellen</b> (welche Werte das Widget gerade liest), <b>Code</b> und <b>SD-Karte</b> (Dateien, die das Widget liest und schreibt).</p>
+<p>Beim Springen nach vorne oder zurück startet das Widget neu und rechnet ab dem Start bis zur Stelle nach, damit Wind, Mittelwerte und Zähler stimmen. Wer nur schnell schauen will, nimmt das Häkchen „Beim Springen ab Start nachrechnen“ weg.</p>
+
+<h2>Wozu der Simulator gut ist</h2>
+<p>Ein Widget für den Sender zu entwickeln oder einzustellen hiess bisher: ändern, auf den Sender kopieren, auf den Platz fahren, fliegen und hoffen, dass man in der Luft etwas erkennt. Der Simulator holt diese Arbeit an den Schreibtisch:</p>
+<ul>
+<li><b>Jeder Flug lässt sich beliebig oft wiederholen</b>, mit genau denselben Daten. Du kannst eine Einstellung ändern und dieselbe Thermik, denselben Gleitflug oder dieselbe Landung noch einmal ansehen und vergleichen.</li>
+<li><b>Fehler zeigen sich vor dem Flug.</b> Ein Lua-Fehler erscheint mit Zeilennummer unter „Ausgabe“ statt als leeres Widget auf dem Platz.</li>
+<li><b>Prüfen, ob das Widget richtig rechnet.</b> Neben dem Widget zeigen die Diagramme, was die App für dieselbe Stelle rechnet, z. B. den Wind oder das Netto-Vario. Weicht das Widget ab, siehst Du wo und wie stark.</li>
+<li><b>Einstellungen ausprobieren und hören.</b> Glättung, Totzone, MC-Wert oder Tonart lassen sich während dem Abspielen ändern, und Du hörst, wie das Widget am Sender piepsen würde.</li>
+<li><b>Schnell.</b> Mit 32× ist ein ganzer Flugtag in wenigen Minuten durchgespielt.</li>
+</ul>
+<p>Zusammen mit den Widgets Polarflug und Sollfahrt wird daraus ein Werkzeug, um das Modell mit der erflogenen Polare optimal einzustellen und schneller zu fliegen. Wie das zusammenhängt, steht in <a href="#k18">Kapitel 18</a>.</p>
+
+<h2>Code ändern und Ordner beobachten</h2>
+<p>Unter „Code“ steht die main.lua des Widgets. Ändern und <span class="btn">Übernehmen</span>: Das Widget startet mit dem neuen Code und spielt bis zur aktuellen Stelle nach. <span class="btn">Original laden</span> holt die Datei wieder vom Ordner. In der Desktop-App speichert <span class="btn">In den scripts-Ordner speichern</span> den geänderten Code zurück, die alte Datei bleibt als main.lua.bak liegen.</p>
+<p>Die Desktop-App beobachtet ausserdem den Ordner. Wird eine main.lua im Hintergrund neu geschrieben, zum Beispiel aus einem Editor, durch git pull oder durch den Widget-Sync, lädt der Simulator den neuen Code sofort und spielt an der gleichen Stelle weiter. Die Konfiguration bleibt. Ist die neue Datei fehlerhaft, hält er an und läuft nach dem nächsten Speichern von selbst weiter. Die Web-Version kann den Ordner nicht beobachten.</p>
+
+<h2>Grenzen</h2>
+<p>Der Simulator baut die Ethos-Funktionen nach, die Widgets üblicherweise brauchen (lcd, system, form, model, storage, io, loadfile). Er ist kein Sender: <code>wakeup</code> läuft alle 50 ms in Logzeit, Schriften und Bildschirmgrössen sind angenähert, Bilder (lcd.loadBitmap), weitere Tasten und das Senden von Telemetrie fehlen. Die Werte kommen so, wie sie im Log stehen; zwischen zwei Logzeilen bleibt ein Wert stehen. Wie viel Rechenzeit ein Widget am Sender braucht, zeigt der Simulator nicht. Ein Widget, das hier läuft, solltest Du deshalb trotzdem einmal am Sender prüfen.</p>
+
+<!-- 17 -->
+<h1 id="k17"><span class="n">17</span>Eigene Widgets von GitHub auf den Sender</h1>
+<p>Nur Desktop-App (Windows und Mac). Die App holt Ethos-Widgets aus einem öffentlichen GitHub-Repository und kopiert sie beim Anschliessen des Senders automatisch dorthin. Ein neues oder verbessertes Widget kommt so ohne Kopieren von Hand auf den Sender.</p>
+<p>Standard ist das Repository <b>mrskynavi/mm-ethos-widgets</b> von Mächler Modelle. Es enthält:</p>
+<table>
+<tr><th>Widget</th><th>Was es macht</th></tr>
+<tr><td><b>Sollfahrt</b></td><td>MacCready-Sollfahrt mit Netto-Vario, Wind nach Höhe, Ton „schneller/bremsen“ und dem Streckenverlust gegenüber der Sollfahrt. Braucht die Polare in polaren.lua (<a href="#k18">Kapitel 18</a>).</td></tr>
+<tr><td><b>Polarflug</b></td><td>Hilft beim Erfliegen der Polare: zählt Messpunkte pro Fahrtbereich, zeigt die Polare und schreibt sie auf Wunsch in polaren.lua (<a href="#k18">Kapitel 18</a>).</td></tr>
+<tr><td><b>Thermik</b>, <b>Steigflüge</b></td><td>Balken pro Thermik- bzw. Steigflug-Phase mit Ø Steigen und Höhengewinn, so wie die gleichnamigen Tabs der App.</td></tr>
+<tr><td><b>Wind</b>, <b>GPS Course</b></td><td>Wind, Windrichtung und TAS aus dem GPS bzw. der Kurs aus zwei GPS-Positionen, als Quellen für andere Widgets.</td></tr>
+</table>
+<figure class="half"><img src="bilder/28-widgets.png" alt=""><figcaption>⚙ Einstellungen → Eigene Widgets</figcaption></figure>
+<h2>So läuft es ab</h2>
+<ol>
+<li>Die App lädt die Widgets von GitHub in das <b>Benutzerverzeichnis</b> (Standard Dokumente/MM Flight Analyzer/Widgets). Sie holt nur Dateien, die sich geändert haben.</li>
+<li>Sobald ein Ethos-Sender angeschlossen ist, kopiert sie nach dem Log-Sync alle eingeschalteten Widgets nach <b>scripts/<i>Name</i>/</b> auf dem Sender. Sie kopiert immer, auch bei gleicher Version, und überschreibt die alten Dateien <b>ohne Sicherung</b>.</li>
+<li>Andere Dateien im Widget-Ordner am Sender bleiben, z. B. die Messpunkte des Polarflug-Widgets, ebenso polaren.lua.</li>
+<li>Die Sync-Zeile meldet z. B. „Widgets: 6 kopiert (1 neu)“. Der Knopf <span class="btn">Widgets</span> daneben zeigt pro Widget die Version vorher und jetzt.</li>
+</ol>
+<p>Ein Widget, das zum ersten Mal auf den Sender kommt, fügst Du in Ethos wie gewohnt einem Bildschirm hinzu. Ethos lädt neue oder geänderte Lua-Skripte erst nach einem Neustart des Senders.</p>
+<h2>Einstellungen</h2>
+<p>Unter <span class="btn">⚙</span> → <span class="btn">Widgets …</span>: GitHub-Repo und Zweig, Benutzerverzeichnis, „Beim Anschliessen des Senders automatisch kopieren“, pro Widget ein Häkchen „Auf den Sender“, dazu <span class="btn">Jetzt von GitHub holen</span> und <span class="btn">Jetzt auf den Sender kopieren</span>. Ein eigenes Repository ist aufgebaut wie der Sender: <code>scripts/<i>Name</i>/main.lua</code>, weitere Dateien des Widgets im selben Ordner. Die Version steht als Kommentar oben in main.lua (<code>-- @version 1.1</code>); sie dient nur der Anzeige.</p>
+<div class="warn"><b>Achtung</b>Änderst Du ein Widget direkt auf dem Sender, ist die Änderung beim nächsten Anschliessen überschrieben. Eigene Anpassungen gehören ins Repository oder in einen eigenen Ordner, dessen Häkchen aus ist.</div>
+
+<!-- 18 -->
+<h1 id="k18"><span class="n">18</span>Polare erfliegen und das Modell optimal einstellen</h1>
+<p>Die Polare sagt, wie viel Dein Modell bei jeder Fahrt sinkt. Sie ist die Grundlage für zwei Dinge: für die <b>richtige Fahrt</b> im Flug (Sollfahrt nach MacCready) und für das <b>Einstellen des Modells</b>, denn jede Änderung an Schwerpunkt, Wölbklappe, Ballast oder Profilpflege zeigt sich als bessere oder schlechtere Polare. Herstellerpolaren fehlen bei Modellen meist oder passen nicht zum eigenen Modell. Mit der App, zwei Widgets und dem Simulator erfliegst Du die echte Polare selbst und nutzt sie am Sender.</p>
+<table>
+<tr><th>Schritt</th><th>Womit</th><th>Ergebnis</th></tr>
+<tr><td>1. Messpunkte fliegen</td><td>Widget Polarflug am Sender</td><td>Gleitpunkte in allen Fahrtbereichen</td></tr>
+<tr><td>2. Polare rechnen und auf den Sender</td><td>Widget Polarflug oder Tab Polare</td><td>scripts/maccready/polaren.lua</td></tr>
+<tr><td>3. Mit der Polare fliegen</td><td>Widget Sollfahrt am Sender</td><td>Sollfahrt, Netto-Vario, Streckenverlust</td></tr>
+<tr><td>4. Nachspielen und abstimmen</td><td>Tab Simulator mit dem Log</td><td>Widget-Einstellungen, MC-Wert, Erkenntnisse</td></tr>
+<tr><td>5. Modell verbessern</td><td>Tab Polare, Einzel-Logs</td><td>Messbarer Vergleich von Einstellungen</td></tr>
+</table>
+
+<h2>1. Messpunkte fliegen mit dem Widget Polarflug</h2>
+<p>Das Widget Polarflug (Vollbild) zählt am Sender alle Sekunden, die für die Polare taugen, mit denselben Regeln wie der Tab Polare: Motor aus und 15 s danach, geradeaus, ohne starkes Beschleunigen. Gezählt wird erst, wenn der Wind gemessen ist; dazu genügt es, einmal zu kreisen. Für jeden Fahrtbereich (Standard 20–30, 30–40 … km/h) steht ein Balken mit der Zahl der Punkte:</p>
+<figure><img src="bilder/polarflug-balken.png" alt=""><figcaption>Widget Polarflug: Balken pro Fahrtbereich, der aktuelle Bereich weiss umrahmt</figcaption></figure>
+<ul>
+<li><b>Rot</b>: zu wenig Punkte, die Polare ist hier nicht gestützt (Standard unter 20).</li>
+<li><b>Orange</b>: rechenbar, aber noch ungenau (20 bis 59).</li>
+<li><b>Grün</b>: genug, hier braucht es keine Messungen mehr (ab 60).</li>
+</ul>
+<p>Im Flug fliegst Du gezielt die roten und orangen Bereiche: lange, ruhige Geraden mit konstanter Fahrt. Wechselst Du im Geradeausflug in einen anderen Bereich, sagt das Widget ihn an, so musst Du nicht auf den Bildschirm schauen. Die Punkte bleiben pro Modell gespeichert und sammeln sich über mehrere Flüge.</p>
+<div class="tip"><b>Tipp</b>Die besten Punkte gibt es in ruhiger Luft, am Morgen oder Abend. Kurz nach einer Thermik oder in Lee streuen die Punkte stark. Mit dem Filter im Tab Diagramme lässt sich später auch in der App eine Polare nur aus ruhigen Abschnitten rechnen.</div>
+
+<h2>2. Polare rechnen und auf den Sender schreiben</h2>
+<p>Der Knopf <span class="btn">POLARE</span> im Widget zeigt die Messpunkte, die Mediane pro Klasse und die Kurve. Violett ist die Polare, die gerade in polaren.lua steht, grün die neue. <span class="btn">-&gt; polaren.lua</span> (zweimal tippen) schreibt die neue Polare für dieses Modell in <b>scripts/maccready/polaren.lua</b>. Im erflogenen Bereich gilt die Messung, ausserhalb bleibt die alte Polare. Die alte Datei bleibt als polaren_alt.lua.</p>
+<figure><img src="bilder/polarflug-polare.png" alt=""><figcaption>Widget Polarflug: Polare mit Messpunkten, Klassen-Medianen und gültigem Bereich</figcaption></figure>
+<p>Der zweite Weg führt über die App: Der Tab Polare rechnet die Polare aus allen Logs des Modells (<a href="#k12">Kapitel 12</a>), mit mehr Punkten und Filtern. Unter „Für MacCready / Lua-Widget“ schreibt <span class="btn">Auf Sender schreiben</span> dieselbe Datei polaren.lua für alle Modelle.</p>
+<figure><img src="bilder/26-maccready.png" alt=""><figcaption>Tab Polare: Kennzahlen fürs Widget und Sollfahrt nach MacCready</figcaption></figure>
+<div class="warn"><b>Wichtig</b>Ist im Tab Polare das Häkchen „Beim Sync automatisch aktualisieren“ an, überschreibt die App polaren.lua bei jedem Sync mit der Polare aus den Logs. Willst Du die Polare behalten, die das Widget Polarflug geschrieben hat, nimm das Häkchen weg. Umgekehrt ist das Häkchen bequem, wenn die App-Polare Deine Referenz ist.</div>
+
+<h2>3. Mit der Polare fliegen: Widget Sollfahrt</h2>
+<p>Das Widget Sollfahrt liest polaren.lua und zeigt im Flug:</p>
+<ul>
+<li><b>Netto</b>: wie die Luft steigt oder sinkt, also Vario plus Eigensinken aus der Polare.</li>
+<li><b>SOLL</b> und <b>IST</b>: die Sollfahrt nach MacCready für MC-Wert, Netto und Gegenwind, daneben die geflogene Fahrt. Der Balken in der Mitte und der Ton sagen „schneller“ oder „bremsen“.</li>
+<li><b>MC</b>: mit + und − auf dem Bildschirm, einem Poti oder Schaltern. Eine Änderung wird angesagt.</li>
+<li><b>Wind</b>: aus den Kreisen geschätzt, getrennt nach Höhenschichten von 100 m.</li>
+<li><b>Verlust</b>: wie viel Strecke Du gegenüber der Sollfahrt verschenkt hast, in m und %. Zweimal tippen setzt ihn auf 0.</li>
+</ul>
+<p>Fehlt für das aktive Modell die Polare, zeigt das Widget „Polare fehlt“. Mit einer guten Polare fliegst Du zwischen den Thermiken mit der Fahrt, die den besten Schnitt bringt, und in Abwind nicht zu langsam.</p>
+
+<h2>4. Im Simulator nachspielen und abstimmen</h2>
+<p>Nach dem Flug holt der Sync das Log in die App. Im Tab Simulator (<a href="#k16">Kapitel 16</a>) wählst Du dasselbe Widget und spielst den Flug ab:</p>
+<ul>
+<li>Stimmt die Sollfahrt? Die Diagramme daneben zeigen die TAS und das Netto-Vario der App zum Vergleich.</li>
+<li>Glättung, Totzone und Ton so einstellen, dass das Widget in Böen ruhig bleibt und trotzdem früh genug reagiert. Du hörst sofort, wie es klingt.</li>
+<li>Den MC-Wert ändern und sehen, wie sich Sollfahrt und Streckenverlust über den ganzen Flug verändern. So findest Du den MC-Wert, der zu Deinem Fluggebiet und Wetter passt.</li>
+<li>Mit dem Widget Polarflug im Simulator siehst Du, welche Fahrtbereiche ein Flug abgedeckt hätte, und planst den nächsten Messflug.</li>
+</ul>
+<p>Was im Simulator gut ist, überträgst Du als Konfiguration am Sender. Hast Du am Code etwas verbessert, kommt die neue Version über das Repository und den Widget-Sync auf den Sender (<a href="#k17">Kapitel 17</a>).</p>
+
+<h2>5. Das Modell optimal einstellen</h2>
+<p>Weil die Polare jetzt messbar ist, lässt sich jede Einstellung am Modell vergleichen:</p>
+<ol>
+<li>Pro Flugtag <b>nur eine Sache ändern</b>, z. B. Schwerpunkt 2 mm nach hinten, eine andere Wölbklappenstellung im Speedflug oder Ballast.</li>
+<li>Mit dem Widget Polarflug genug Punkte in den wichtigen Fahrtbereichen sammeln.</li>
+<li>Im Tab Polare mit <b>Einzel-Logs</b> die Polaren der Flüge übereinanderlegen. Beste Gleitzahl, geringstes Sinken und die Kurve bei schneller Fahrt zeigen, was die Änderung gebracht hat. Logs, die mehr als 20 % abweichen, sind mit „weicht ab“ markiert.</li>
+<li>Die bessere Einstellung behalten, die zugehörige Polare auf den Sender schreiben und die Sollfahrt damit fliegen.</li>
+</ol>
+<p>Ob sich Ballast lohnt, zeigt schon vor dem Flug der Regler <b>Ballast</b> im Tab Polare: Die Polare verschiebt sich zu höherer Fahrt, die Tabelle zeigt Sollfahrt und Schnitt für MC 0 bis 3. Der Regler <b>Verschmutzung</b> zeigt, was Mücken oder Regen auf den Flächen kosten.</p>
+<div class="note"><b>Genauigkeit</b>Die erflogene Polare ist so gut wie die Sensoren und die Luft. Ein barometrisches Vario mit gutem GPS reicht; ein Staurohr macht die Fahrt genauer. Vergleiche nur Polaren, die mit genug Punkten im selben Fahrtbereich entstanden sind. Unterschiede unter etwa 5 % liegen oft im Rauschen.</div>
+
 <!-- 15 -->
-<h1 id="k16"><span class="n">16</span>KI-Auswertung</h1>
+<h1 id="k19"><span class="n">19</span>KI-Auswertung</h1>
 <p>Die KI-Auswertung schickt einen Ausschnitt des offenen Logs an Claude (von Anthropic) und zeigt die Analyse in einem Panel rechts, neben dem Tab, den Du gerade ansiehst. Auf Wunsch bedient die KI auch die App: Sie setzt Filter, wählt einen Zeitbereich, blendet Diagramme ein und erstellt eine Polare. Die Funktion ist freiwillig und braucht einen eigenen API-Schlüssel.</p>
 <h2>Einrichten</h2>
-<p>Zuerst brauchst Du einen API-Schlüssel von Anthropic. Wie Du ihn bekommst, was er kostet und wie Du ihn sicher aufbewahrst, steht Schritt für Schritt in <a href="#k17">Kapitel 17</a>. Den Schlüssel trägst Du unter <span class="btn">⚙</span> → <span class="btn">KI-Auswertung …</span> ein, mit <span class="btn">Prüfen</span> und <span class="btn">Speichern</span>.</p>
+<p>Zuerst brauchst Du einen API-Schlüssel von Anthropic. Wie Du ihn bekommst, was er kostet und wie Du ihn sicher aufbewahrst, steht Schritt für Schritt in <a href="#k20">Kapitel 20</a>. Den Schlüssel trägst Du unter <span class="btn">⚙</span> → <span class="btn">KI-Auswertung …</span> ein, mit <span class="btn">Prüfen</span> und <span class="btn">Speichern</span>.</p>
 <p>Erst wenn ein Schlüssel hinterlegt ist, erscheint rechts neben den Tabs der Knopf <span class="btn">✦ KI-Auswertung</span>. Er steht in jedem Tab an derselben Stelle; auf dem Handy zeigt er nur das ✦. Die Desktop-App legt den Schlüssel verschlüsselt im Schlüsselbund des Betriebssystems ab; auf dem Mac fragt macOS beim ersten Mal, ob die App darauf zugreifen darf. Die Web-Version speichert ihn im Speicher des Browsers auf diesem Gerät. <span class="btn">Schlüssel entfernen</span> löscht ihn.</p>
 <figure class="half"><img src="bilder/22-ki-einstellungen.png" alt=""><figcaption>Einstellungen der KI-Auswertung</figcaption></figure>
 <table>
@@ -505,9 +664,9 @@ a { color: var(--acc); }
 <div class="tip"><b>Kosten</b>Jede Anfrage kostet je nach Datenmenge und Modell meist wenige Rappen und wird über Dein Anthropic-Konto abgerechnet. Ist das Guthaben leer, meldet das Panel das.</div>
 
 <!-- API-Schlüssel -->
-<h1 id="k17"><span class="n">17</span>So kommst Du zu einem Anthropic-API-Schlüssel</h1>
+<h1 id="k20"><span class="n">20</span>So kommst Du zu einem Anthropic-API-Schlüssel</h1>
 <p>Für die KI-Auswertung braucht die App einen eigenen <b>API-Schlüssel</b> von Anthropic, der Firma hinter Claude. Der Schlüssel ist eine lange Zeichenfolge, die mit <code>sk-ant-</code> beginnt. Mit ihm bezahlt die App jede Anfrage aus Deinem eigenen Guthaben. Ein Claude-Abo (Pro, Max) ist dafür weder nötig noch reicht es: Abo und API-Guthaben sind zwei getrennte Dinge.</p>
-<div class="note"><b>Ohne Schlüssel</b>Hast Du ein Claude-Abo und nutzt Claude Desktop, brauchst Du keinen Schlüssel: Über den MCP-Server bedient Claude Desktop die App direkt (<a href="#k19">Kapitel 19</a>).</div>
+<div class="note"><b>Ohne Schlüssel</b>Hast Du ein Claude-Abo und nutzt Claude Desktop, brauchst Du keinen Schlüssel: Über den MCP-Server bedient Claude Desktop die App direkt (<a href="#k22">Kapitel 22</a>).</div>
 <h2>1. Konto anlegen</h2>
 <ol>
 <li>Im Browser <code>platform.claude.com</code> öffnen (die Claude-Plattform für Entwickler, früher <code>console.anthropic.com</code>).</li>
@@ -567,7 +726,7 @@ a { color: var(--acc); }
 </table>
 
 <!-- Beispielfragen -->
-<h1 id="k18"><span class="n">18</span>Beispielfragen für die KI</h1>
+<h1 id="k21"><span class="n">21</span>Beispielfragen für die KI</h1>
 <p>Ins Feld <b>Frage oder Auftrag</b> darfst Du schreiben wie zu einem erfahrenen Fliegerkollegen. Die folgenden Beispiele sind zum Ausprobieren gedacht. Sie funktionieren in der KI-Auswertung und genauso in Claude Desktop über MCP. Am besten wählst Du vorher das passende Log und die Kanäle, um die es geht.</p>
 <h2>Analyse</h2>
 <table>
@@ -585,9 +744,9 @@ a { color: var(--acc); }
 <p>Für solche Fragen am besten beim Ausschnitt <b>Keine Logdaten, nur eine Frage zur App</b> wählen. Die KI schlägt im Handbuch nach.</p>
 <table>
 <tr><th>Frage</th><th>Was dabei herauskommt</th></tr>
-<tr><td>„Wie lege ich den Sensor für den Verbrauch fest?“</td><td>Der Weg: Tab Thermik &amp; Steigflüge → Einstellungen → Verbrauch, und was die Wahl bewirkt.</td></tr>
+<tr><td>„Wie lege ich den Sensor für den Verbrauch fest?“</td><td>Der Weg: Tab Motorsteigflüge → Verbrauch, und was die Wahl bewirkt.</td></tr>
 <tr><td>„Wie kommen die Logs vom Sender in die App?“</td><td>Sync per USB oder Import, je nach Desktop- oder Web-Version.</td></tr>
-<tr><td>„Warum zeigt der Tab Thermik keine Steigflüge?“</td><td>Hinweise aus der Fehlersuche, meist der falsche Schalter.</td></tr>
+<tr><td>„Warum zeigt der Tab Motorsteigflüge keine Steigflüge?“</td><td>Hinweise aus der Fehlersuche, meist der falsche Schalter.</td></tr>
 </table>
 <h2>Die App bedienen lassen</h2>
 <p>Ist <b>KI darf die App bedienen</b> eingeschaltet, setzt die KI selbst Filter, Zeitbereich, Diagramme, Tab und Log. Was sie gemacht hat, steht im Kasten „Ausgeführt“, und <span class="btn">Rückgängig</span> nimmt alles zurück.</p>
@@ -604,7 +763,7 @@ a { color: var(--acc); }
 <div class="tip"><b>Tipp</b>Kommt eine Antwort ungenau zurück, frag nach: „Rechne das nur für die Zeit mit Motor aus“ oder „Erklär mir, wie Du auf die Gleitzahl kommst“. Die KI kennt nur die Daten, die mitgeschickt wurden; was fehlt, kannst Du in der Zeile „Gesendete Daten“ dazuwählen.</div>
 
 <!-- 16 -->
-<h1 id="k19"><span class="n">19</span>MCP-Server: die App aus Claude bedienen</h1>
+<h1 id="k22"><span class="n">22</span>MCP-Server: die App aus Claude bedienen</h1>
 <p>MCP (Model Context Protocol) ist ein offener Standard, über den KI-Programme mit anderen Programmen sprechen. Die Desktop-App hat einen eingebauten MCP-Server. Ist er eingeschaltet, kann <b>Claude Desktop</b>, <b>Claude Code</b> oder ein anderes MCP-fähiges Programm die offene App bedienen: Zustand lesen, Daten lesen, Logs auflisten und öffnen, Filter und Zeitbereich setzen, Diagramme zeigen, den Tab wechseln, eine Polare erstellen und alles rückgängig machen. Das sind dieselben Aktionen wie bei der KI-Auswertung.</p>
 <p>Der Unterschied zur KI-Auswertung: Du schreibst nicht in der App, sondern im Chat von Claude Desktop, und es braucht <b>keinen API-Schlüssel</b>. Die KI läuft über Dein Claude-Konto (in Claude Desktop ist dafür ein Abo wie Pro oder Max sinnvoll). Die Web-Version hat keinen MCP-Server.</p>
 <h2>So hängt alles zusammen</h2>
@@ -648,7 +807,7 @@ a { color: var(--acc); }
 <li>Den MM Flight Analyzer offen lassen und z. B. fragen: „Welches Log ist im MM Flight Analyzer offen?“</li>
 <li>Beim ersten Werkzeug fragt Claude, ob es <b>mm-flight-analyzer</b> benutzen darf. Mit „Immer erlauben“ fragt es künftig nicht mehr.</li>
 </ol>
-<p>Jede Aktion siehst Du sofort in der App. Beispiele zum Ausprobieren stehen in <a href="#k18">Kapitel 18</a>.</p>
+<p>Jede Aktion siehst Du sofort in der App. Beispiele zum Ausprobieren stehen in <a href="#k21">Kapitel 21</a>.</p>
 <h2>Claude Code</h2>
 <p>In einem Terminal genügt: <code>claude mcp add --transport http mm-flight-analyzer http://127.0.0.1:3917/mcp</code>. Den passenden Befehl mit dem eingestellten Port zeigt auch der MCP-Dialog. Hier gibt es keine Brücke, Claude Code spricht direkt mit der App.</p>
 <h2>Fehlersuche</h2>
@@ -664,12 +823,14 @@ a { color: var(--acc); }
 </table>
 
 <!-- 17 -->
-<h1 id="k20"><span class="n">20</span>Darstellung, Sprache und Web-Version</h1>
+<h1 id="k23"><span class="n">23</span>Darstellung, Sprache und Web-Version</h1>
 <h2>Hell und dunkel</h2>
 <p>Unter <span class="btn">⚙</span> → <b>Darstellung</b> wählst Du „Wie System“, „Hell“ oder „Dunkel“. „Wie System“ folgt der Einstellung von Windows bzw. macOS.</p>
 <figure><img src="bilder/16-hell.png" alt=""><figcaption>Helle Darstellung</figcaption></figure>
 <h2>Geschwindigkeit</h2>
 <p>Unter <span class="btn">⚙</span> → <b>Geschwindigkeit</b> wählst Du die Einheit für alle Geschwindigkeiten: km/h (Standard), kn, m/s oder mph. Loggt ein Sensor in einer anderen Einheit (z. B. GPS-Geschwindigkeit in Knoten), rechnet die App um: Diagramme, Kennzahlen, Min/Ø/Max, Werte am Zeitpunkt, Filter, berechnete Werte wie TAS, Wind und Gegenwind sowie die Polare. Das Vario bleibt in m/s, die Rohdaten zeigen die Werte wie im Log. Nach dem Speichern wird das offene Log neu eingelesen; Filter auf einer Geschwindigkeit fallen dabei weg.</p>
+<h2>Esri-Schlüssel für Luftbilder</h2>
+<p>Die Karte im Tab Thermik zeigt in der Schweiz Luftbilder von swisstopo, ohne Schlüssel. Für Luftbilder im Ausland trägst Du unter <span class="btn">⚙</span> → <b>Luftbild im Ausland (Esri-Schlüssel)</b> einen eigenen API-Schlüssel von Esri (ArcGIS Location Platform, kostenloses Konto) ein. Ohne Schlüssel bleibt der Hintergrund im Ausland leer. Der Schlüssel bleibt nur auf diesem Gerät.</p>
 <h2>Sprache</h2>
 <p>Die Oberfläche gibt es auf Deutsch und Englisch (<span class="btn">⚙</span> → <b>Sprache</b>). Die Sensornamen stammen aus dem Log und bleiben in der Sprache des Senders.</p>
 <figure><img src="bilder/19-englisch.png" alt=""><figcaption>Englische Oberfläche</figcaption></figure>
@@ -681,14 +842,18 @@ a { color: var(--acc); }
 </div>
 
 <!-- 18 -->
-<h1 id="k21"><span class="n">21</span>Was die App speichert</h1>
+<h1 id="k24"><span class="n">24</span>Was die App speichert</h1>
 <table>
 <tr><th>Was</th><th>Wo</th></tr>
 <tr><td>Logs</td><td>Im Archiv-Ordner, ein Unterordner pro Modell. Die App löscht dort nie etwas.</td></tr>
 <tr><td>Sync-Einstellungen (Log-Ordner auf dem Sender, Archiv-Ordner, automatischer Sync, Importe ins Archiv)</td><td>Datei <code>settings.json</code> im App-Datenordner:<br>Windows <code>%APPDATA%\MM Flight Analyzer</code><br>Mac <code>~/Library/Application Support/MM Flight Analyzer</code></td></tr>
 <tr><td>Ansicht (Sprache, Darstellung, Geschwindigkeitseinheit, letzter Tab, gewählte Kanäle, Reihenfolge der Diagramme, Einzeln/Überlagert, Schalter und Höhenquellen, Schwelle, Stufe, Rot markieren pro Modell, zuletzt gewähltes Modell)</td><td>Im Speicher der App bzw. des Browsers (Web-Version). Bleibt bei Updates erhalten.</td></tr>
 <tr><td>API-Schlüssel der KI-Auswertung</td><td>Desktop-App: verschlüsselt mit dem Schlüsselbund des Betriebssystems in der Datei <code>ai-key.bin</code> im App-Datenordner. Web-Version: im Speicher des Browsers. Nie im Archiv.</td></tr>
+<tr><td>Esri-Schlüssel und Häkchen in der Thermik-Tabelle (pro Log)</td><td>Im Speicher der App bzw. des Browsers.</td></tr>
 <tr><td>MCP-Server ein/aus und Port</td><td>In <code>settings.json</code> im App-Datenordner.</td></tr>
+<tr><td>Eigene Widgets (Repo, Zweig, Benutzerverzeichnis, automatisch kopieren, ausgeschaltete Widgets)</td><td>In <code>settings.json</code> im App-Datenordner. Die Widgets selbst liegen im Benutzerverzeichnis (Standard Dokumente/MM Flight Analyzer/Widgets).</td></tr>
+<tr><td>Simulator: Konfiguration der Widgets pro Modell, im Simulator geänderter Code</td><td>Im Speicher der App bzw. des Browsers. In den scripts-Ordner kommt Code nur mit „In den scripts-Ordner speichern“.</td></tr>
+<tr><td>Polaren für den Sender</td><td>Im Speicher der App; auf dem Sender in scripts/maccready/polaren.lua.</td></tr>
 <tr><td>Zwischenspeicher der Log-Details (Dauer, Sensoren)</td><td>Ebenfalls im Speicher der App, damit die Log-Liste schnell erscheint.</td></tr>
 </table>
 <h2>Einstellungen pro Modell</h2>
@@ -696,7 +861,7 @@ a { color: var(--acc); }
 <p>Sprache, Darstellung, Geschwindigkeitseinheit und der zuletzt offene Tab gelten für alle Modelle.</p>
 
 <!-- 19 -->
-<h1 id="k22"><span class="n">22</span>Troubleshooting und FAQ</h1>
+<h1 id="k25"><span class="n">25</span>Troubleshooting und FAQ</h1>
 <div class="faq">
 <h2>Installation und Start</h2>
 <h3>Windows meldet „Der Computer wurde durch Windows geschützt“.</h3>
@@ -744,7 +909,7 @@ a { color: var(--acc); }
 
 <h2>Auswertung</h2>
 <h3>Es werden keine Steigflüge oder keine Thermik erkannt.</h3>
-<p>Prüfe im Tab „Thermik &amp; Steigflüge“ den Schalter. Er muss im Log vorkommen und in der Phase EIN sein. Für Steigflüge ohne Schalter „ESC Strom (automatisch)“ wählen und bei Bedarf die Schwelle anpassen. Thermik zählt erst ab 5 s.</p>
+<p>Prüfe im Tab „Thermik“ bzw. „Motorsteigflüge“ den Schalter. Er muss im Log vorkommen und in der Phase EIN sein. Für Steigflüge ohne Schalter „ESC Strom (automatisch)“ wählen und bei Bedarf die Schwelle anpassen. Thermik zählt erst ab 5 s.</p>
 <h3>Die Tabelle „Wind nach Höhe“ ist leer.</h3>
 <p>Für den Wind braucht es GPS-Position, GPS-Geschwindigkeit und Kurven im Flug. Logs ohne GPS oder mit nur geraden Strecken liefern keinen Wind.</p>
 <h3>Die GPS-Spur fehlt („Keine GPS-Daten im Log“).</h3>
@@ -768,7 +933,7 @@ a { color: var(--acc); }
 </div>
 
 <!-- 20 -->
-<h1 id="k23"><span class="n">23</span>Kurzreferenz Maus und Tastatur</h1>
+<h1 id="k26"><span class="n">26</span>Kurzreferenz Maus und Tastatur</h1>
 <table>
 <tr><th>Wo</th><th>Aktion</th><th>Wirkung</th></tr>
 <tr><td>Diagramm</td><td>Ziehen</td><td>Ausschnitt verschieben</td></tr>
@@ -787,7 +952,7 @@ a { color: var(--acc); }
 <tr><td>Fenster</td><td>CSV-Dateien hineinziehen</td><td>Logs öffnen</td></tr>
 </table>
 <!-- 21 -->
-<h1 id="k24"><span class="n">24</span>Änderungen pro Version</h1>
+<h1 id="k27"><span class="n">27</span>Änderungen pro Version</h1>
 <p>Dieses Kapitel ist das Changelog der App, die neueste Version zuerst.</p>
 <div class="changelog">
 {{CHANGELOG}}

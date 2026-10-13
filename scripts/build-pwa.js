@@ -19,6 +19,10 @@ let html = fs.readFileSync(path.join(root, 'web', 'index.html'), 'utf8');
 const cdn = /<script src="https:\/\/cdnjs\.cloudflare\.com\/ajax\/libs\/Chart\.js\/[^"]+"><\/script>/;
 if (!cdn.test(html)) throw new Error('Chart.js-Einbindung in web/index.html nicht gefunden');
 html = html.replace(cdn, '<script src="chart.umd.min.js"></script>');
+// Lua-VM für den Simulator ebenfalls lokal
+const luaCdn = /<script src="https:\/\/cdn\.jsdelivr\.net\/npm\/fengari-web@[^"]+"><\/script>/;
+if (!luaCdn.test(html)) throw new Error('fengari-Einbindung in web/index.html nicht gefunden');
+html = html.replace(luaCdn, '<script src="fengari-web.js"></script>');
 
 const head = `
 <link rel="manifest" href="manifest.webmanifest">
@@ -28,7 +32,7 @@ const head = `
 <meta name="theme-color" content="#0f141a" media="(prefers-color-scheme: dark)">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="Ethos Logs">
+<meta name="apple-mobile-web-app-title" content="MM Flight Analyzer">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">`;
 if (!html.includes('</title>')) throw new Error('<title> in web/index.html nicht gefunden');
 html = html.replace('</title>', '</title>' + head);
@@ -63,6 +67,7 @@ html = html.trimEnd() + '\n' + tail + od;
 
 fs.writeFileSync(path.join(out, 'index.html'), html);
 fs.copyFileSync(path.join(root, 'node_modules', 'chart.js', 'dist', 'chart.umd.js'), path.join(out, 'chart.umd.min.js'));
+fs.copyFileSync(path.join(root, 'node_modules', 'fengari-web', 'dist', 'fengari-web.js'), path.join(out, 'fengari-web.js'));
 fs.copyFileSync(path.join(pwa, 'manifest.webmanifest'), path.join(out, 'manifest.webmanifest'));
 if (clientId) {
   fs.copyFileSync(path.join(root, 'node_modules', '@azure', 'msal-browser', 'lib', 'msal-browser.min.js'), path.join(out, 'msal-browser.min.js'));
@@ -84,7 +89,7 @@ if (sample && fs.existsSync(path.join(root, 'web', 'beispiel.csv'))) {
 fs.writeFileSync(path.join(out, '.nojekyll'), '');
 
 // Offline-Grundausstattung; das Beispiel-Log (2,7 MB) wird erst beim ersten Laden gemerkt
-const shell = ['./', 'index.html', 'chart.umd.min.js', 'manifest.webmanifest', ...icons.map(f => 'icons/' + f),
+const shell = ['./', 'index.html', 'chart.umd.min.js', 'fengari-web.js', 'manifest.webmanifest', ...icons.map(f => 'icons/' + f),
   ...(clientId ? ['msal-browser.min.js', 'onedrive.js'] : [])];
 const hash = crypto.createHash('sha256');
 for (const f of shell.slice(1)) hash.update(fs.readFileSync(path.join(out, f)));

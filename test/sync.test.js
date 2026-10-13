@@ -164,3 +164,49 @@ test('Text als UTF-8 oder Latin-1 lesen', () => {
   const b = Buffer.from('Abc;Höhe;Zeit;ä', 'utf8');
   assert.ok(S.decodeText(b.subarray(0, b.length - 1)).startsWith('Abc;Höhe'));
 });
+
+test('Polaren fürs MacCready-Widget neben die Logs schreiben', async () => {
+  const root = tmp();
+  const txt = '-- Test\nreturn {\n  ["SB-10"] = { a = -0.0072, b = 0.162, c = -1.51, vMin = 6.7, vMax = 18.9 },\n}\n';
+  const dest = await S.writePolars(root, txt);
+  assert.equal(dest, path.join(root, 'scripts', 'maccready', 'polaren.lua'));
+  assert.equal(fs.readFileSync(dest, 'utf8'), txt);
+  await S.writePolars(root, '-- neu\n');              // überschreibt
+  assert.equal(fs.readFileSync(dest, 'utf8'), '-- neu\n');
+  await assert.rejects(S.writePolars(root, 'os.remove("x")'));
+});
+
+test('Watcher merkt sich den Ethos-Ordner für polaren.lua', async () => {
+  const root = tmp(), arc = tmp();
+  put(path.join(root, 'RADIO', 'logs', 'SB-10-2026-10-02-14-39-06.csv'), 'a');
+  const w = new S.SyncWatcher(() => ({ senderPath: 'Radio/logs', archiveDir: arc, autoSync: true }),
+    { volumes: async () => [{ root: path.join(root, 'RADIO'), label: 'RADIO' }] });
+  await w.poll(true);
+  assert.deepEqual(w.ethosRoots, [path.join(root, 'RADIO')]);
+});
+
+test('Simulator: scripts-Ordner lesen und Widget zurückschreiben', async () => {
+  const dir = tmp();
+  put(path.join(dir, 'sollfahrt', 'main.lua'), 'return {}');
+  put(path.join(dir, 'maccready', 'polaren.lua'), 'return {}');
+  put(path.join(dir, 'sollfahrt', 'bild.png'), 'x');
+  const files = await S.readScripts(dir);
+  assert.deepEqual(Object.keys(files).sort(), ['maccready/polaren.lua', 'sollfahrt/main.lua']);
+  await S.writeScript(dir, 'sollfahrt/main.lua', '-- neu');
+  assert.equal(fs.readFileSync(path.join(dir, 'sollfahrt', 'main.lua'), 'utf8'), '-- neu');
+  assert.equal(fs.readFileSync(path.join(dir, 'sollfahrt', 'main.lua.bak'), 'utf8'), 'return {}');
+  await assert.rejects(S.writeScript(dir, '../x.lua', ''));
+  await assert.rejects(S.writeScript(dir, 'sollfahrt/main.txt', ''));
+});
+
+test('Nach dem Log-Sync eines Ethos-Senders kommen die Widgets, einmal pro Anschluss', async () => {
+  const root = tmp(), arc = path.join(root, 'arc');
+  const vol = { root: path.join(root, 'RADIO'), label: 'RADIO' };
+  fs.mkdirSync(path.join(vol.root, 'logs'), { recursive: true });
+  const calls = [];
+  const w = new S.SyncWatcher(() => ({ senderPath: 'RADIO/logs', archiveDir: arc, autoSync: true }),
+    { volumes: async () => [vol], afterEthos: async roots => { calls.push(roots); return { results: [{ name: 'x' }] }; } });
+  const s = await w.poll();
+  assert.deepEqual(calls, [[vol.root]]); assert.equal(s.widgets.results.length, 1);
+  await w.poll(); assert.equal(calls.length, 1);
+});
