@@ -1,7 +1,7 @@
 {
   "name": "mm-flight-analyzer",
   "productName": "MM Flight Analyzer",
-  "version": "2026.10.1",
+  "version": "2026.10.2",
   "description": "Flugauswertung von Mächler Modelle: Telemetrie-Logs von Ethos- und Jeti-Sendern auswerten und automatisch vom Sender ins Archiv synchronisieren",
   "author": "Christoph Mächler",
   "license": "UNLICENSED",

@@ -36,6 +36,12 @@
       desktop:{ mcpServers:{ 'mm-flight-analyzer':{ command:'/Applications/MM Flight Analyzer.app/Contents/MacOS/MM Flight Analyzer',
         args:['/Applications/MM Flight Analyzer.app/Contents/Resources/mcp-stdio.js'], env:{ ELECTRON_RUN_AS_NODE:'1' } } } } }),
     copyText: async () => {},
+    // Eigene Widgets von GitHub (Stand nach dem Holen)
+    widgetInfo: async () => ({ repo:'mrskynavi/mm-ethos-widgets', branch:'main', dir:'/Users/christoph/Documents/MM Flight Analyzer/Widgets', auto:true, off:['gpscourse'],
+      widgets:[['sollfahrt','Sollfahrt','1.1'],['polarflug','Polarflug','1.1'],['thermik','Thermik','1.0'],['steigfluege','Steigflüge','1.0'],['wind','Wind','1.0'],['gpscourse','GPS Course','1.0']].map(([name,title,version])=>({ name, title, version })),
+      fetch:{ ok:true, at:Date.parse('2026-10-13T17:40:00+02:00'), loaded:2, same:4 }, copy:null, senders:['/Volumes/RADIO'] }),
+    widgetFetch: async () => window.ethosDesktop.widgetInfo(),
+    widgetCopy: async () => ({ copied:5 }),
   };
   window.__setSync = s => { window.__STATUS = s; syncCb && syncCb(s); };
 })();

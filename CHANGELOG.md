@@ -1,6 +1,6 @@
 # Changelog
 
-## 2026.10.2 – in Arbeit
+## 2026.10.2 – 2026-10-13
 
 - Wind ruhiger: Der erste Wind-Fit braucht ein volles Fenster (40 Werte, etwa 28 s), damit der Start mit Motor keinen falschen Wind liefert. Danach gilt der Median der letzten 5 guten Fits, einzelne Ausreisser schlagen nicht mehr durch (im SB-10-Log vom 12.10. z. B. 47 km/h nach 25 min). TAS, Steuerkurs, Drift und Gegenwind rechnen mit diesem Wind.
 - Thermik ohne Motor: Im Tab Thermik zählt bei der Thermik nicht mehr, was mit Motor gestiegen ist. Läuft der Motor während einer Thermik-Phase (Drehzahl über 300 U/min, ohne Drehzahl-Sensor ESC-Strom über 3 A), endet die Phase beim Motorstart; nach dem Motor beginnt sie neu, aber erst 5 s nach Motor aus, damit das Ausschweben nicht als Thermik zählt. Reste unter 5 s fallen weg. Das gilt für Tabelle, Balken, Kennzahlen, Diagramme und Karte. Das Häkchen „Ohne Motor“ bei der Thermik schaltet das ab; daneben steht, wie viele Phasen gekürzt sind. Die Wahl wird pro Modell gespeichert. Ohne Motor-Sensor im Log ändert sich nichts.
@@ -16,6 +16,9 @@
 - Eigene Widgets automatisch auf den Sender (nur Desktop-App): Die App holt Deine Ethos-Widgets aus einem öffentlichen GitHub-Repo (Standard mrskynavi/mm-ethos-widgets, aufgebaut wie am Sender: scripts/<Name>/main.lua) ins Benutzerverzeichnis (Dokumente/MM Flight Analyzer/Widgets). Sobald ein Ethos-Sender angeschlossen ist, kopiert sie nach dem Log-Sync alle eingeschalteten Widgets auf den Sender, immer, auch bei gleicher Version, und überschreibt die alten Dateien ohne Sicherung. Andere Dateien im Widget-Ordner am Sender (z. B. Messpunkte) und polaren.lua bleiben. Die Sync-Zeile meldet „Widgets: 6 kopiert (1 neu)“, der Knopf „Widgets“ zeigt pro Widget Version vorher und jetzt. Einstellungen unter ⚙ → Eigene Widgets: Repo, Zweig, Benutzerverzeichnis, automatisch kopieren, pro Widget ein Häkchen, „Jetzt von GitHub holen“ und „Jetzt auf den Sender kopieren“. Die Version steht als Kommentar oben in main.lua (-- @version 1.0).
 - Simulator: Quelle „Intern“ (Beispiel-Widgets der App) oder „Meine Widgets“ (Benutzerverzeichnis mit der Kopie von GitHub; in der Web-Version ein gewählter Ordner). Die Widget-Liste zeigt Name und Version. Bildschirm nur noch hohe (800 × 480) oder niedrige Auflösung (480 × 320), wie es die Ethos-Sender gibt; system.getVersion() meldet dazu X20S bzw. X18S.
 - Polare: Sinken wird jetzt überall negativ gezeigt wie auf dem Vario (Achse „Vario (m/s)“, Kennzahl geringstes Sinken z. B. −0,59 m/s).
+- Wind nach Höhe: Die Tabelle im Tab Karte & Wind nimmt jetzt auch den Sensor „Flughöhe“ als Höhenquelle. Bei Modellen mit diesem Sensor (z. B. Lak-17 oder Shark) stand vorher „Kein Wind berechnet“, obwohl der Wind gerechnet war.
+- Handbuch: neue Kapitel „Tab Simulator: Widgets am Computer testen“ (Bedienung und wozu er gut ist), „Eigene Widgets von GitHub auf den Sender“ und „Polare erfliegen und das Modell optimal einstellen“ (Widget Polarflug → polaren.lua → Widget Sollfahrt → Simulator → Einstellungen vergleichen), dazu Bilder vom Tab Polare, vom Block für MacCready, vom Simulator und von den Widgets.
+- Hinweis: Vor dem Release getestet wurde auf dem Mac. Unter Windows laufen Widget-Sync und das Beobachten des scripts-Ordners im Simulator mit dieser Version zum ersten Mal.
 
 ## 2026.10.1 – 2026-10-09
 

@@ -19,7 +19,7 @@ function chapterText(html) {
   html = html.replace(/<!--[\s\S]*?-->/g, '').replace(/<figure[\s\S]*?<\/figure>/g, '');
   const out = [];
   const push = s => { s = s.trim(); if (s) out.push(s); };
-  const re = /<h2[^>]*>([\s\S]*?)<\/h2>|<table[^>]*>([\s\S]*?)<\/table>|<(ol|ul)[^>]*>([\s\S]*?)<\/\3>|<div class="(tip|note)[^"]*">([\s\S]*?)<\/div>|<p[^>]*>([\s\S]*?)<\/p>|<pre[^>]*>([\s\S]*?)<\/pre>/g;
+  const re = /<h2[^>]*>([\s\S]*?)<\/h2>|<table[^>]*>([\s\S]*?)<\/table>|<(ol|ul)[^>]*>([\s\S]*?)<\/\3>|<div class="(tip|note|warn)[^"]*">([\s\S]*?)<\/div>|<p[^>]*>([\s\S]*?)<\/p>|<pre[^>]*>([\s\S]*?)<\/pre>/g;
   let m;
   while ((m = re.exec(html))) {
     if (m[1] != null) push('### ' + strip(m[1]));
