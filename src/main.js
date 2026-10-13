@@ -8,12 +8,14 @@ const E = require('./eject');
 const M = require('./mcp');
 const AI = require('./ai');
 const MG = require('./migrate');
+const WG = require('./widgets');
 
 // Daten aus dem Ordner der früheren App „Ethos Log Viewer“ übernehmen, bevor irgendetwas den neuen Ordner benutzt
 const MIGRATED = MG.migrate(path.join(app.getPath('appData'), MG.OLD_NAME), app.getPath('userData'));
 
 const SETTINGS_FILE = () => path.join(app.getPath('userData'), 'settings.json');
-const DEFAULTS = () => ({ senderPath: 'Radio/logs', archiveDir: S.defaultArchive(), autoSync: true, archiveManual: false, mcp: false, mcpPort: M.DEFAULT_PORT });
+const DEFAULTS = () => ({ senderPath: 'Radio/logs', archiveDir: S.defaultArchive(), autoSync: true, archiveManual: false, mcp: false, mcpPort: M.DEFAULT_PORT,
+  widgetRepo: WG.DEFAULT_REPO, widgetBranch: WG.DEFAULT_BRANCH, widgetDir: WG.defaultDir(), widgetAuto: true, widgetOff: [] });
 let settings;
 function loadSettings() {
   try { settings = { ...DEFAULTS(), ...JSON.parse(fs.readFileSync(SETTINGS_FILE(), 'utf8')) }; }
@@ -89,13 +91,17 @@ async function simScriptsDir(opts) {
     saveSettings({ simScripts: r.filePaths[0] });
   }
   if (opts?.sender) saveSettings({ simScripts: '' });
+  if (opts?.mine) {   // Meine Widgets: scripts im Benutzerverzeichnis (Kopie von GitHub plus eigene)
+    const d = path.join(settings.widgetDir, 'scripts');
+    return fs.existsSync(d) ? { dir: d, source: 'mine' } : null;
+  }
   if (settings.simScripts && fs.existsSync(settings.simScripts)) return { dir: settings.simScripts, source: 'ordner' };
   for (const r of watcher.ethosRoots || []) { const d = path.join(r, 'scripts'); if (fs.existsSync(d)) return { dir: d, source: 'sender' }; }
   return null;
 }
 ipcMain.handle('scripts:read', async (_, opts) => {
   const t = await simScriptsDir(opts || {});
-  if (!t) { simDir = null; return { files: {}, error: opts?.sender ? 'Kein Ethos-Sender mit scripts-Ordner angeschlossen.' : null }; }
+  if (!t) { simDir = null; return { files: {}, error: opts?.sender ? 'Kein Ethos-Sender mit scripts-Ordner angeschlossen.' : opts?.mine ? 'Im Benutzerverzeichnis liegen noch keine Widgets. Hole sie unter ⚙ → Eigene Widgets von GitHub.' : null }; }
   simDir = t.dir; simWatch(t.dir);
   return { ...t, files: await S.readScripts(t.dir) };
 });
@@ -133,6 +139,51 @@ async function netJson(url) {
   if (!r.ok) throw new Error('HTTP ' + r.status);
   return r.json();
 }
+// ---------- Eigene Widgets: von GitHub ins Benutzerverzeichnis, beim Anschliessen auf den Sender ----------
+async function netBuf(url) {
+  const r = await net.fetch(url, { headers: { 'User-Agent': 'mm-flight-analyzer' } });
+  if (!r.ok) throw new Error('HTTP ' + r.status);
+  return r.arrayBuffer();
+}
+let wgFetch = null, wgCopy = null, wgBusy = null;
+async function fetchWidgets() {
+  if (wgBusy) return wgBusy;
+  wgBusy = (async () => {
+    try {
+      const r = await WG.fetchRepo({ repo: settings.widgetRepo, branch: settings.widgetBranch || 'main', dir: settings.widgetDir, getJson: netJson, getBuf: netBuf });
+      wgFetch = { ok: true, ...r };
+    } catch (e) {
+      const msg = /HTTP 404/.test(e.message) ? `Repo ${settings.widgetRepo} (Zweig ${settings.widgetBranch || 'main'}) nicht gefunden oder nicht öffentlich.` : e.message;
+      wgFetch = { ok: false, error: msg, at: Date.now() };
+    }
+    return wgFetch;
+  })();
+  try { return await wgBusy; } finally { wgBusy = null; }
+}
+async function copyWidgets(roots) {
+  // vorher frisch holen; ohne Netz wird die letzte Kopie im Benutzerverzeichnis verwendet
+  if (!wgFetch || Date.now() - wgFetch.at > 5 * 60 * 1000 || !wgFetch.ok) await fetchWidgets();
+  const res = { at: Date.now(), fetchError: wgFetch?.ok ? '' : wgFetch?.error || '', results: [] };
+  for (const r of roots) res.results.push(...(await WG.copyToSender(settings.widgetDir, r, settings.widgetOff || [])).map(x => ({ ...x, root: r })));
+  wgCopy = res;
+  return res;
+}
+async function widgetInfo() {
+  return { repo: settings.widgetRepo, branch: settings.widgetBranch, dir: settings.widgetDir, auto: settings.widgetAuto !== false, off: settings.widgetOff || [],
+    widgets: await WG.listWidgets(path.join(settings.widgetDir, 'scripts')), fetch: wgFetch, copy: wgCopy, senders: watcher.ethosRoots || [] };
+}
+ipcMain.handle('widgets:info', () => widgetInfo());
+ipcMain.handle('widgets:fetch', async () => { await fetchWidgets(); return widgetInfo(); });
+ipcMain.handle('widgets:copy', async () => {
+  const roots = watcher.ethosRoots || [];
+  if (!roots.length) throw new Error('Kein Ethos-Sender angeschlossen.');
+  for (let i = 0; watcher.busy && i < 600; i++) await new Promise(r => setTimeout(r, 100));   // laufenden Sync abwarten
+  if (watcher.busy) throw new Error('Der Sync läuft noch.');
+  const r = await copyWidgets(roots);
+  watcher.set({ ...watcher.status, widgets: r });
+  return r;
+});
+
 let lastUpdate = null;
 async function checkUpdate() {
   let u = await U.check(app.getVersion(), netJson);
@@ -202,7 +253,8 @@ ipcMain.handle('clipboard:write', (_, t) => { require('electron').clipboard.writ
 app.whenReady().then(() => {
   loadSettings();
   restartMcp();
-  watcher = new S.SyncWatcher(() => settings);
+  watcher = new S.SyncWatcher(() => settings, { afterEthos: roots => settings.widgetAuto === false ? null : copyWidgets(roots) });
+  fetchWidgets();
   watcher.on('status', s => win && !win.isDestroyed() && win.webContents.send('sync:status', s));
   createWindow();
   watcher.start();

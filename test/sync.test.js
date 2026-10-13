@@ -198,3 +198,15 @@ test('Simulator: scripts-Ordner lesen und Widget zurückschreiben', async () => 
   await assert.rejects(S.writeScript(dir, '../x.lua', ''));
   await assert.rejects(S.writeScript(dir, 'sollfahrt/main.txt', ''));
 });
+
+test('Nach dem Log-Sync eines Ethos-Senders kommen die Widgets, einmal pro Anschluss', async () => {
+  const root = tmp(), arc = path.join(root, 'arc');
+  const vol = { root: path.join(root, 'RADIO'), label: 'RADIO' };
+  fs.mkdirSync(path.join(vol.root, 'logs'), { recursive: true });
+  const calls = [];
+  const w = new S.SyncWatcher(() => ({ senderPath: 'RADIO/logs', archiveDir: arc, autoSync: true }),
+    { volumes: async () => [vol], afterEthos: async roots => { calls.push(roots); return { results: [{ name: 'x' }] }; } });
+  const s = await w.poll();
+  assert.deepEqual(calls, [[vol.root]]); assert.equal(s.widgets.results.length, 1);
+  await w.poll(); assert.equal(calls.length, 1);
+});

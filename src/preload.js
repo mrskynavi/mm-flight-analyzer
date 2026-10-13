@@ -29,4 +29,7 @@ contextBridge.exposeInMainWorld('ethosDesktop', {
   simScripts: opts => ipcRenderer.invoke('scripts:read', opts),
   simWrite: (rel, text) => ipcRenderer.invoke('scripts:write', rel, text),
   onSimChanged: cb => ipcRenderer.on('scripts:changed', (_, r) => cb(r)),
+  widgetInfo: () => ipcRenderer.invoke('widgets:info'),
+  widgetFetch: () => ipcRenderer.invoke('widgets:fetch'),
+  widgetCopy: () => ipcRenderer.invoke('widgets:copy'),
 });

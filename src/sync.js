@@ -305,6 +305,7 @@ class SyncWatcher extends EventEmitter {
     this.roots = [];        // Laufwerke der zuletzt gefundenen Sender
     this.ethosRoots = [];   // Ethos: Ordner über logs, dorthin geht scripts/maccready/polaren.lua
     this.paused = false;    // während dem Auswerfen nicht auf den Sender zugreifen
+    this.afterEthos = opts.afterEthos || null;   // nach dem Log-Sync: eigene Widgets auf den Sender (Ordner über logs)
   }
   start() { this.stop(); this.timer = setInterval(() => this.poll(), this.interval); this.poll(); }
   stop() { clearInterval(this.timer); this.timer = null; }
@@ -347,6 +348,12 @@ class SyncWatcher extends EventEmitter {
         else this.synced.add(d);
         all.sources.push(d); all.copied.push(...r.copied); all.errors.push(...r.errors);
         all.skipped += r.skipped; all.total += r.total;
+      }
+      const fresh = [...new Set(todo.filter(d => ethos.includes(d) && this.synced.has(d)).map(d => path.dirname(d)))];
+      if (this.afterEthos && fresh.length) {
+        this.set({ state: 'widgets', source: fresh[0] });
+        try { all.widgets = await this.afterEthos(fresh); }
+        catch (e) { all.widgets = { error: isDenied(e) ? 'Keine Berechtigung zum Schreiben auf den Sender.' : e.message }; }
       }
       this.set(all);
       return all;
