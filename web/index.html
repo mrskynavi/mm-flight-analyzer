@@ -4637,7 +4637,7 @@ $('#markReset').addEventListener('click',()=>{ try{ localStorage.removeItem('eth
 function refreshWidgets(){ computeWidgets(); fillMark(); drawBars(); drawCharts(); drawTrack(LOG,CH,CLIMB,THERM); renderCursor(); }
 // ---------- Wind nach Höhe: jeder akzeptierte Kreisfit zählt in der Höhenstufe, in der er gerechnet wurde ----------
 function fillWindAlt(){
-  const opts=LOG.cols.filter(c=>!c.rc && (c.ch==='alt'||c.ch==='galt'||/^(Altitude|Alt|Höhe|GAlt|GPS Alt)/i.test(c.name)));
+  const opts=LOG.cols.filter(c=>!c.rc && (c===CH.alt||c.ch==='alt'||c.ch==='galt'||/^(Altitude|Alt|Höhe|Flughöhe|GAlt|GPS Alt)/i.test(c.name)));
   $('#whAlt').innerHTML=sortCols(opts).map(c=>`<option value="${esc(c.raw)}">${esc(colText(c))}</option>`).join('');
   const sv=mstore.get('wh.alt'); $('#whAlt').value = sv && opts.some(c=>c.raw===sv) ? sv : (CH.alt?.raw||opts[0]?.raw||'');
   const st=mstore.get('wh.step'); if (st) $('#whStep').value=st;
