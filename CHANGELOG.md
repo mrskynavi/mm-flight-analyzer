@@ -1,5 +1,9 @@
 # Changelog
 
+## Unveröffentlicht
+
+- Simulator ohne Auswahl „Intern | Meine Widgets“: Ist ein Ethos-Sender angeschlossen, zeigt er die Widgets im scripts-Ordner des Senders, sonst die Widgets aus dem GitHub-Repo (Desktop über die Kopie im Benutzerverzeichnis, Web-Version direkt von GitHub, dort optional „Ordner wählen …“). Ist GitHub nicht erreichbar, nimmt er die letzte Kopie, nur ohne Kopie die Beispiel-Widgets der App. Wird der Sender angeschlossen oder abgezogen, wechselt die Quelle von selbst. Die Konfiguration eines Widgets gilt jetzt für alle Quellen (bisherige Einstellungen werden übernommen).
+
 ## 2026.10.2 – 2026-10-13
 
 - Wind ruhiger: Der erste Wind-Fit braucht ein volles Fenster (40 Werte, etwa 28 s), damit der Start mit Motor keinen falschen Wind liefert. Danach gilt der Median der letzten 5 guten Fits, einzelne Ausreisser schlagen nicht mehr durch (im SB-10-Log vom 12.10. z. B. 47 km/h nach 25 min). TAS, Steuerkurs, Drift und Gegenwind rechnen mit diesem Wind.
