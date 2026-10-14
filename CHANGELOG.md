@@ -1,5 +1,9 @@
 # Changelog
 
+## Noch nicht veröffentlicht
+
+- Tab Karte & Wind: Die GPS-Spur liegt jetzt auf dem Luftbild (Schweiz swisstopo, Ausland Esri mit eigenem Schlüssel), der Knopf „Luftbild“ schaltet es aus und ein. Zoomen mit Mausrad oder zwei Fingern (vorher nur mit Strg + Mausrad), ziehen verschiebt, Doppelklick zeigt wieder die ganze Spur. Das Gitter passt sich dem Zoom an.
+
 ## 2026.10.2 – 2026-10-13
 
 - Wind ruhiger: Der erste Wind-Fit braucht ein volles Fenster (40 Werte, etwa 28 s), damit der Start mit Motor keinen falschen Wind liefert. Danach gilt der Median der letzten 5 guten Fits, einzelne Ausreisser schlagen nicht mehr durch (im SB-10-Log vom 12.10. z. B. 47 km/h nach 25 min). TAS, Steuerkurs, Drift und Gegenwind rechnen mit diesem Wind.
