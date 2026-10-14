@@ -524,7 +524,7 @@ a { color: var(--acc); }
 <figure><img src="bilder/27-simulator.png" alt=""><figcaption>Simulator mit dem Sollfahrt-Widget, Beispiel-Log bei Minute 20</figcaption></figure>
 <table>
 <tr><th class="c">Nr.</th><th>Element</th><th>Funktion</th></tr>
-<tr><td class="c"><span class="num">1</span></td><td>Quelle</td><td><b>Intern</b>: die Beispiel-Widgets, die mit der App kommen (Sollfahrt, Thermik, Steigflüge). <b>Meine Widgets</b>: die Widgets im Benutzerverzeichnis, also Deine Kopie von GitHub (<a href="#k17">Kapitel 17</a>) und eigene Ordner dort. In der Web-Version wählst Du dafür einen scripts-Ordner.</td></tr>
+<tr><td class="c"><span class="num">1</span></td><td>Quelle</td><td>Woher die Widgets kommen, wählt der Simulator selbst. Ist ein Ethos-Sender angeschlossen, nimmt er die Widgets in dessen scripts-Ordner („7 Widgets vom Sender“). Sonst zeigt er die Widgets aus Deinem GitHub-Repo („6 Widgets von GitHub“, <a href="#k17">Kapitel 17</a>); die Desktop-App holt sie dafür ins Benutzerverzeichnis, eigene Ordner dort erscheinen auch. In der Web-Version kommen sie direkt von GitHub, mit <span class="btn">Ordner wählen …</span> nimmst Du stattdessen einen scripts-Ordner, zum Beispiel den auf dem Sender. Ist GitHub nicht erreichbar, nimmt er die letzte Kopie und nur ohne jede Kopie die Beispiel-Widgets der App (Sollfahrt, Thermik, Steigflüge). Die Konfiguration eines Widgets gilt für alle Quellen.</td></tr>
 <tr><td class="c"><span class="num">2</span></td><td>Widget</td><td>Jeder Unterordner mit einer main.lua, mit Name und Version.</td></tr>
 <tr><td class="c"><span class="num">3</span></td><td>Bildschirm</td><td>Hohe Auflösung (800 × 480, z. B. X20) oder niedrige (480 × 320, z. B. X18). Das Widget bekommt die Fläche eines Vollbild-Widgets.</td></tr>
 <tr><td class="c"><span class="num">4</span></td><td>Konfiguration</td><td>Die Felder des Widgets wie in Ethos unter „Widget konfigurieren“: Quellen, Zahlen, Auswahl. Eine Änderung gilt sofort, das Log läuft weiter. Die Konfiguration wird wie in Ethos pro Modell gespeichert.</td></tr>
@@ -925,7 +925,7 @@ a { color: var(--acc); }
 
 <h2>Allgemein</h2>
 <h3>Werden meine Logs irgendwohin hochgeladen?</h3>
-<p>Nein. Die App liest die Dateien nur auf Deinem Gerät. Ins Internet geht nur die Abfrage nach einer neuen Version auf GitHub. Liegt Dein Archiv in Google Drive oder OneDrive, synchronisiert natürlich dieses Programm die Dateien.</p>
+<p>Nein. Die App liest die Dateien nur auf Deinem Gerät. Ins Internet gehen nur die Abfrage nach einer neuen Version und das Holen der Widgets, beides von GitHub. Liegt Dein Archiv in Google Drive oder OneDrive, synchronisiert natürlich dieses Programm die Dateien.</p>
 <h3>Kann ich die App auf mehreren Computern nutzen?</h3>
 <p>Ja. Installiere sie überall und wähle denselben Archiv-Ordner in Google Drive oder OneDrive.</p>
 <h3>Funktioniert die App mit anderen Sendern?</h3>
