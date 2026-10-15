@@ -77,6 +77,20 @@ test('aufgaben.lua: Startfenster in UTC, Texte sicher in Lua-Strings', () => {
   assert.match(lua, /rct = "V:02\.0\\r\\nT:/);
 });
 
+test('Widget-Einstellungen: Bereich, Typ und Vorgaben in aufgaben.lua', () => {
+  const st = SKY.settingsOf({ margin: 500, zoomSec: '7', sound: 'ja', compId: 'AB\u00e9C', radMode: 5 });
+  assert.strictEqual(st.margin, 100);
+  assert.strictEqual(st.zoomSec, 7);
+  assert.strictEqual(st.sound, true);
+  assert.strictEqual(st.compId, 'ABC');
+  assert.strictEqual(st.radMode, 1);
+  assert.strictEqual(st.varioTone, false);
+  const lua = SKY.toLua({ tasks: [], settings: { margin: 12, navVoice: false, gliderId: 'HB-1' } });
+  assert.match(lua, /settings = \{[^}]*margin = 12[^}]*\}/);
+  assert.match(lua, /navVoice = false/);
+  assert.match(lua, /gliderId = "HB-1"/);
+});
+
 test('IGC lesen und Wertung nachrechnen: zwei Runden, Strafe aus dem Einflug', () => {
   const task = { ...SKY.newTask('Sport'), dir: 250 };
   const igc = SKY.parseIgc(igcFlight(task, 2, { agl: 410, kmh: 100 }));
