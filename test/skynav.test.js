@@ -88,6 +88,9 @@ test('IGC lesen und Wertung nachrechnen: zwei Runden, Strafe aus dem Einflug', (
   assert.strictEqual(r.start.penalty, 50 + 2 * 10);
   assert.ok(r.laps[0].speed > 80 && r.laps[0].speed < 100, String(r.laps[0].speed));
   assert.ok(Math.abs(r.speed - 2 * r.geom.perim / r.time * 3.6) < 1e-6);
+  // Index: geflogene Strecke je Runde zum Umfang; der Testflug fliegt knapp aussen um die Ecken
+  for (const l of r.laps) assert.ok(l.idx > 100 && l.idx < 115, String(l.idx));
+  assert.ok(Math.abs(r.idx - (r.laps[0].dist + r.laps[1].dist) / (2 * r.geom.perim) * 100) < 1e-9);
 });
 
 test('ohne Wendepunkt kein Ziel', () => {
