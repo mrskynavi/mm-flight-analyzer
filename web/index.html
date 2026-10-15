@@ -436,12 +436,12 @@ td.mut{color:var(--muted)}
 .sky-form label>span{display:flex;gap:6px;align-items:center}
 .sky-form label>span input{width:100%}
 .sky-sets{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:10px}
-.sky-sets fieldset{border:1px solid var(--line);border-radius:8px;padding:6px 10px 8px;margin:0;display:grid;gap:6px;font-size:.82rem;color:var(--muted)}
+.sky-sets fieldset{border:1px solid var(--line);border-radius:8px;padding:6px 10px 8px;margin:0;display:grid;gap:6px;align-content:start;font-size:.82rem;color:var(--muted)}
 .sky-sets legend{padding:0 4px;color:var(--fg);font-weight:600}
 .sky-sets label{display:flex;gap:8px;align-items:center;justify-content:space-between}
 .sky-sets label.chk{justify-content:flex-start}
 .sky-sets label span{display:inline-flex;gap:6px;align-items:center;white-space:nowrap}
-.sky-sets input[type=number]{width:5.5em} .sky-sets input[type=text]{width:9em}
+.sky-sets input[type=number]{width:5.5em} .sky-sets input[type=text]{flex:0 1 9em;width:0;min-width:0;box-sizing:border-box}
 .sky-slot{border:1px solid var(--line);border-radius:8px;padding:6px 10px 8px;display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:0}
 .sky-slot legend label{display:inline-flex;gap:6px;align-items:center;padding:0 4px}
 .sky-slot span{display:inline-flex;gap:6px;align-items:center} .sky-slot input[type=number]{width:5em}
