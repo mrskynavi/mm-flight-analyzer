@@ -402,7 +402,7 @@ a { color: var(--acc); }
 <h2>Berechnete Werte (ƒ)</h2>
 <ul>
 <li><b>Leistung</b> = Strom × Spannung für jedes Paar mit gleichem Präfix (ESC, BEC, SRV1 …), <b>Energie</b> = Leistung über die Zeit aufsummiert.</li>
-<li><b>GPS Kurs (ber.), Windgeschw., Windrichtung, TAS</b> rechnen wie die Lua-Widgets „GPS Course“ und „Wind Estimator“ mit deren Standardwerten (40 Werte alle 0,7 s, Fit jede Sekunde, Kurs ab 3 m Abstand). Vor dem ersten gültigen Fit zeigt der Wind 0 und die TAS die Geschwindigkeit über Grund, genau wie am Sender.</li>
+<li><b>GPS Kurs (ber.), Windgeschw., Windrichtung, TAS</b> rechnen wie die Lua-Widgets „GPS Course“ und „Wind Estimator“ mit deren Standardwerten (40 Werte alle 0,7 s, Fit jede Sekunde, Kurs ab 3 m Abstand). Ein Wind-Fit zählt aber wie im Sollfahrt-Widget nur bei echtem Kreisen (etwa 270° Kurswechsel im Fenster); eine einzelne Kurve reicht nicht. Vor dem ersten gültigen Fit zeigt der Wind 0 und die TAS die Geschwindigkeit über Grund, genau wie am Sender.</li>
 <li><b>Steuerkurs (windkorr.)</b> = Richtung, in die die Nase zeigt (Bodenvektor minus Windvektor). <b>Drift</b> = Kurs über Grund minus Steuerkurs, positiv heisst nach rechts versetzt. <b>Gegenwind</b> = Windanteil gegen die Flugrichtung, negativ heisst Rückenwind.</li>
 <li><b>Distanz zum Start</b> = waagrechte Distanz zum ersten GPS-Fix. <b>Effektive Distanz</b> = schräg vom Startpunkt zum Modell, mit der Höhe über dem Start.</li>
 <li><b>Winkel zum Start</b> = Winkel zwischen der Längsachse des Modells (Steuerkurs, ohne Wind der GPS Kurs) und der Linie vom Modell zum Startort. 0° heisst, die Nase zeigt zum Start, ±180° das Heck, ±90° fliegt das Modell quer dazu. Positiv: Der Start liegt rechts. Nützlich zum Beispiel, um Empfangseinbrüche mit der Lage der Antennen zu vergleichen. Unter 10 m Abstand zum Start gibt es keinen Wert.</li>
@@ -505,7 +505,7 @@ a { color: var(--acc); }
 <li>Unten steht die grösste Entfernung vom Startpunkt.</li>
 </ul>
 <h2>Wind nach Höhe</h2>
-<p>Die Tabelle teilt die Höhe in Stufen (25, 50 oder 100 m, Feld „Stufe“) und zeigt pro Stufe den durchschnittlichen Wind, die Richtung, aus der er kommt, das Maximum und die Anzahl Wind-Fits. Der Pfeil zeigt, wohin der Wind weht. <b>„wechselnd“</b> heisst, die Richtungen in dieser Stufe streuen stark. Die Stufe des Zeitpunkts ist hervorgehoben, darunter steht der Wind genau am Zeitpunkt.</p>
+<p>Die Tabelle teilt die Höhe in Stufen (25, 50 oder 100 m, Feld „Stufe“) und zeigt pro Stufe den durchschnittlichen Wind (Mittel der Windvektoren, wie die Windtabelle im Sollfahrt-Widget), die Richtung, aus der er kommt, das Maximum und die Anzahl Wind-Fits. Der Pfeil zeigt, wohin der Wind weht. <b>„wechselnd“</b> heisst, die Richtungen in dieser Stufe streuen stark. Die Stufe des Zeitpunkts ist hervorgehoben, darunter steht der Wind genau am Zeitpunkt.</p>
 <p>Für den Wind braucht es GPS-Position, GPS-Geschwindigkeit und Kurven im Flug. Gerade Strecken liefern keinen Wind.</p>
 
 <!-- 13 -->
