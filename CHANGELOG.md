@@ -2,6 +2,7 @@
 
 ## Unveröffentlicht
 
+- Simulator: polaren.lua enthält jetzt immer die Polaren aus dem Tab Polare, auch wenn der Sender oder der gewählte Ordner eine eigene polaren.lua hat. Mit „Beim Sync automatisch aktualisieren“ gilt eine neu gerechnete Polare sofort, sonst die vom Sender; Modelle ohne Eintrag am Sender kommen aus dem Tab Polare. Vorher meldete das Sollfahrt-Widget „Polare fehlt“, wenn die Datei am Sender das Modell nicht kannte.
 - Polare und Netto-Vario rechnen das Sinken jetzt aus der Höhe (Flughöhe) statt aus dem Vario. Beim Shark zeigte das Vario im Gleitflug rund 20 % zu wenig Sinken (Flughöhe und GPS-Höhe stimmten überein), die Polare war dadurch zu gut (Gleitzahl 34 statt 28) und ihr bestes Gleiten zu langsam. Vario TEK bleibt beim Vario.
 - Tab Karte & Wind: Unter der GPS-Spur steht eine Auswertung des kräftig gezeichneten Teils (sichtbarer Zeitausschnitt, mit Filter nur aktive Einträge): Strecke, Dauer, Ø Tempo, Höhengewinn und -verlust, Höhe netto (Einflug minus Ende), Ø Netto (Steigen der Luft), Gleitzahl über Grund und Gleitzahl Modell (um das Netto-Steigen der Luft korrigiert, zum Prüfen der Polare). Filter-inaktive Stücke der Spur sind blass.
 - GPS-Spur ohne Stufen: Ethos schreibt Breite und Länge nicht immer in derselben Zeile; die Spur verbindet jetzt jede Koordinate für sich über die Zeit, auch für die Strecke.

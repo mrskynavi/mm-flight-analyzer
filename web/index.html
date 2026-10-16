@@ -1215,7 +1215,7 @@ pre.code{background:var(--bg);border:1px solid var(--line);border-radius:8px;pad
           <div class="simrow"><button type="button" class="btn" id="simApply">Übernehmen</button><button type="button" class="zb" id="simSave" hidden>In den scripts-Ordner speichern</button><button type="button" class="zb" id="simCopy">Code kopieren</button><button type="button" class="zb" id="simOrig">Original laden</button><span class="hint" id="simCodeMsg"></span></div>
         </div>
         <div id="simSd" hidden class="simstack">
-          <p class="hint">Dateien im scripts-Ordner. Das Widget findet sie mit loadfile, io.open oder require, z. B. /scripts/maccready/polaren.lua oder relativ zu seinem Ordner. Fehlt polaren.lua, nimmt der Simulator die Polaren aus dem Tab Polare. Die Aufgaben (skynav/aufgaben.lua) kommen aus dem Tab SkyNavigator, sobald dort eigene Aufgaben stehen, wie beim Sync auf den Sender.</p>
+          <p class="hint">Dateien im scripts-Ordner. Das Widget findet sie mit loadfile, io.open oder require, z. B. /scripts/maccready/polaren.lua oder relativ zu seinem Ordner. polaren.lua kommt aus dem Tab Polare: Mit „Beim Sync automatisch aktualisieren“ gilt dort eine neu gerechnete Polare sofort, sonst die Polare aus polaren.lua am Sender; Modelle ohne Eintrag am Sender kommen aus dem Tab Polare. Die Aufgaben (skynav/aufgaben.lua) kommen aus dem Tab SkyNavigator, sobald dort eigene Aufgaben stehen, wie beim Sync auf den Sender.</p>
           <label class="simfl">Datei<select id="simSdSel"></select></label>
           <textarea class="simcode short" id="simSdTxt" spellcheck="false" aria-label="Dateiinhalt"></textarea>
           <div class="simrow"><button type="button" class="zb" id="simSdSave">Übernehmen und Widget neu starten</button></div>
@@ -5894,11 +5894,11 @@ function mcRemember(){
   const o=all[f.mid]; if (o && ['name','a','b','c','vMin','vMax'].every(k=>o[k]===e[k])) return;
   all[f.mid]={...e, at:Date.now()}; store.set('mc.polars', JSON.stringify(all));
 }
-function mcFileText(){
+function mcFileText(extra=[], skip=null){
   const d=new Date(), z=n=>String(n).padStart(2,'0'), ts=`${d.getFullYear()}-${z(d.getMonth()+1)}-${z(d.getDate())} ${z(d.getHours())}:${z(d.getMinutes())}`;
-  const rows=Object.entries(mcPolars()).sort((x,y)=>x[0].localeCompare(y[0]))
+  const rows=Object.entries(mcPolars()).filter(([mid])=>!skip?.has(mid)).sort((x,y)=>x[0].localeCompare(y[0]))
     .map(([mid,p])=>`  [${JSON.stringify(mid)}] = { a = ${p.a}, b = ${p.b}, c = ${p.c}, vMin = ${p.vMin.toFixed(1)}, vMax = ${p.vMax.toFixed(1)} },`);
-  return `-- MM Flight Analyzer: Polaren für das MacCready-Widget, geschrieben ${ts}\n-- Vario (m/s, Sinken negativ) = a*v^2 + b*v + c, v in m/s; vMin/vMax = gültiger Bereich in m/s\n-- Wird von der App überschrieben, bitte nicht von Hand ändern.\nreturn {\n${rows.join('\n')}\n}\n`;
+  return `-- MM Flight Analyzer: Polaren für das MacCready-Widget, geschrieben ${ts}\n-- Vario (m/s, Sinken negativ) = a*v^2 + b*v + c, v in m/s; vMin/vMax = gültiger Bereich in m/s\n-- Wird von der App überschrieben, bitte nicht von Hand ändern.\nreturn {\n${rows.concat(extra).join('\n')}\n}\n`;
 }
 const MC_LUA=`-- Polare des aktiven Modells aus polaren.lua. Der MM Flight Analyzer schreibt die Datei
 -- in den Ordner scripts/maccready auf dem Sender, neben main.lua des Widgets.
@@ -7509,7 +7509,17 @@ function resolve(p){
   const low = key.toLowerCase(); return Object.keys(FS).find(k => k.toLowerCase() === low) || key;
 }
 // polaren.lua: liegt sie nicht im Ordner, kommt sie aus dem Tab Polare
-function fsGet(p){ const k = resolve(p); if (/^skynav\/aufgaben\.lua$/i.test(k) && window.SKY_APP_LUA) return window.SKY_APP_LUA; if (k in FS) return FS[k]; if (/^maccready\/polaren\.lua$/i.test(k) && typeof mcFileText === 'function') return mcFileText(); return null; }
+function fsGet(p){ const k = resolve(p); if (/^skynav\/aufgaben\.lua$/i.test(k) && window.SKY_APP_LUA) return window.SKY_APP_LUA; if (/^maccready\/polaren\.lua$/i.test(k) && typeof mcFileText === 'function') return polMerged(k in FS ? FS[k] : null); if (k in FS) return FS[k]; return null; }
+// polaren.lua wie nach dem nächsten Sync: Mit „Beim Sync automatisch aktualisieren“ gelten die Polaren aus
+// dem Tab Polare (eine neu gerechnete Polare wirkt sofort), sonst die der Datei am Sender oder im Ordner.
+// Modelle, die nur auf einer Seite stehen, kommen immer dazu.
+function polMerged(file){
+  const app = mcPolars(); if (file != null && !Object.keys(app).length) return file;
+  const auto = store.get('mc.auto') !== '0', fromFile = new Set(), extra = [];
+  if (file) for (const m of String(file).matchAll(/\[\s*("(?:[^"\\]|\\.)*")\s*\]\s*=\s*\{[^{}]*\}/g)){ let k; try{ k = JSON.parse(m[1]); }catch(e){ continue; }
+    if (auto && k in app) continue; fromFile.add(k); extra.push('  ' + m[0] + ','); }
+  return mcFileText(extra, fromFile);
+}
 let srcOld = false;   // GitHub nicht erreichbar, letzte Kopie
 function dirInfo(){
   const el = g('simDirInfo'), base = fsDir ? String(fsDir).replace(/[\\/]+$/, '').split(/[\\/]/).slice(-2).join('/') : T('gewählter Ordner');
@@ -7571,7 +7581,7 @@ async function pickSource(){
 function wHead(text){ const h = {}; String(text || '').split(/\r?\n/).slice(0, 30).forEach(l => { const m = /^\s*--\s*@(widget|version)\s+(.+?)\s*$/i.exec(l); if (m) h[m[1].toLowerCase()] = m[2]; }); return h; }
 function fillSel(){ const s = g('simSel'); s.innerHTML = ''; WIDGETS.forEach(w => { const h = wHead(FS[w.file]); s.append(new Option((h.widget || w.dir) + (h.version ? ' · ' + h.version : ''), w.id)); }); if (cur && WIDGETS.some(w => w.id === cur.id)) s.value = cur.id; }
 function fillSd(){ const s = g('simSdSel'), v = s.value; s.innerHTML = ''; const keys = Object.keys(FS).sort(); if (!keys.some(k => /^maccready\/polaren\.lua$/i.test(k))) keys.push('maccready/polaren.lua');
-  keys.forEach(k => s.append(new Option('/scripts/' + k + (k in FS ? '' : ' ' + T('(aus dem Tab Polare)')), k)));
+  keys.forEach(k => s.append(new Option('/scripts/' + k + (/^maccready\/polaren\.lua$/i.test(k) ? ' ' + T('(aus dem Tab Polare)') : ''), k)));
   s.value = keys.includes(v) ? v : (keys.find(k => /polaren/.test(k)) || keys[0] || ''); g('simSdTxt').value = fsGet(s.value) ?? ''; }
 
 // ---------- Ausgabe, Ton, Sprache ----------
@@ -7912,7 +7922,7 @@ window.ethosDesktop?.onSync?.(s => {
 let polSeen = null;
 const polText = () => fsGet('maccready/polaren.lua');
 function polHint(){
-  if (!SL || Object.keys(FS).some(k => /^maccready\/polaren\.lua$/i.test(k))) return;
+  if (!SL) return;
   let all = {}; try{ all = JSON.parse(store.get('mc.polars') || '{}'); }catch(e){}
   if (!all[SL.model]) log('hinweis', T('Für {m} gibt es noch keine Polare. Öffne einmal den Tab Polare, dann steht sie dem Widget in polaren.lua zur Verfügung.', {m: SL.model}));
 }
