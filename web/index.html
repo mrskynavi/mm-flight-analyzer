@@ -421,6 +421,40 @@ td.mut{color:var(--muted)}
 .simcode{width:100%;min-height:340px;font:.8rem/1.5 var(--mono);color:var(--fg);border:1px solid var(--line);border-radius:6px;padding:8px 10px;background:var(--bg);tab-size:2;resize:vertical}
 .simcode.short{min-height:160px}
 @media (prefers-reduced-motion:reduce){.etog::after{transition:none}}
+/* Tab SkyNavigator */
+.sky .sky-t.on{border-color:var(--accent);background:var(--accent-soft)}
+.sky .sky-t .tag{font:600 .7rem var(--mono);color:var(--good)}
+.sky-pilot{display:grid;gap:6px;font-size:.85rem;color:var(--muted)}
+.sky-pilot label,.sky-form label{display:grid;gap:2px}
+.sky input:not([type=checkbox]):not([type=radio]),.sky select{font:inherit;font-size:.9rem;color:var(--fg);background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:4px 8px;min-width:0}
+.sky input[aria-invalid="true"]{border-color:var(--bad)}
+.sky-ed{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:14px;align-items:start}
+@media (max-width:820px){.sky-ed{grid-template-columns:1fr}}
+.sky-form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px 12px;font-size:.82rem;color:var(--muted)}
+.sky-form .wide{grid-column:1/-1}
+.sky-form label>span{display:flex;gap:6px;align-items:center}
+.sky-form label>span input{width:100%}
+.sky-sets{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:10px}
+.sky-sets fieldset{border:1px solid var(--line);border-radius:8px;padding:6px 10px 8px;margin:0;display:grid;gap:6px;align-content:start;font-size:.82rem;color:var(--muted)}
+.sky-sets legend{padding:0 4px;color:var(--fg);font-weight:600}
+.sky-sets label{display:flex;gap:8px;align-items:center;justify-content:space-between}
+.sky-sets label.chk{justify-content:flex-start}
+.sky-sets label span{display:inline-flex;gap:6px;align-items:center;white-space:nowrap}
+.sky-sets input[type=number]{width:5.5em} .sky-sets input[type=text]{flex:0 1 9em;width:0;min-width:0;box-sizing:border-box}
+.sky-slot{border:1px solid var(--line);border-radius:8px;padding:6px 10px 8px;display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:0}
+.sky-slot legend label{display:inline-flex;gap:6px;align-items:center;padding:0 4px}
+.sky-slot span{display:inline-flex;gap:6px;align-items:center} .sky-slot input[type=number]{width:5em}
+.sky-cv{position:relative;height:340px;background:var(--bg);border-radius:8px}
+.sky-cv canvas{width:100%;height:100%;display:block}
+.sky-zones input{width:7em;margin-right:4px} .sky-zones input[type=number]{width:5em}
+.sky-zones td{text-align:left!important}
+.pol-mini-x{border:1px solid var(--line);background:var(--panel);color:var(--muted);border-radius:4px;padding:1px 7px;cursor:pointer}
+.pol-mini-x:hover{color:var(--accent);border-color:var(--accent)}
+.sky-acts{display:flex;flex-wrap:wrap;gap:8px}
+.sky-fl td:nth-child(n+4){text-align:right}
+.sky-det{margin-top:10px}
+#skyDet{display:grid;gap:10px}
+#skyDet[hidden]{display:none}
 </style>
 
 <style>
@@ -805,6 +839,7 @@ pre.code{background:var(--bg);border:1px solid var(--line);border-radius:8px;pad
     <button type="button" role="tab" class="tab" data-tab="werte" id="tab-werte" aria-controls="pane-werte">Alle Werte</button>
     <button type="button" role="tab" class="tab" data-tab="rohdaten" id="tab-rohdaten" aria-controls="pane-rohdaten">Rohdaten</button>
     <button type="button" role="tab" class="tab" data-tab="simulator" id="tab-simulator" aria-controls="pane-simulator">Simulator</button>
+    <button type="button" role="tab" class="tab" data-tab="skynav" id="tab-skynav" aria-controls="pane-skynav">SkyNavigator</button>
   </nav>
   <button type="button" class="kibtn" id="kiOpen" hidden aria-expanded="false" aria-controls="kiPanel" aria-label="KI-Auswertung" title="KI-Auswertung"><span class="spark">✦</span> <span class="lbl">KI-Auswertung</span></button>
   </div>
@@ -1038,6 +1073,72 @@ pre.code{background:var(--bg);border:1px solid var(--line);border-radius:8px;pad
     <div class="infopop" id="info-raw" hidden><p>Alle Zeilen und Spalten so, wie sie im Log stehen. Ein Klick auf eine Zeile setzt den Zeitpunkt; die Zeile des gewählten Zeitpunkts ist hervorgehoben.</p></div>
     <div class="rawwrap" id="rawwrap"><table id="rawtable"><thead></thead><tbody></tbody></table></div>
   </section>
+  </div>
+  <div class="pane" role="tabpanel" id="pane-skynav" data-tab="skynav" aria-labelledby="tab-skynav" hidden>
+  <div class="infopop" id="info-skynav" hidden><p>Hier legst Du die Aufgaben für das Ethos-Widget SkyNavigator an (GPS Triangle nach Triangle Definition V1.7, Klassen Light, Sport und Scale). Die markierte Aufgabe ist am Sender aktiv, im Widget lässt sich auch eine andere wählen. Beim Anschliessen des Senders schreibt die App die Aufgaben nach scripts/skynav/aufgaben.lua und holt die Flüge (IGC) aus scripts/skynav/fluege/ ins Archiv.</p><p>Die Wertung der Flüge rechnet die App aus der IGC-Datei nach: Start beim Überfliegen der Linie aus dem Startsektor (Einflugwerte vom letzten Fix davor), Wendepunkte im Viertelkreis von 1.5 km, Ziel mit Mindestspeed innerhalb der Arbeitszeit. Startfenster gibst Du in Ortszeit ein, das Widget rechnet in UTC.</p></div>
+  <div class="pol sky">
+    <section class="pol-logs">
+      <div class="pol-lh"><h2 class="hi">Aufgaben <button type="button" class="iconbtn sm" data-info="info-skynav" aria-expanded="false" aria-controls="info-skynav" aria-label="So funktioniert SkyNavigator">i</button></h2>
+        <span class="pol-mini"><button type="button" id="skyNew">Neu</button><button type="button" id="skyImp">Import .rct</button></span></div>
+      <input type="file" id="skyImpFile" accept=".rct,.txt,text/plain" multiple hidden>
+      <ul class="pol-list" id="skyTasks"></ul>
+      <div class="sky-pilot">
+        <label>Pilot <input id="skyPilot" autocomplete="name"></label>
+        <label>Pilot-ID <input id="skyPilotId" placeholder="z. B. Lizenz-Nr."></label>
+      </div>
+    </section>
+    <div class="pol-main">
+      <section class="pol-box" id="skyEdit">
+        <div class="pol-head"><h2 class="hi">Aufgabe</h2><span id="skyEditInfo"></span></div>
+        <div class="sky-ed">
+          <div class="sky-form" id="skyForm">
+            <label class="wide">Name <input id="skyName" maxlength="32"></label>
+            <label>Klasse <select id="skyCls"><option>Light</option><option>Sport</option><option>Scale</option></select></label>
+            <label class="wide">Ursprung O (Breite, Länge) <input id="skyPos" placeholder="47.220500, 8.945500"></label>
+            <label>dTP (Abstand O–Ecke) <span><input id="sky_dist" type="number" min="50" step="10"> m</span></label>
+            <label>Richtung O → TP1 <span><input id="sky_dir" type="number" min="0" max="359"> °</span></label>
+            <label>Platzhöhe (MSL) <span><input id="sky_elev" type="number"> m</span></label>
+            <label>Max. Einflughöhe <span><input id="sky_maxH" type="number"> m</span></label>
+            <label>Max. Einfluggeschwindigkeit <span><input id="sky_maxV" type="number"> km/h</span></label>
+            <label>Mindestspeed im Ziel <span><input id="sky_minF" type="number"> km/h</span></label>
+            <label>Arbeitszeit <span><input id="sky_work" type="number" min="1"> min</span></label>
+            <label>Maximalhöhe <span><input id="sky_maxAlt" type="number"> m</span></label>
+            <fieldset class="wide sky-slot"><legend><label><input type="checkbox" id="skySlotOn"> Startfenster</label></legend>
+              <input type="date" id="skySlotDate" aria-label="Datum"> <input type="time" id="skySlotTime" aria-label="Beginn"> <span><input type="number" id="skySlotLen" min="1" aria-label="Länge"> min</span></fieldset>
+          </div>
+          <div class="sky-cv"><canvas id="skyCv" aria-label="Skizze der Aufgabe"></canvas></div>
+        </div>
+        <div class="pol-head"><p class="mc-sub">Sicherheitszonen <span>(höchstens 5, Höhen über Platz)</span></p>
+          <span class="pol-mini" id="skyZoneAdd"><button type="button" id="skyZoneC">+ Kreis</button><button type="button" id="skyZoneR">+ Rechteck</button></span></div>
+        <div class="mc-tw"><table class="mc-tab sky-zones"><thead><tr><th>Name</th><th>Art</th><th>Position</th><th>Richtung / Länge / Breite bzw. Radius (m)</th><th>Von / bis Höhe (m)</th><th></th></tr></thead><tbody id="skyZones"></tbody></table></div>
+        <div class="sky-acts"><button type="button" class="btn ghost" id="skyActBtn">Als aktiv markieren</button><button type="button" class="btn ghost" id="skyDup">Duplizieren</button><button type="button" class="btn ghost" id="skyExp">Export .rct</button><button type="button" class="btn ghost" id="skyDel">Löschen</button></div>
+      </section>
+      <section class="pol-box">
+        <div class="mc-head"><p class="mc-sub">Auf den Sender</p><span class="mc-state"><i class="mc-dot" id="skyDot"></i><span id="skyState"></span></span></div>
+        <div class="pol-ctrl"><span>Datei</span><span class="mc-path">scripts › skynav › aufgaben.lua</span></div>
+        <div class="mc-head" style="align-items:flex-start"><p class="hint deskonly">Die App schreibt die Aufgaben bei jedem Anschliessen des Senders.</p><button type="button" class="btn" id="skyWrite">Auf Sender schreiben</button></div>
+        <div class="hint mc-res" id="skyRes"></div>
+        <details class="mc-code"><summary>Inhalt der Datei</summary><pre class="mc-lua" id="skyFile"></pre></details>
+      </section>
+      <section class="pol-box">
+        <div class="pol-head"><h2 class="hi">Widget-Einstellungen</h2><span class="pol-mini"><button type="button" id="skySetReset">Vorgaben</button></span></div>
+        <p class="hint">Gelten für alle Aufgaben und gehen mit aufgaben.lua auf den Sender. Am Sender stellst Du nur noch Aufgabe, Sensoren, Schalter und das Startfenster von Hand ein.</p>
+        <div class="sky-sets" id="skySet"></div>
+      </section>
+      <section class="pol-box">
+        <div class="pol-head"><h2 class="hi">Flüge</h2><span class="pol-mini"><button type="button" id="skyFetch" class="deskonly">Vom Sender holen</button><button type="button" id="skyFolder" class="deskonly">Ordner öffnen</button><button type="button" id="skyOpenIgc">IGC öffnen</button></span></div>
+        <input type="file" id="skyIgcFile" accept=".igc,.IGC" multiple hidden>
+        <p class="hint" id="skyFlMsg"></p>
+        <div class="mc-tw"><table class="mc-tab pick sky-fl"><thead><tr><th>Flug</th><th>Aufgabe</th><th>Modell</th><th>Dreiecke</th><th>Schnitt km/h</th><th>Zeit</th><th>Strafe</th><th></th></tr></thead><tbody id="skyFl"></tbody></table></div>
+        <div id="skyDet" hidden>
+          <p class="mc-sub" id="skyDetT"></p>
+          <div class="kpis" id="skyDetK"></div>
+          <div class="sky-ed sky-det"><div class="sky-cv"><canvas id="skyFlCv" aria-label="Spur des Flugs"></canvas></div>
+          <div class="mc-tw"><table class="mc-tab" id="skyLaps"></table></div></div>
+        </div>
+      </section>
+    </div>
+  </div>
   </div>
   <div class="pane" role="tabpanel" id="pane-simulator" data-tab="simulator" aria-labelledby="tab-simulator" hidden>
   <div class="simbar">
@@ -3418,6 +3519,247 @@ end
 return {init = init}
 </script>
 
+<script id="skynavCore">
+// ---------- SkyNavigator: Aufgaben (GPS Triangle) und Auswertung der IGC-Flüge des Ethos-Widgets ----------
+// Regeln wie im Widget scripts/skynav/main.lua (GPS Triangle Definition V1.7b, Reglemente Light/Sport/Scale).
+// Rein rechnerisch, ohne DOM: die Tests laden diesen Block direkt aus der Seite.
+const SKY = (() => {
+  const M_PER_DEG = 111320, SECTOR_R = 1500, LINE_HALF = 2000, D2R = Math.PI / 180;
+  const CLASSES = {
+    Light: { dist: 200, maxH: 250, maxV: 70, minF: 10, work: 20, maxAlt: 350 },
+    Sport: { dist: 350, maxH: 400, maxV: 120, minF: 20, work: 30, maxAlt: 750 },
+    Scale: { dist: 500, maxH: 500, maxV: 120, minF: 20, work: 30, maxAlt: 750 },
+  };
+  const dirVec = a => [Math.sin(a * D2R), Math.cos(a * D2R)];
+  const norm = a => ((a % 360) + 360) % 360;
+  const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+
+  function newTask(cls = 'Sport', lat = 47.2205, lon = 8.9455) {
+    return { id: uid(), name: 'Neue Aufgabe', cls, lat, lon, elev: 400, dir: 0, ...CLASSES[cls], slot: null, zones: [] };
+  }
+
+  // Geometrie im lokalen System (m, x Ost, y Nord, Ursprung O = Mitte der Hypotenuse)
+  function geom(t) {
+    const d = +t.dist, [ux, uy] = dirVec(+t.dir), [px, py] = dirVec(+t.dir - 90);
+    const V = [[d * ux, d * uy], [d * px, d * py], [-d * ux, -d * uy]];
+    const out = [+t.dir + 22.5, +t.dir - 90, +t.dir + 157.5].map(dirVec);
+    return { ux, uy, px, py, cosLat: Math.cos(t.lat * D2R), perim: d * (2 + 2 * Math.SQRT2),
+      tp: V.map((v, i) => ({ x: v[0], y: v[1], bx: out[i][0], by: out[i][1] })) };
+  }
+  const toXY = (t, g, lat, lon) => [(lon - t.lon) * M_PER_DEG * g.cosLat, (lat - t.lat) * M_PER_DEG];
+  const toLL = (t, g, x, y) => [t.lat + y / M_PER_DEG, t.lon + x / (M_PER_DEG * g.cosLat)];
+  function inSector(c, x, y) {
+    const dx = x - c.x, dy = y - c.y, n = Math.hypot(dx, dy);
+    if (n > SECTOR_R) return false;
+    return n < 1 || (dx * c.bx + dy * c.by) / n >= Math.cos(45 * D2R) - 1e-9;
+  }
+  function inZone(t, g, z, x, y, agl) {
+    if (agl < (+z.lo || 0) || agl > (z.hi == null ? 9999 : +z.hi)) return false;
+    const [zx, zy] = toXY(t, g, +z.lat, +z.lon);
+    if (z.t !== 'R') return (x - zx) ** 2 + (y - zy) ** 2 <= (+z.r) ** 2;
+    const [ux, uy] = dirVec(+z.dir), dx = x - zx, dy = y - zy;
+    return Math.abs(dx * ux + dy * uy) <= z.len / 2 && Math.abs(dx * uy - dy * ux) <= z.wid / 2;
+  }
+  function penaltyOf(t, agl, kmh) {
+    const a = Math.round(agl), v = Math.round(kmh);
+    if (a <= t.maxH && v <= t.maxV) return 0;
+    return 50 + 2 * Math.max(0, a - t.maxH) + 2 * Math.max(0, v - t.maxV);
+  }
+
+  // ---- .rct (Triangle Definition V1.7, Protocol V:02.0)
+  const f6 = v => (+v).toFixed(6), clean = s => String(s ?? '').replace(/[,\r\n]/g, ' ').trim();
+  function toRct(t) {
+    const L = ['V:02.0', `T:${clean(t.name).slice(0, 32)},${f6(t.lat)},${f6(t.lon)},${Math.round(t.elev)},${Math.round(norm(t.dir))},${Math.round(t.dist)},${Math.round(t.maxH)},${Math.round(t.maxV)},${Math.round(t.minF)},${Math.round(t.work)}`];
+    (t.zones || []).slice(0, 5).forEach((z, i) => {
+      const nm = clean(z.name) || 'Zone ' + (i + 1);
+      L.push(z.t === 'R' ? `R:${nm},${f6(z.lat)},${f6(z.lon)},${Math.round(norm(z.dir))},${Math.round(z.len)},${Math.round(z.wid)},${Math.round(z.lo)},${Math.round(z.hi)}`
+        : `C:${nm},${f6(z.lat)},${f6(z.lon)},${Math.round(z.r)},${Math.round(z.lo)},${Math.round(z.hi)}`);
+    });
+    return L.join('\r\n') + '\r\n';
+  }
+  function fromRct(txt) {
+    const lines = String(txt).split(/\r?\n/).map(l => l.trim().replace(/^LTSK:/, '')).filter(Boolean);
+    const T = lines.find(l => l.startsWith('T:'));
+    if (!T) throw new Error('Keine T-Zeile gefunden');
+    const a = T.slice(2).split(',');
+    if (a.length < 10) throw new Error('T-Zeile braucht 10 Werte');
+    const n = a.slice(1).map(Number);
+    if (n.slice(0, 9).some(isNaN) || !(n[4] > 0)) throw new Error('Ungültige Zahlen in der T-Zeile');
+    const t = { id: uid(), name: a[0].trim() || 'Aufgabe', lat: n[0], lon: n[1], elev: n[2], dir: norm(n[3]), dist: n[4], maxH: n[5], maxV: n[6], minF: n[7], work: n[8], slot: null, zones: [] };
+    t.cls = Object.keys(CLASSES).find(k => CLASSES[k].dist === t.dist) || 'Sport';
+    t.maxAlt = CLASSES[t.cls].maxAlt;
+    for (const l of lines) {
+      const b = l.slice(2).split(',');
+      if (l.startsWith('C:')) t.zones.push({ t: 'C', name: b[0], lat: +b[1], lon: +b[2], r: +b[3], lo: +b[4] || 0, hi: +b[5] || 9999 });
+      if (l.startsWith('R:')) t.zones.push({ t: 'R', name: b[0], lat: +b[1], lon: +b[2], dir: +b[3], len: +b[4], wid: +b[5], lo: +b[6] || 0, hi: +b[7] || 9999 });
+    }
+    t.zones = t.zones.slice(0, 5);
+    return t;
+  }
+
+  // ---- aufgaben.lua fürs Widget. Startfenster in Ortszeit des Rechners, im Widget in UTC.
+  const luaStr = s => '"' + String(s ?? '').replace(/[\\"]/g, '\\$&').replace(/\r/g, '\\r').replace(/\n/g, '\\n') + '"';
+  const luaNum = v => { const x = +v; return Number.isFinite(x) ? String(Math.round(x * 1e6) / 1e6) : '0'; };
+  function slotUtc(slot) {
+    if (!slot || !slot.date || !slot.time) return null;
+    const d = new Date(`${slot.date}T${slot.time}`);
+    if (isNaN(d)) return null;
+    return { y: d.getUTCFullYear(), mo: d.getUTCMonth() + 1, d: d.getUTCDate(), h: d.getUTCHours(), mi: d.getUTCMinutes(), len: Math.max(1, Math.round(+slot.len || 30)) };
+  }
+  // Einstellungen des Widgets, die nicht am Sender stehen (gehen mit aufgaben.lua mit). Schlüssel wie im Widget.
+  const SETTINGS = [
+    { g: 'Töne', k: 'sound', t: 'bool', def: true, l: 'Ton' },
+    { g: 'Töne', k: 'eventsAlways', t: 'bool', def: false, l: 'Ereignisse immer melden (auch auf anderen Seiten)' },
+    { g: 'Töne', k: 'startTone', t: 'bool', def: true, l: 'Start: Gleitwinkel-Ton' },
+    { g: 'Töne', k: 'stfTone', t: 'bool', def: true, l: 'Gleiten: Sollfahrt-Ton' },
+    { g: 'Töne', k: 'navVoice', t: 'bool', def: true, l: 'Gleiten: Kurs-Kommandos' },
+    { g: 'Töne', k: 'varioTone', t: 'bool', def: false, l: 'Thermik: Vario-Ton des Widgets (sonst vom Sender)' },
+    { g: 'Töne', k: 'cmdMin', def: 10, min: 3, max: 45, u: '°', l: 'Kommando ab' },
+    { g: 'Töne', k: 'cmdGap', def: 8, min: 3, max: 60, u: 's', l: 'Kommando höchstens alle' },
+    { g: 'Start', k: 'winLo', def: 10, min: 2, max: 50, u: 'm', l: 'Einflugfenster unter dem Limit' },
+    { g: 'Start', k: 'speedMargin', def: 3, min: 0, max: 20, u: 'km/h', l: 'Vibration ab Limit minus' },
+    { g: 'Weg', k: 'radMode', t: 'sel', def: 1, opts: [[1, 'Gemessen'], [2, 'Fest']], l: 'Wenderadius' },
+    { g: 'Weg', k: 'radFix', def: 30, min: 5, max: 200, u: 'm', l: 'Wenderadius fest / beim Start' },
+    { g: 'Weg', k: 'margin', def: 5, min: 0, max: 100, u: 'm', l: 'Reserve im Sektor' },
+    { g: 'Weg', k: 'warnSec', def: 3, min: 0, max: 10, u: 's', l: 'Piepse vor dem Wenden' },
+    { g: 'Weg', k: 'lead', def: 5, min: 0, max: 30, u: '0.1 s', l: 'Vorhalt Kurveneinleitung' },
+    { g: 'Weg', k: 'zoomSec', def: 10, min: 3, max: 60, u: 's', l: 'Eckansicht vor dem Wendepunkt' },
+    { g: 'Seiten', k: 'autoPage', t: 'bool', def: true, l: 'Seite automatisch, wenn kein Seiten-Schalter ein ist' },
+    { g: 'Sollfahrt', k: 'mc', def: 10, min: 0, max: 50, u: '0.1 m/s', l: 'MC (ohne Poti)' },
+    { g: 'Sollfahrt', k: 'mcMax', def: 30, min: 10, max: 100, u: '0.1 m/s', l: 'MC Maximum am Poti' },
+    { g: 'Sollfahrt', k: 'ballast', def: 100, min: 50, max: 300, u: '%', l: 'Fluggewicht (der Polare)' },
+    { g: 'Sollfahrt', k: 'bugs', def: 0, min: 0, max: 30, u: '%', l: 'Verschmutzung' },
+    { g: 'Sollfahrt', k: 'dead', def: 3, min: 0, max: 20, u: '± km/h', l: 'Totzone Sollfahrt' },
+    { g: 'IGC', k: 'compId', t: 'text', def: '', l: 'Wettbewerbskennung' },
+    { g: 'IGC', k: 'gliderId', t: 'text', def: '', l: 'Kennzeichen' },
+  ];
+  // gültige Werte (Bereich, Typ); Fehlendes mit Vorgabe
+  function settingsOf(st) {
+    const o = {};
+    for (const d of SETTINGS) {
+      const v = st?.[d.k];
+      if (d.t === 'bool') o[d.k] = typeof v === 'boolean' ? v : d.def;
+      else if (d.t === 'text') o[d.k] = typeof v === 'string' ? v.replace(/[^\x20-\x7e]/g, '').slice(0, 20) : d.def;
+      else if (d.t === 'sel') o[d.k] = d.opts.some(([x]) => x === +v) ? +v : d.def;
+      else o[d.k] = Number.isFinite(+v) && v !== '' && v != null ? Math.round(Math.min(d.max, Math.max(d.min, +v))) : d.def;
+    }
+    return o;
+  }
+
+  function toLua(data, now = new Date()) {
+    const L = ['-- SkyNavigator: Aufgaben aus dem MM Flight Analyzer (Tab SkyNavigator). Wird beim Sync überschrieben.',
+      `-- geschrieben ${now.toISOString()}`, 'return {', '  version = 1,',
+      `  utcOffsetMin = ${-now.getTimezoneOffset()},`, `  active = ${luaStr(data.active || '')},`,
+      `  pilot = ${luaStr(data.pilot || '')},`, `  pilotId = ${luaStr(data.pilotId || '')},`];
+    const st = settingsOf(data.settings);
+    L.push('  settings = {' + SETTINGS.map(d => `${d.k} = ${d.t === 'bool' ? String(st[d.k]) : d.t === 'text' ? luaStr(st[d.k]) : luaNum(st[d.k])}`).join(', ') + '},', '  tasks = {');
+    for (const t of data.tasks || []) {
+      const f = ['id', 'name', 'cls'].map(k => `${k} = ${luaStr(t[k])}`)
+        .concat(['lat', 'lon', 'elev', 'dir', 'dist', 'maxH', 'maxV', 'minF', 'work', 'maxAlt'].map(k => `${k} = ${luaNum(t[k])}`));
+      const s = slotUtc(t.slot);
+      if (s) f.push(`slot = {y = ${s.y}, mo = ${s.mo}, d = ${s.d}, h = ${s.h}, mi = ${s.mi}, len = ${s.len}}`);
+      const z = (t.zones || []).map(z => '{' + [`t = ${luaStr(z.t === 'R' ? 'R' : 'C')}`, `name = ${luaStr(z.name)}`,
+        ...(z.t === 'R' ? ['lat', 'lon', 'dir', 'len', 'wid', 'lo', 'hi'] : ['lat', 'lon', 'r', 'lo', 'hi']).map(k => `${k} = ${luaNum(z[k])}`)].join(', ') + '}');
+      f.push(`zones = {${z.join(', ')}}`, `rct = ${luaStr(toRct(t))}`);
+      L.push('    {' + f.join(', ') + '},');
+    }
+    L.push('  },', '}', '');
+    return L.join('\n');
+  }
+
+  // ---- IGC lesen
+  function parseIgc(text) {
+    const r = { h: {}, rct: [], fixes: [], events: [], date: null, sus: null };
+    let day = 0, lastT = -1;
+    for (const raw of String(text).split(/\r?\n/)) {
+      const l = raw.trimEnd();
+      if (l.startsWith('HFDTE')) { const m = /(\d\d)(\d\d)(\d\d)/.exec(l); if (m) r.date = `20${m[3]}-${m[2]}-${m[1]}`; }
+      if (l.startsWith('H')) { const m = /^H[FOP]([A-Z]{3})[^:]*:(.*)$/.exec(l); if (m) r.h[m[1]] = m[2].trim(); }
+      if (l.startsWith('I')) { const m = /(\d\d)(\d\d)SUS/.exec(l); if (m) r.sus = [+m[1] - 1, +m[2]]; }
+      if (l.startsWith('LTSK:')) r.rct.push(l.slice(5));
+      if (l.startsWith('LPilotID:')) r.pilotId = l.slice(9);
+      if (l.startsWith('E') && l.length >= 10) r.events.push({ t: hms(l.slice(1, 7)) + day, code: l.slice(7, 10) });
+      if (l.startsWith('B') && l.length >= 35) {
+        let t = hms(l.slice(1, 7));
+        if (t + day < lastT - 43200) day += 86400;
+        t += day;
+        if (r.sus && l.length >= r.sus[1]) t += (+l.slice(r.sus[0], r.sus[1]) || 0) / 100;
+        const lat = (+l.slice(7, 9) + +l.slice(9, 14) / 60000) * (l[14] === 'S' ? -1 : 1);
+        const lon = (+l.slice(15, 18) + +l.slice(18, 23) / 60000) * (l[23] === 'W' ? -1 : 1);
+        const pAlt = +l.slice(25, 30), gAlt = +l.slice(30, 35);
+        if (t === lastT) continue;   // Ereignis-Fix doppelt
+        lastT = t;
+        r.fixes.push({ t, lat, lon, alt: gAlt || pAlt, valid: l[24] === 'A' });
+      }
+    }
+    for (const e of r.events) if (r.fixes.length && e.t < r.fixes[0].t - 43200) e.t += 86400;
+    return r;
+  }
+  function hms(s) { return +s.slice(0, 2) * 3600 + +s.slice(2, 4) * 60 + +s.slice(4, 6); }
+
+  // ---- Wertung nachrechnen. task: wie in aufgaben.json (z. B. aus fromRct der LTSK-Zeilen).
+  function evaluate(task, igc) {
+    const t = { ...CLASSES[task.cls] || CLASSES.Sport, ...task };
+    const g = geom(t), fx = igc.fixes.filter(f => f.valid !== false);
+    const pev = igc.events.find(e => e.code === 'PEV');
+    const res = { task: t, geom: g, n: 0, laps: [], penalty: 0, start: null, zoneHits: [], overMax: false, track: [], end: '', points: fx.length };
+    let state = 0, tp = 0, lapT = 0, lapAgl = 0, lapDist = 0, prev = null, lastInStart = null, inZ = new Set();
+    for (let i = 0; i < fx.length; i++) {
+      const f = fx[i], [x, y] = toXY(t, g, f.lat, f.lon), agl = f.alt - t.elev;
+      let v3d = 0;
+      if (prev) { const dt = Math.max(0.2, f.t - prev.t); v3d = Math.hypot(x - prev.x, y - prev.y, agl - prev.agl) / dt * 3.6; }
+      const s = x * g.ux + y * g.uy, lat = x * g.px + y * g.py;
+      const p = { t: f.t, x, y, agl, v3d, s, lat };
+      res.track.push(p);
+      if (state === 2 && prev) lapDist += Math.hypot(x - prev.x, y - prev.y);   // Strecke über Grund, für den Index
+      if (state === 0 && (!pev || f.t >= pev.t)) state = 1;
+      if (prev && prev.s < 0 && s >= 0 && Math.abs(lat) <= LINE_HALF && Math.abs(prev.lat) <= LINE_HALF) {
+        if (state === 1) {
+          const e = lastInStart || prev;
+          state = 2; tp = 0; lapT = e.t; lapAgl = e.agl; lapDist = 0;
+          res.start = { t: e.t, agl: e.agl, v3d: e.v3d, penalty: penaltyOf(t, e.agl, e.v3d) };
+          res.penalty = res.start.penalty;
+        } else if (state === 2 && tp === 3) {
+          if (v3d >= t.minF && f.t - res.start.t <= t.work * 60) {
+            const lt = f.t - lapT;
+            res.laps.push({ n: res.laps.length + 1, time: lt, speed: g.perim / Math.max(lt, 1) * 3.6, agl, dAlt: agl - lapAgl, at: f.t - res.start.t, v3d, tps: res.curTps,
+              dist: lapDist, idx: lapDist / g.perim * 100 });
+            lapT = f.t; lapAgl = agl; tp = 0; lapDist = 0;
+          }
+        }
+      }
+      if (s < 0) lastInStart = p;
+      if (state === 2 && tp < 3 && inSector(g.tp[tp], x, y)) { tp++; (res.curTps = tp === 1 ? [] : res.curTps).push(f.t); }
+      if (state === 2) {
+        (t.zones || []).forEach((z, k) => { const hit = inZone(t, g, z, x, y, agl); if (hit && !inZ.has(k)) res.zoneHits.push({ t: f.t, name: z.name }); hit ? inZ.add(k) : inZ.delete(k); });
+        if (agl > t.maxAlt) res.overMax = true;
+        if (f.t - res.start.t > t.work * 60) { state = 3; res.end = 'Arbeitszeit'; }
+      }
+      prev = p;
+    }
+    if (state === 2) res.end = 'Landung';
+    delete res.curTps;
+    res.n = res.laps.length;
+    if (res.n) {
+      res.time = res.laps[res.n - 1].at; res.speed = res.n * g.perim / Math.max(res.time, 1) * 3.6;
+      // Index = geflogene Strecke / Summe der Schenkel (100 % = genau auf dem Dreieck)
+      res.idx = res.laps.reduce((a, l) => a + l.dist, 0) / (res.n * g.perim) * 100;
+    }
+    res.flightTime = fx.length ? fx[fx.length - 1].t - fx[0].t : 0;
+    return res;
+  }
+  // Aufgabe aus den LTSK-Zeilen der Datei (null ohne)
+  function taskOfIgc(igc) {
+    let t = null;
+    try { t = fromRct(igc.rct.join('\n')); } catch {}
+    const cls = (igc.h.CCL || '').toLowerCase();
+    const k = Object.keys(CLASSES).find(c => c.toLowerCase() === cls);
+    if (t && k) { t.cls = k; t.maxAlt = CLASSES[k].maxAlt; }
+    return t;
+  }
+  return { CLASSES, M_PER_DEG, SECTOR_R, LINE_HALF, SETTINGS, settingsOf, newTask, geom, toXY, toLL, inSector, penaltyOf, toRct, fromRct, slotUtc, toLua, parseIgc, evaluate, taskOfIgc, norm };
+})();
+</script>
 <script>
 // ---------- Sprache: Deutsch ist der Quelltext, Englisch kommt aus EN; Standard = Sprache des Systems ----------
 const EN = {"Flug": "Flight", "Navigation & Wind": "Navigation & wind", "Antrieb & Akku": "Motor & battery", "Bordstrom": "Onboard power", "Servos": "Servos", "Lage & Beschleunigung": "Attitude & acceleration", "Empfang": "Reception", "Senderakku": "Radio battery", "Sonstiges": "Other", "Knüppel": "Sticks", "Drehgeber & Potis": "Knobs & pots", "Logische Schalter": "Logical switches", "Ändert sich in diesem Log nie": "Never changes in this log", "Schalter|gruppe": "Switches", "{n} gewählt": "{n} selected", "{n} unverändert": "{n} unchanged", "+ {n} weitere": "+ {n} more", "Gleitzahl": "Glide ratio", "Strecke durch Höhenverlust über 10 s, aus {s} und {a}; nur im Gleitflug mit Motor aus": "Distance divided by height lost over 10 s, from {s} and {a}; gliding with the motor off only", "Gleitzahl = geflogene Strecke durch Höhenverlust, jeweils über 10 s gerechnet (5 s vor und nach dem Zeitpunkt). Die Strecke kommt aus der TAS, also durch die Luft; ohne Wind aus der GPS-Geschwindigkeit. Werte gibt es nur im Gleitflug: Motor aus und mindestens 0,2 m/s Sinken. Gleitzahl 20 heisst 20 m weit pro Meter Höhe.": "Glide ratio = distance flown divided by height lost, calculated over 10 s (5 s before and after the point in time). The distance comes from the TAS, i.e. through the air; without wind from the GPS speed. Values only exist while gliding: motor off and at least 0.2 m/s sink. A glide ratio of 20 means 20 m forward per metre of height.", "Filter": "Filter", "Parameter zum Filtern": "Parameter to filter", "Alle zurücksetzen": "Reset all", "So funktioniert der Filter": "How the filter works", "+ Parameter wählen …": "+ Choose parameter …", "{n} Min": "{n} min", "{n} Max": "{n} max", "Zurücksetzen": "Reset", "Filter {n} entfernen": "Remove filter {n}", "Filter entfernen": "Remove filter", "{a} von {b} Einträgen aktiv": "{a} of {b} entries active", "Gefiltert: {t}": "Filtered: {t}", "{a} aktiv": "{a} active", "keine aktiven Werte": "no active values", "Im sichtbaren Ausschnitt, nur aktive Einträge": "In the visible range, active entries only", "Info zur App": "About the app", "Modell": "Model", "Älteres Log": "Older log", "Neueres Log": "Newer log", "Einstellungen": "Settings", "Wertet Telemetrie-Logs (CSV) vom Ethos-Sender aus: Flugzeit, Motorläufe, Empfang, Akku, GPS-Spur, Thermik, Steigflüge, Wind und alle Sensoren. Logs lädst Du über „Import …“ oder ziehst die CSV-Dateien einfach ins Fenster. Die Dateien bleiben auf Deinem Gerät.": "Analyses telemetry logs (CSV) from Ethos radios: flight time, motor runs, link quality, batteries, GPS track, thermals, climbs, wind and all sensors. Load logs with “Import …” or simply drop the CSV files onto the window. The files stay on your device.", "Sender wird gesucht …": "Looking for the radio …", "Details zum Sync": "Sync details", "Jetzt vom Sender synchronisieren": "Sync from the radio now", "Archiv öffnen": "Open archive", "Letzter Sync": "Last sync", "Schliessen": "Close", "Logs importieren": "Import logs", "Dateien auswählen": "Choose files", "Ein oder mehrere Logs (.csv)": "One or more logs (.csv)", "Ordner öffnen": "Open folder", "Alle Logs eines Ordners, z.B. LOGS vom Sender": "All logs in a folder, e.g. LOGS from the radio", "Du kannst CSV-Dateien auch einfach irgendwo ins Fenster ziehen.": "You can also simply drop CSV files anywhere on the window.", "Importierte Logs ins Archiv kopieren": "Copy imported logs to the archive", "Logs hier ablegen": "Drop logs here", "Sprache": "Language", "Systemsprache": "System language", "Log-Ordner auf dem Sender": "Log folder on the radio", "Wird auf jedem angeschlossenen Laufwerk gesucht. Ein vollständiger Pfad wie E:\\logs geht auch.": "Searched on every connected drive. A full path such as E:\\logs works too.", "Archiv-Ordner": "Archive folder", "Wählen …": "Choose …", "Am besten ein Ordner in Google Drive oder OneDrive, dann sind die Logs auf allen Geräten da. Pro Modell entsteht ein Unterordner.": "Ideally a folder in Google Drive or OneDrive, so the logs are available on all your devices. Each model gets its own subfolder.", "Automatisch synchronisieren, sobald der Sender angeschlossen ist": "Sync automatically as soon as the radio is connected", "Importierte Logs immer ins Archiv kopieren": "Always copy imported logs to the archive", "Abbrechen": "Cancel", "Speichern": "Save", "Zeitpunkt im Log": "Point in time in the log", "Zeitpunkt": "Time", "Einen Datensatz zurück": "One record back", "Einen Datensatz vor": "One record forward", "Ziehen oder ins Diagramm klicken": "Drag or click into a chart", "Aus": "Off", "Ansichten": "Views", "Übersicht": "Overview", "Diagramme": "Charts", "Thermik & Steigflüge": "Thermals & climbs", "Karte & Wind": "Map & wind", "Alle Werte": "All values", "Lade Beispiel-Log …": "Loading example log …", "Kennzahlen": "Key figures", "Werte am Zeitpunkt": "Values at the selected time", "Gerechnet wie Deine Widgets „Thermik“ und „Steigfluege“: Ein Steigflug läuft, solange der Schalter EIN ist. Gibt es keinen Steigflug-Schalter, erkennt die App Steigflüge am ESC-Strom: Motor an, solange der Strom über der Schwelle liegt (Standard 3 A, kurze Lücken bis 1 s zählen mit). Gewinn = höchste Höhe während der Phase minus Starthöhe, Ø Steigen = Gewinn durch Dauer. Thermik zählt ab 5 s, Steigflüge ab 1 s. Mit „Ohne Motor“ zählt bei der Thermik nicht, solange der Motor läuft (Drehzahl über 300 U/min, ohne Drehzahl Strom über 3 A) und 5 s danach; die Phase endet beim Motorstart und beginnt danach neu. Eine Phase, die beim Logende noch läuft, zählt wie im Widget nicht. Die Zeiten sind so genau wie das Log (etwa 0,5 s).": "Calculated like your widgets “Thermik” and “Steigfluege”: a climb lasts as long as the switch is ON. Without a climb switch the app detects climbs from the ESC current: motor on while the current is above the threshold (default 3 A, short gaps up to 1 s count). Gain = highest altitude during the phase minus start altitude, avg climb = gain divided by duration. Thermals count from 5 s, climbs from 1 s. With “Without motor”, thermals do not count while the motor runs (rpm above 300, without rpm current above 3 A) and for 5 s after; the phase ends when the motor starts and restarts afterwards. A phase still running at the end of the log does not count, as in the widget. Times are as precise as the log (about 0.5 s).", "Thermik": "Thermals", "So wird gerechnet": "How it is calculated", "Thermik-Schalter": "Thermal switch", "Ohne Motor": "Without motor", "Steigen mit Motor nicht als Thermik zählen": "Do not count climbing with the motor as thermal", "({n} gekürzt)": "({n} trimmed)", "({n} mit Motor)": "({n} with motor)", "Höhenquelle": "Altitude source", "Balkenhöhe": "Bar height", "Steiggeschwindigkeit": "Climb rate", "Erreichte Höhe": "Height gained", "Steigdauer": "Climb time", "Steigflüge": "Climbs", "Steigflug-Schalter": "Climb switch", "ab": "above", "Höhengewinn (m) · Zahl = Ø Steigen (m/s)": "Height gain (m) · number = avg climb (m/s)", "GPS-Spur": "GPS track", "Spur herauszoomen": "Zoom track out", "Spur hineinzoomen": "Zoom track in", "Alles": "All", "Wind nach Höhe": "Wind by altitude", "Stufe": "Band", "Für die Tabelle braucht es GPS-Position, GPS-Geschwindigkeit und Kurven im Flug.": "The table needs GPS position, GPS speed and turns during the flight.", "Kanäle": "Channels", "Bedienung und Berechnung": "Controls and calculations", "Im Diagramm ziehen verschiebt. Zoomen mit Strg + Mausrad, Trackpad-Pinch oder den Knöpfen. Doppelklick zeigt alles. In der Leiste oben das Fenster ziehen oder an den Rändern grösser und kleiner machen.": "Drag in a chart to pan. Zoom with Ctrl + mouse wheel, trackpad pinch or the buttons. Double-click shows everything. In the bar above, drag the window or resize it at its edges.", "Zeitachse in Minuten ab Logbeginn. Hinterlegt: Steigflüge blau, Thermik grün, rot der oben gewählte Schalterzustand. Reihenfolge ändern: Diagramm am Griff ⋮⋮ ziehen oder mit ▲ ▼ verschieben. ✕ schliesst ein Diagramm, wie ein Klick auf den Sensor oben.": "Time axis in minutes from the start of the log. Background: climbs blue, thermals green, red the switch state chosen above. Reorder: drag a chart by its handle ⋮⋮ or move it with ▲ ▼. ✕ closes a chart, like clicking the sensor above.", "Sender-Kanäle, Schalter und logische Schalter anzeigen": "Show radio channels, switches and logical switches", "Herauszoomen": "Zoom out", "Hineinzoomen": "Zoom in", "Rot markieren": "Mark red", "Schalter": "Switch", "Zustand": "State", "automatisch": "automatic", "Die Datei enthält keine Datenzeilen.": "The file contains no data rows.", "Keine Spalte \"Time\" gefunden. Ist das ein Ethos-Telemetrie-Log?": "No \"Time\" column found. Is this an Ethos telemetry log?", "Leistung": "Power", "Energie": "Energy", "Integral von {p} Leistung": "Integral of {p} power", "GPS Kurs (ber.)": "GPS course (calc.)", "Azimut zwischen zwei GPS-Fixes, ab 3 m Abstand (Widget GPS Course)": "Bearing between two GPS fixes, from 3 m distance (GPS Course widget)", "Windgeschw.": "Wind speed", "Kasa-Kreisfit über GPS-Geschwindigkeit und GPS Kurs (ber.), Widget Wind Estimator": "Kasa circle fit over GPS speed and GPS course (calc.), Wind Estimator widget", "Windrichtung": "Wind direction", "Richtung, aus der der Wind kommt (Widget Wind Estimator)": "Direction the wind comes from (Wind Estimator widget)", "Bodenvektor minus Windvektor (Widget Wind Estimator)": "Ground vector minus wind vector (Wind Estimator widget)", "Logdauer": "Log duration", "{n} Zeilen": "{n} rows", "Flugzeit": "Flight time", "Höhe über 5 m": "Altitude above 5 m", "Motorläufe": "Motor runs", "{t} Motorzeit": "{t} motor time", "Max. Höhe": "Max. altitude", "Max. Tempo": "Max. speed", "Sinken max {v}": "Sink max {v}", "Start {a} · Ende {b}": "Start {a} · end {b}", "Verbraucht": "Consumed", "aus {d}": "from {d}", "{v} Wh gesamt": "{v} Wh total", "Senderakku min": "Radio battery min", "Start {v}": "Start {v}", "N,NO,O,SO,S,SW,W,NW": "N,NE,E,SE,S,SW,W,NW", "Keine GPS-Daten im Log.": "No GPS data in the log.", "Gitter {s} m · Norden oben": "Grid {s} m · north up", "Höhe": "Altitude", "Steigflug": "Climb", "max. Entfernung vom Start {d} m": "max. distance from start {d} m", "Kräftig: sichtbarer Zeitausschnitt": "Bold: visible time range", "Beispiel: Dein Log": "Example: your log", "Geladen": "Loaded", "{n} Sensoren": "{n} sensors", "Kanal": "Channel", "Einheit": "Unit", "Am Zeitpunkt": "At selected time", "Werte": "Values", "berechnet": "calculated", "– wählen –": "– choose –", "{n} (automatisch)": "{n} (automatic)", "Ø Steigen": "Avg climb", "Gesamthöhe": "Total height", "Gesamtdauer": "Total time", "Kein Steigflug. Prüfe, ob der richtige Schalter gewählt ist.": "No climbs. Check that the right switch is selected.", "Uhrzeit": "Time of day", "Dauer": "Duration", "Höchste": "Highest", "Gewinn": "Gain", "Verbrauch": "Consumption", "– kein –": "– none –", "Steigflug {n}": "Climb {n}", "Gewinn {v}": "Gain {v}", "Dauer {v}": "Duration {v}", "Ø Steigen {v}": "Avg climb {v}", "Steiggeschwindigkeit (m/s)": "Climb rate (m/s)", "Erreichte Höhe (m)": "Height gained (m)", "Steigdauer (s)": "Climb time (s)", "an": "on", "aus": "off", "oben": "up", "Mitte": "middle", "unten": "down", "Kein Wind berechnet. Dafür braucht es GPS-Position, GPS-Geschwindigkeit und Kurven im Flug.": "No wind calculated. This needs GPS position, GPS speed and turns during the flight.", "Wind Ø": "Wind avg", "aus|wind": "from", "wechselnd": "variable", "Berechnet: {n}": "Calculated: {n}", "Ziehen zum Umsortieren": "Drag to reorder", "{n} verschieben": "Move {n}", "{n} nach oben": "Move {n} up", "{n} nach unten": "Move {n} down", "Wähle oben einen oder mehrere Kanäle aus.": "Choose one or more channels above.", "{a} von {b}": "{a} of {b}", "{t} ab Start": "{t} from start", "kein Zeitpunkt": "no point in time", "Kein Zeitpunkt gewählt": "No point in time selected", "Oben den Zeitstrahl ziehen oder in ein Diagramm klicken.": "Drag the time bar or click into a chart.", "Phase": "Phase", "Thermik|phase": "Thermal", "kein Schalter aktiv": "no switch active", "Am Zeitpunkt {t}: {w} {u} aus {d}° in {h} m.": "At {t}: {w} {u} from {d}° at {h} m.", "Keine CSV-Dateien gefunden. Ethos speichert Logs im Ordner LOGS als .csv.": "No CSV files found. Ethos saves logs as .csv in the LOGS folder.", "Log wählen": "Choose log", "Datum": "Date", "Sensoren": "Sensors", "Zeilen": "Rows", "Grösse": "Size", "Datei": "File", "ja": "yes", "nein": "no", "Modelle": "Models", "Lade {n} …": "Loading {n} …", "Datei konnte nicht gelesen werden.": "The file could not be read.", "{n} ins Archiv kopiert.": "{n} copied to the archive.", "Archiv": "Archive", "Im Archiv sichern": "Save to archive", "Im Archiv gesichert": "Saved to archive", "Sync: Sobald der Sender angeschlossen ist, kopiert die App neue Logs aus „{p}“ ins Archiv, ein Ordner pro Modell. Archiv: {a}": "Sync: as soon as the radio is connected, the app copies new logs from “{p}” to the archive, one folder per model. Archive: {a}", "Sync läuft: {d} von {n}": "Syncing: {d} of {n}", "Sender gefunden, suche neue Logs …": "Radio found, looking for new logs …", "Sync unterbrochen, Sender getrennt": "Sync interrupted, radio disconnected", "{n} kopiert, {m} fehlen noch · {t} · geht beim nächsten Anschliessen weiter": "{n} copied, {m} still missing · {t} · continues next time you connect", "{n} neu im Archiv": "{n} new in the archive", "Keine neuen Logs": "No new logs", "{n} Fehler": "{n} errors", "Sender angeschlossen": "Radio connected", "Sender getrennt": "Radio disconnected", "Sync fehlgeschlagen": "Sync failed", "Zugriff auf den Sender erlauben": "Allow access to the radio", "macOS fragt nach dem Zugriff auf das Wechselmedium. Nach „Erlauben“ startet der Sync von selbst.": "macOS is asking for access to the removable volume. After “Allow” the sync starts by itself.", "Automatischer Sync aus": "Automatic sync off", "Sender nicht angeschlossen": "Radio not connected", "Fehler": "Error", "Zeit": "Time", "Kopiert": "Copied", "Nicht kopiert": "Not copied", "{n}, der Sender wurde während dem Sync getrennt. Beim nächsten Anschliessen werden sie geholt.": "{n}, the radio was disconnected during the sync. They will be fetched the next time you connect.", "Sender": "Radio", "Version {v} ist verfügbar": "Version {v} is available", "Herunterladen": "Download", "Die Diagramm-Bibliothek konnte nicht geladen werden. Lade die Seite neu.": "The chart library could not be loaded. Reload the page.", "Öffne ein Ethos-Log (CSV), um es auszuwerten.": "Open an Ethos log (CSV) to analyse it.", "Sender auswerfen, damit er abgezogen werden kann": "Eject the radio so you can unplug it", "⏏ Auswerfen": "⏏ Eject", "Sender ausgeworfen, Du kannst ihn abziehen": "Radio ejected, you can unplug it", "Wird ausgeworfen …": "Ejecting …", "Auswerfen fehlgeschlagen: {e}": "Eject failed: {e}", "Der Sync läuft noch.": "The sync is still running.", "Kein Sender angeschlossen.": "No radio connected.", "Das Laufwerk wird noch verwendet.": "The drive is still in use.", "Ein Werkzeug von Mächler Modelle, nicht mit den Herstellern von Ethos oder Jeti verbunden. Ethos ist eine Marke ihres Inhabers.": "A tool by Mächler Modelle, not affiliated with the makers of Ethos or Jeti. Ethos is a trademark of its owner.", "Darstellung": "Appearance", "Wie System": "Same as system", "Hell": "Light", "Dunkel": "Dark", "Rohdaten": "Raw data", "So funktioniert es": "How it works", "Alle Zeilen und Spalten so, wie sie im Log stehen. Ein Klick auf eine Zeile setzt den Zeitpunkt; die Zeile des gewählten Zeitpunkts ist hervorgehoben.": "All rows and columns exactly as they are in the log. Clicking a row sets the point in time; the row of the selected time is highlighted.", "{n} Zeilen · {m} Spalten": "{n} rows · {m} columns", "Darstellung der Diagramme": "Chart layout", "Einzeln": "Separate", "Überlagert": "Overlaid", "Alle Kanäle überlagert": "All channels overlaid", "„Überlagert“ zeigt alle gewählten Kanäle in einem Diagramm. Jeder Kanal hat seine eigene Skala und füllt die ganze Höhe; die ersten zwei Skalen stehen links und rechts in der Farbe des Kanals.": "“Overlaid” shows all selected channels in one chart. Each channel has its own scale and uses the full height; the first two scales are shown left and right in the channel colour.", "Web-Version": "Web version", "Nach Updates suchen": "Check for updates", "Version {v}": "Version {v}", "MM Flight Analyzer, Version {v}": "MM Flight Analyzer, version {v}", "Suche nach Updates fehlgeschlagen ({e})": "Update check failed ({e})", "Das ist die neueste Version.": "You have the latest version.", "Suche …": "Checking …", "Steuerkurs (windkorr.)": "Heading (wind-corr.)", "Richtung, in die die Nase zeigt: GPS Kurs (ber.) korrigiert um den Wind": "Direction the nose points: GPS course (calc.) corrected for the wind", "Drift": "Drift", "Kurs über Grund minus Steuerkurs; positiv = Wind von links, das Modell wird nach rechts versetzt": "Course over ground minus heading; positive = wind from the left, the model drifts to the right", "Gegenwind": "Headwind", "Windanteil gegen die Flugrichtung; negativ = Rückenwind": "Wind component against the direction of flight; negative = tailwind", "Distanz zum Start": "Distance to start", "Waagrechte Distanz zum ersten gültigen GPS-Fix": "Horizontal distance to the first valid GPS fix", "Steuerkurs (windkorr.) = Richtung, in die die Nase zeigt, aus Bodenvektor minus Windvektor. Drift = Kurs über Grund minus Steuerkurs (positiv = nach rechts versetzt). Gegenwind = Windanteil gegen die Flugrichtung, negativ heisst Rückenwind. Distanz zum Start = waagrechte Distanz zum ersten GPS-Fix, Effektive Distanz = schräg vom Startpunkt zum Modell, mit der Höhe. Winkel zum Start = Winkel zwischen Längsachse (Steuerkurs, ohne Wind GPS Kurs) und der Linie vom Modell zum Startort: 0° Nase zum Start, ±180° Heck zum Start, ±90° quer, positiv = Start liegt rechts. Unter 10 m Abstand gibt es keinen Wert.": "Heading (wind-corr.) = direction the nose points, from ground vector minus wind vector. Drift = course over ground minus heading (positive = pushed to the right). Headwind = wind component against the direction of flight, negative means tailwind. Distance to start = horizontal distance to the first GPS fix, effective distance = straight line from the start point to the model, including altitude. Angle to start = angle between the longitudinal axis (heading, without wind the GPS course) and the line from the model to the start point: 0° nose to the start, ±180° tail to the start, ±90° crosswise, positive = start is on the right. No value below 10 m distance.", "Effektive Distanz": "Effective distance", "Schräge Distanz vom Startpunkt zum Modell: waagrechte Distanz und Höhe über dem Start ({a})": "Straight-line distance from the start point to the model: horizontal distance and height above the start ({a})", "Parameter wählen und mit den beiden Griffen oder den Feldern Min und Max den Bereich einstellen. Die Balken zeigen, wie oft welcher Wert im Log vorkommt. Ein Logeintrag ist aktiv, wenn er bei allen Filtern im Bereich liegt. Inaktive Einträge bleiben in den Diagrammen sichtbar, auf grauem Hintergrund, auch in der Übersichtsleiste. Min, Ø und Max in den Diagrammen und unter „Alle Werte“ zählen nur aktive Einträge. „Zurücksetzen“ stellt einen Filter auf den ganzen Bereich, ✕ entfernt ihn. Beim Wechsel des Logs bleiben die Filter bestehen und gelten für denselben Parameter im neuen Log.": "Pick a parameter and set the range with the two handles or the Min and Max fields. The bars show how often each value occurs in the log. A log entry is active when it lies inside the range of every filter. Inactive entries stay visible in the charts, on a grey background, also in the overview bar. Min, Ø and Max in the charts and under “All values” only count active entries. “Reset” sets a filter back to the full range, ✕ removes it. When you switch logs the filters stay and apply to the same parameter in the new log.", "Nicht in diesem Log, gilt wieder, sobald ein Log den Parameter hat": "Not in this log, applies again as soon as a log has this parameter", "Winkel zum Start": "Angle to start", "Winkel zwischen Längsachse (Steuerkurs) und der Linie Modell–Startort; 0° = Nase zum Start, ±180° = Heck zum Start, positiv = Start rechts": "Angle between the longitudinal axis (heading) and the line model–start point; 0° = nose to the start, ±180° = tail to the start, positive = start on the right", "Winkel zwischen Flugrichtung (GPS Kurs) und der Linie Modell–Startort; 0° = fliegt zum Start, ±180° = fliegt weg, positiv = Start rechts": "Angle between the direction of flight (GPS course) and the line model–start point; 0° = flying towards the start, ±180° = flying away, positive = start on the right", "Im Jeti-Log stehen keine Sensoren.": "The Jeti log contains no sensors.", "Jeti-Modell {n}": "Jeti model {n}", "Keine Logs gefunden. Ethos speichert Logs im Ordner LOGS als .csv, Jeti im Ordner Log als .log.": "No logs found. Ethos saves logs as .csv in the LOGS folder, Jeti as .log in the Log folder.", "Motor": "Motor", "{n}, Zähler {a} → {b}": "{n}, counter {a} → {b}", "Eigener Kanal": "Own channel", "Ausblenden": "Hide", "Höhe absolut / GPS": "Absolute / GPS altitude", "Vario": "Vario", "GPS-Geschwindigkeit": "GPS speed", "Fahrt (Staurohr)": "Airspeed (pitot)", "Motor-Strom": "Motor current", "Motor-Spannung": "Motor voltage", "Drehzahl": "RPM", "Regler-Temperatur": "ESC temperature", "Empfänger-Spannung": "Receiver voltage", "Empfangsqualität": "Link quality", "geändert": "changed", "ausgeblendet": "hidden", "eigener Kanal": "own channel", "erkannt": "recognised", "GPS-Position": "GPS position", "GPS-Zeit": "GPS time", "App-Kanal für {n}": "App channel for {n}", "Sensor": "Sensor", "Rate": "Rate", "App-Kanal": "App channel", "Jeti speichert keine Schalter im Log: Thermik und „Rot markieren“ brauchen einen Schalter, Steigflüge erkennt die App am Motor-Strom.": "Jeti does not log switches: thermals and “Mark red” need a switch, climbs are detected from the motor current.", "{n} Meldungen des Senders im Log, davon {m} Telemetrieverlust.": "{n} radio messages in the log, {m} of them telemetry loss.", "Jeti-Log, erkannt an den Geräten {d}. Jeder Log mit diesen Geräten bekommt diesen Namen.": "Jeti log, recognised by the devices {d}. Every log with these devices gets this name.", "Erkannt am Anfang des Dateinamens „{m}“, z. B. {f}. Jeder Log, dessen Name so beginnt, bekommt diesen Namen.": "Recognised by the start of the file name “{m}”, e.g. {f}. Every log whose name starts like this gets this name.", "Modell umbenennen": "Rename model", "Name": "Name", "Der Name gilt für alle Logs dieses Modells, auch für spätere Importe und den Sync. Einstellungen, Polare und Filter bleiben erhalten. Wählst du den Namen eines anderen Modells, stehen beide in der Liste zusammen.": "The name applies to all logs of this model, including later imports and the sync. Settings, polar and filters are kept. If you choose the name of another model, both are listed together.", "Ursprünglicher Name": "Original name", "Umbenennen": "Rename", "Sensoren …": "Sensors …", "Jeti-Sensoren den App-Kanälen zuordnen": "Assign Jeti sensors to app channels", "Jeti-Sensoren zuordnen": "Assign Jeti sensors", "Jeti-Sensoren haben keine festen Namen. Die App schlägt eine Zuordnung vor, jede Zeile lässt sich ändern. Was keinem App-Kanal entspricht, bleibt ein eigener Kanal mit dem Namen aus dem Log. Die Zuordnung gilt für alle Logs dieses Modells.": "Jeti sensors have no fixed names. The app suggests an assignment and every row can be changed. Anything that matches no app channel stays an own channel with the name from the log. The assignment applies to all logs of this model.", "↺ Vorschlag": "↺ Suggestion", "Übernehmen": "Apply", "Ein oder mehrere Logs (Ethos .csv, Jeti .log)": "One or more logs (Ethos .csv, Jeti .log)", "Alle Logs eines Ordners, z.B. LOGS vom Ethos-Sender oder Log vom Jeti-Sender": "All logs in a folder, e.g. LOGS from the Ethos radio or Log from the Jeti radio", "Du kannst Log-Dateien auch einfach irgendwo ins Fenster ziehen.": "You can also simply drop log files anywhere on the window.", "Wertet Telemetrie-Logs vom Ethos-Sender (CSV) und vom Jeti-Sender (.log) aus: Flugzeit, Motorläufe, Empfang, Akku, GPS-Spur, Thermik, Steigflüge, Wind und alle Sensoren. Logs lädst Du über „Import …“ oder ziehst die Dateien einfach ins Fenster. Die Dateien bleiben auf Deinem Gerät.": "Analyses telemetry logs from Ethos radios (CSV) and Jeti radios (.log): flight time, motor runs, link quality, batteries, GPS track, thermals, climbs, wind and all sensors. Load logs with “Import …” or simply drop the files onto the window. The files stay on your device.", "Kräftig: sichtbarer Zeitausschnitt, aktive Einträge": "Bold: visible time range, active entries", "Auswertung: sichtbarer Ausschnitt, nur aktive Einträge": "Analysis: visible range, active entries only", "Auswertung: sichtbarer Ausschnitt": "Analysis: visible range", "Auswertung: ganzes Log, nur aktive Einträge": "Analysis: whole log, active entries only", "Auswertung: ganzes Log": "Analysis: whole log", "Strecke": "Distance", "Ø Tempo": "Avg speed", "Höhengewinn": "Height gained", "Höhenverlust": "Height lost", "Höhe netto": "Net height", "Ø Netto": "Avg net", "Gleitzahl Modell": "Model glide ratio", "Gleitzahl über Grund": "Glide ratio over ground", "Gezählt wird nur, was auf der Spur kräftig gezeichnet ist: der Zeitraum, den der Tab Diagramme gerade zeigt, und mit Filter nur aktive Einträge. Strecke = Länge der Spur über Grund, ohne die Stufen aus dem Log. Dauer = Zeit dieser Einträge, Ø Tempo = Strecke durch Dauer. Höhengewinn und Höhenverlust zählen jedes Steigen und Sinken ab 2 m (Höhe über 4 s gemittelt). Höhe netto = Einflughöhe minus Endhöhe. Gleitzahl über Grund = Strecke durch Höhe netto (ab 5 m). Ø Netto = mittleres Steigen der Luft aus dem Netto-Vario, über die Zeit gemittelt; ohne Motor und 15 s danach, nur mit Polare des Modells. Gleitzahl Modell = Strecke durch die Luft (TAS) durch die Höhe, die das Modell selbst verloren hat: Höhe netto plus Ø Netto mal Dauer. Sinkt die Luft, ist sie besser als die Gleitzahl über Grund.": "Only what is drawn bold on the track counts: the time range the Charts tab currently shows and, with a filter, only active entries. Distance = length of the track over ground, without the steps from the log. Duration = time of these entries, avg speed = distance divided by duration. Height gained and lost count every climb and descent of 2 m or more (altitude averaged over 4 s). Net height = entry height minus end height. Glide ratio over ground = distance divided by net height (from 5 m). Avg net = average rise of the air from the net vario, time-weighted; without motor and 15 s after, only with a polar for the model. Model glide ratio = distance through the air (TAS) divided by the height the model itself lost: net height plus avg net times duration. If the air sinks, it is better than the glide ratio over ground.", "ƒ = berechneter Wert. Leistung = Strom × Spannung, Energie = Leistung über die Zeit aufsummiert. GPS Kurs, Windgeschw., Windrichtung und TAS rechnen wie Deine Widgets „GPS Course“ und „Wind Estimator“ mit deren Standardwerten (40 Werte alle 0,7 s, Fit jede Sekunde, Kurs ab 3 m Abstand). Ein Wind-Fit zählt aber wie im Sollfahrt-Widget nur bei echtem Kreisen (etwa 270° Kurswechsel im Fenster). Vor dem ersten gültigen Fit zeigt der Wind 0 und die TAS die Geschwindigkeit über Grund, genau wie am Sender.": "ƒ = calculated value. Power = current × voltage, energy = power summed over time. GPS course, wind speed, wind direction and TAS are calculated like your widgets “GPS Course” and “Wind Estimator” with their default settings (40 samples every 0.7 s, fit every second, course from 3 m distance). As in the Sollfahrt widget, a wind fit only counts when actually circling (about 270° of course change in the window). Before the first valid fit the wind shows 0 and the TAS shows ground speed, exactly as on the radio.", "Gezählt werden die {n} akzeptierten Wind-Fits, jeweils in der Höhe ({a}), in der sie gerechnet wurden. Stärke und Richtung = Vektormittel der Fits; „wechselnd“ heisst, die Richtungen in dieser Stufe streuen stark. Der Pfeil zeigt, wohin der Wind weht.": "Counts the {n} accepted wind fits, each at the altitude ({a}) where it was calculated. Speed and direction = vector mean of the fits; “variable” means the directions in this band scatter widely. The arrow shows where the wind blows to."};
@@ -3435,6 +3777,7 @@ const LANG = LANGS.includes(LANG_PREF) ? LANG_PREF : ((navigator.languages||[nav
 const LOC = LANG==='de' ? 'de-CH' : 'en-GB';
 // T('Text {n}', {n:5}); ein Zusatz nach "|" unterscheidet gleiche deutsche Wörter mit verschiedener Übersetzung
 Object.assign(EN, {"Für MacCready / Lua-Widget": "For MacCready / Lua widget", "Was sind diese Werte?": "What are these values?", "Koeffizienten für Fahrt in": "Coefficients for speed in", "Gültigkeit und Eckwerte": "Validity and key values", "3-Punkte-Polare": "3-point polar", "(für Widgets, die Stützpunkte wollen)": "(for widgets that want support points)", "Sollfahrt nach MacCready": "MacCready speed to fly", "MC-Wert": "MC value", "Wind": "Wind", "Netto": "Net", "Ballast": "Ballast", "Verschmutzung": "Bugs", "+ Gegenwind, − Rückenwind, auf der Flugrichtung": "+ headwind, − tailwind, along the flight path", "Steigen der Luft: + steigt, − fällt": "Air movement: + rising, − sinking", "Zuladung in % des Fluggewichts beim Loggen": "Added load in % of the weight when logging", "Mücken, Regen: Sinken wird um so viel % grösser": "Bugs, rain: sink grows by this many %", "Alles zurücksetzen": "Reset all", "Auf den Sender": "To the transmitter", "Datei": "File", "Beim Sync automatisch aktualisieren": "Update automatically on sync", "Schreibt die Datei jedes Mal neu, wenn die App Logs vom Sender holt.": "Writes the file again every time the app fetches logs from the transmitter.", "Auf Sender schreiben": "Write to transmitter", "Datei speichern": "Save file", "Inhalt der Datei": "File content", "Im Widget lesen": "Reading it in the widget", "Code kopieren": "Copy code", "Werte als JSON kopieren": "Copy values as JSON", "Gegenwind {v} km/h": "headwind {v} km/h", "Rückenwind {v} km/h": "tailwind {v} km/h", "Netto {v} m/s": "net {v} m/s", "Ballast {v} %": "ballast {v} %", "Verschmutzung {v} %": "bugs {v} %", "MacCready {m} → {v} km/h": "MacCready {m} → {v} km/h", "Widget: {v} km/h": "Widget: {v} km/h", "angepasst: {t}": "adjusted: {t}", "Noch keine Kennzahlen für dieses Modell.": "No values for this model yet.", "Die Gleitpunkte liegen nur zwischen {a} und {b} km/h, daraus lässt sich keine Polare mit Minimum rechnen. Fliege ein paar gerade Gleitstrecken langsamer und schneller (z. B. 30 bis 70 km/h), dann erscheinen die Werte hier.": "The glide points lie only between {a} and {b} km/h, which does not give a polar with a minimum. Fly a few straight glides slower and faster (e.g. 30 to 70 km/h), then the values appear here.", "Es gibt noch zu wenig Gleitpunkte.": "There are not enough glide points yet.", "{m} · gültig {a}–{b} km/h": "{m} · valid {a}–{b} km/h", "v in m/s": "v in m/s", "v in km/h": "v in km/h", "Ergebnis in m/s (Sinken negativ)": "result in m/s (sink negative)", "Kopieren": "Copy", "Gültig von": "Valid from", "Gültig bis": "Valid to", "Geringstes Sinken (Parabel)": "Minimum sink (parabola)", "{w} m/s bei {v}": "{w} m/s at {v}", "Beste Gleitzahl (Parabel)": "Best glide ratio (parabola)", "{g} bei {v}": "{g} at {v}", "Abweichung zur Polare": "Deviation from the polar", "max. {d} cm/s im Bereich": "max. {d} cm/s in range", "Punkt": "Point", "Fahrt ({u})": "Speed ({u})", "Vario (m/s)": "Vario (m/s)", "langsam": "slow", "beste Gleitzahl": "best glide ratio", "schnell": "fast", "Sollfahrt (km/h)": "Speed to fly (km/h)", "Schnitt": "Average", "über Bereich": "above range", "unter Bereich": "below range", "schneller": "faster", "langsamer": "slower", "Bei MC {m} wäre die Sollfahrt {v} km/h, {d} als der gültige Bereich ({a}–{b} km/h). Das Widget sagt dann <b>{l} km/h</b> an.": "At MC {m} the speed to fly would be {v} km/h, {d} than the valid range ({a}–{b} km/h). The widget then announces <b>{l} km/h</b>.", "Bei MC {m} mit {t}: Sollfahrt <b>{v} km/h</b>.": "At MC {m} with {t}: speed to fly <b>{v} km/h</b>.", "Bei MC {m} in ruhiger Luft: Sollfahrt <b>{v} km/h</b>.": "At MC {m} in still air: speed to fly <b>{v} km/h</b>.", "Ohne diese Einflüsse wären es {v} km/h.": "Without these it would be {v} km/h.", "Mit Ballast verschiebt sich der gültige Bereich auf {a}–{b} km/h.": "With ballast the valid range moves to {a}–{b} km/h.", "kein": "none", "ohne": "none", "sauber": "clean", "Nur in der Desktop-App direkt auf den Sender": "Directly to the transmitter only in the desktop app", "Sender verbunden": "Transmitter connected", "Kein Sender angeschlossen": "No transmitter connected", "Geschrieben {t}": "Written {t}", "Die Datei enthält das Modell {l}.": "The file contains the model {l}.", "Die Datei enthält {n} Modelle: {l}.": "The file contains {n} models: {l}.", "Noch keine Modelle in der Datei.": "No models in the file yet.", "Jeti-Modelle kommen nicht in die Datei, das Widget läuft auf Ethos.": "Jeti models are not in the file, the widget runs on Ethos.", "{m} fehlt darin, weil es noch keine Polare hat; das Widget zeigt dann „keine Polare“.": "{m} is missing because it has no polar yet; the widget then shows “no polar”.", "Weitere Modelle kommen dazu, sobald Du ihre Polare hier ansiehst.": "Other models are added as soon as you view their polar here.", "Schliesse den Sender per USB an, dann kannst Du schreiben. Mit dem Häkchen passiert es beim nächsten Sync von selbst.": "Connect the transmitter via USB to write. With the tick it happens on the next sync by itself.", "(beim Sync)": "(on sync)", "Schreiben fehlgeschlagen: {e}": "Writing failed: {e}"});
+Object.assign(EN, {"(Kopie)": "(copy)", "Aktive Aufgabe am Sender": "Active task on the transmitter", "Auf den Sender geschrieben: {p}": "Written to the transmitter: {p}", "Aufgabe „{n}“ löschen?": "Delete task “{n}”?", "Beispiel Sport": "Example Sport", "Bis Höhe": "Up to height", "Breite": "Width", "Die Datei enthält keine Aufgabe (LTSK).": "The file contains no task (LTSK).", "Dreiecke": "Triangles", "Einflug {h} m / {v} km/h": "Entry {h} m / {v} km/h", "Ende: {e}": "End: {e}", "Flugzeit": "Flight time", "Gespeichert. Kein Sender angeschlossen, die Aufgaben gehen beim nächsten Anschliessen hin.": "Saved. No transmitter connected, the tasks will be written the next time you connect it.", "Hinweise": "Notes", "Höhe im Ziel": "Height at finish", "Index": "Index", "geflogen / Schenkel": "flown / legs", "Schalterstellung": "Switch position", "Widget-Einstellungen": "Widget settings", "Vorgaben": "Defaults", "Gelten für alle Aufgaben und gehen mit aufgaben.lua auf den Sender. Am Sender stellst Du nur noch Aufgabe, Sensoren, Schalter und das Startfenster von Hand ein.": "Apply to all tasks and go to the transmitter with aufgaben.lua. On the transmitter you only set the task, sensors, switches and the manual start window.", "Töne": "Sounds", "Ton": "Sound", "Ereignisse immer melden (auch auf anderen Seiten)": "Always announce events (also on other pages)", "Start: Gleitwinkel-Ton": "Start: glide angle tone", "Gleiten: Sollfahrt-Ton": "Glide: speed-to-fly tone", "Gleiten: Kurs-Kommandos": "Glide: course commands", "Thermik: Vario-Ton des Widgets (sonst vom Sender)": "Thermal: widget vario tone (otherwise from the transmitter)", "Kommando ab": "Command from", "Kommando höchstens alle": "Command at most every", "Einflugfenster unter dem Limit": "Entry window below the limit", "Vibration ab Limit minus": "Vibrate from limit minus", "Weg": "Course", "Wenderadius": "Turn radius", "Gemessen": "Measured", "Fest": "Fixed", "Wenderadius fest / beim Start": "Turn radius fixed / at start", "Reserve im Sektor": "Margin inside the sector", "Piepse vor dem Wenden": "Beeps before the turn", "Vorhalt Kurveneinleitung": "Turn entry lead", "Eckansicht vor dem Wendepunkt": "Corner view before the turn point", "Seiten": "Pages", "Seite automatisch, wenn kein Seiten-Schalter ein ist": "Automatic page when no page switch is on", "Sollfahrt": "Speed to fly", "MC (ohne Poti)": "MC (without pot)", "MC Maximum am Poti": "MC maximum on the pot", "Fluggewicht (der Polare)": "Flying weight (of the polar)", "Verschmutzung": "Bugs", "Totzone Sollfahrt": "Speed-to-fly dead band", "IGC": "IGC", "Wettbewerbskennung": "Competition ID", "Kennzeichen": "Registration", "Start": "Start", "IGC herunterladen": "Download IGC", "Im Browser: Datei herunterladen und nach scripts/skynav/ kopieren": "In the browser: download the file and copy it to scripts/skynav/", "Kein Sender angeschlossen": "No transmitter connected", "Keine Sicherheitszonen": "No safety zones", "Keine ganze Runde": "No complete lap", "Kreis": "Circle", "Länge": "Length", "Noch keine Flüge. Das Widget legt sie in scripts/skynav/fluege/ ab, die App holt sie beim Anschliessen.": "No flights yet. The widget saves them in scripts/skynav/fluege/, the app fetches them when you connect the transmitter.", "Rechteck": "Rectangle", "Richtung": "Direction", "Runde": "Lap", "Schnitt": "Average", "Seit Start": "Since start", "Sender angeschlossen": "Transmitter connected", "Speed im Ziel": "Speed at finish", "Strafe": "Penalty", "Umfang {u} m": "Perimeter {u} m", "Von Höhe": "From height", "Zeit": "Time", "Zone löschen": "Delete zone", "Zone {n}": "Zone {n}", "aktiv": "active", "kein gültiger Start": "no valid start", "{n} ist die aktive Aufgabe": "{n} is the active task", "{n} neue Flüge geholt": "{n} new flights fetched", "{n}× in Sicherheitszone": "{n}× in safety zone", "Öffne eine IGC-Datei des Widgets.": "Open an IGC file from the widget.", "über der Maximalhöhe": "above maximum height", "über {t}": "over {t}", "Δ Höhe": "Δ height", "Landung": "Landing", "Arbeitszeit": "Working time", "SkyNavigator: {n} neue Flüge": "SkyNavigator: {n} new flights", "(höchstens 5, Höhen über Platz)": "(up to 5, heights above field)", "+ Kreis": "+ Circle", "+ Rechteck": "+ Rectangle", "Als aktiv markieren": "Mark as active", "Art": "Type", "Auf Sender schreiben": "Write to transmitter", "Auf den Sender": "To the transmitter", "Aufgabe": "Task", "Aufgaben": "Tasks", "Datei": "File", "Die App schreibt die Aufgaben bei jedem Anschliessen des Senders.": "The app writes the tasks every time you connect the transmitter.", "Die Wertung der Flüge rechnet die App aus der IGC-Datei nach: Start beim Überfliegen der Linie aus dem Startsektor (Einflugwerte vom letzten Fix davor), Wendepunkte im Viertelkreis von 1.5 km, Ziel mit Mindestspeed innerhalb der Arbeitszeit. Startfenster gibst Du in Ortszeit ein, das Widget rechnet in UTC.": "The app recalculates the score from the IGC file: start when crossing the line from the start sector (entry values from the last fix before), turn points in the 1.5 km quarter circle, finish with minimum speed within the working time. Enter start windows in local time, the widget works in UTC.", "Duplizieren": "Duplicate", "Flug": "Flight", "Flüge": "Flights", "Hier legst Du die Aufgaben für das Ethos-Widget SkyNavigator an (GPS Triangle nach Triangle Definition V1.7, Klassen Light, Sport und Scale). Die markierte Aufgabe ist am Sender aktiv, im Widget lässt sich auch eine andere wählen. Beim Anschliessen des Senders schreibt die App die Aufgaben nach scripts/skynav/aufgaben.lua und holt die Flüge (IGC) aus scripts/skynav/fluege/ ins Archiv.": "Here you create the tasks for the Ethos widget SkyNavigator (GPS Triangle per Triangle Definition V1.7, classes Light, Sport and Scale). The marked task is active on the transmitter, another one can be chosen in the widget. When you connect the transmitter, the app writes the tasks to scripts/skynav/aufgaben.lua and fetches the flights (IGC) from scripts/skynav/fluege/ into the archive.", "IGC öffnen": "Open IGC", "Inhalt der Datei": "File content", "Klasse": "Class", "Löschen": "Delete", "Max. Einfluggeschwindigkeit": "Max. entry speed", "Max. Einflughöhe": "Max. entry height", "Maximalhöhe": "Maximum height", "Mindestspeed im Ziel": "Minimum speed at finish", "Modell": "Model", "Neu": "New", "Ordner öffnen": "Open folder", "Pilot-ID": "Pilot ID", "Platzhöhe (MSL)": "Field elevation (MSL)", "Richtung / Länge / Breite bzw. Radius (m)": "Direction / length / width or radius (m)", "Richtung O → TP1": "Direction O → TP1", "Schnitt km/h": "Average km/h", "Sicherheitszonen": "Safety zones", "Startfenster": "Start window", "Ursprung O (Breite, Länge)": "Origin O (latitude, longitude)", "Vom Sender holen": "Fetch from transmitter", "Von / bis Höhe (m)": "From / to height (m)", "dTP (Abstand O–Ecke)": "dTP (distance O–corner)", "Beginn": "Start", "Datum": "Date", "Skizze der Aufgabe": "Task sketch", "So funktioniert SkyNavigator": "How SkyNavigator works", "Spur des Flugs": "Flight track", "z. B. Lizenz-Nr.": "e.g. licence no."});
 function T(k, v){ let r = LANG==='de' ? k.split('|')[0] : (EN[k] ?? k.split('|')[0]); if (v) r = r.replace(/\{(\w+)\}/g, (m,x)=>v[x]??m); return r; }
 // feste Texte der Seite übersetzen
 function translateDom(root){
@@ -5701,7 +6044,7 @@ async function mcOnSync(s){
   new MutationObserver(drawPolar).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
 })();
 // ---------- Tabs ----------
-const TABS=['uebersicht','diagramme','steigen','motor','polare','karte','werte','rohdaten','simulator'];
+const TABS=['uebersicht','diagramme','steigen','motor','polare','karte','werte','rohdaten','simulator','skynav'];
 function showTab(id, focus){
   if (!TABS.includes(id)) id='uebersicht';
   document.querySelectorAll('.tab').forEach(b=>{ const on=b.dataset.tab===id; b.setAttribute('aria-selected',on); b.tabIndex=on?0:-1; if(on&&focus) b.focus(); });
@@ -5715,6 +6058,7 @@ function showTab(id, focus){
   kiPing();
   try{ history.replaceState(null,'','#'+id); }catch(e){}
   if (id==='simulator') window.simShow?.(); else window.simHide?.();
+  if (id==='skynav') window.skyShow?.();
   if (!LOG) return;
   if (id==='diagramme') fitChips();
   // Diagramme in versteckten Tabs haben keine Grösse: beim Anzeigen neu ausmessen
@@ -6011,6 +6355,229 @@ new MutationObserver(redraw).observe(document.documentElement,{attributes:true,a
 
 // ---------- Desktop-App: Sync vom Sender, Archiv mit einem Ordner pro Modell ----------
 const DESK = window.ethosDesktop || null;
+// ---------- Tab SkyNavigator: Aufgaben verwalten, auf den Sender, Flüge auswerten ----------
+(function(){
+  const SK={ data:null, sel:null, flights:[], cache:new Map(), flSel:null, saveT:null, senders:[], loaded:false };
+  const CL=SKY.CLASSES, r0=v=>Math.round(+v||0), f1=v=>(+v).toFixed(1);
+  const mmss=s=>{ s=Math.max(0,Math.round(s)); return String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0'); };
+  const cur=()=>SK.data.tasks.find(t=>t.id===SK.sel)||null;
+  const css=k=>getComputedStyle(document.documentElement).getPropertyValue(k).trim();
+  function dl(name, text){ const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([text],{type:'text/plain'})); a.download=name; document.body.append(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(a.href),4000); }
+  const skyErr=e=>String(e?.message||e).replace(/^Error invoking remote method '[^']+': (Error: )?/,'');
+  const fname=s=>String(s||'Aufgabe').replace(/[\\/:*?"<>|]+/g,' ').trim()||'Aufgabe';
+
+  async function load(){
+    if (DESK?.skynavGet){ const r=await DESK.skynavGet(); SK.data=r.data; SK.flights=r.flights||[]; SK.senders=r.senders||[]; SK.dir=r.dir; }
+    else { try{ SK.data=JSON.parse(store.get('skynav.data')||'null'); }catch(e){} SK.data=SK.data||{version:1,active:'',pilot:'',pilotId:'',tasks:[]}; }
+    if (!SK.data.tasks.length){ const t=SKY.newTask('Sport'); t.name=T('Beispiel Sport'); SK.data.tasks.push(t); SK.data.active=t.id; }
+    SK.sel = SK.data.tasks.some(t=>t.id===SK.sel) ? SK.sel : (SK.data.active||SK.data.tasks[0].id);
+    SK.loaded=true;
+  }
+  // speichern (verzögert); toSender: gleich auf den angeschlossenen Sender
+  function save(toSender){
+    clearTimeout(SK.saveT);
+    SK.saveT=setTimeout(async ()=>{
+      const lua=SKY.toLua(SK.data);
+      $('#skyFile').textContent=lua;
+      if (!DESK?.skynavSave){ store.set('skynav.data',JSON.stringify(SK.data)); return; }
+      try{ const r=await DESK.skynavSave(SK.data, lua, !!toSender); txState(toSender ? (r.written.length ? T('Auf den Sender geschrieben: {p}',{p:r.written.join(', ')}) : T('Gespeichert. Kein Sender angeschlossen, die Aufgaben gehen beim nächsten Anschliessen hin.')) : ''); }
+      catch(err){ txState(skyErr(err), true); }
+    }, toSender?0:500);
+  }
+  function txState(msg, bad){
+    const on=SK.senders.length;
+    $('#skyDot').style.background = on ? 'var(--good)' : 'var(--muted)';
+    $('#skyState').textContent = DESK ? (on ? T('Sender angeschlossen') : T('Kein Sender angeschlossen')) : T('Im Browser: Datei herunterladen und nach scripts/skynav/ kopieren');
+    if (msg!=null) $('#skyRes').innerHTML = msg ? `<span class="${bad?'badline':'okline'}">${esc(msg)}</span>` : '';
+  }
+
+  // ---- Liste der Aufgaben
+  function renderList(){
+    $('#skyTasks').innerHTML = SK.data.tasks.map(t=>`<li class="pol-log sky-t${t.id===SK.sel?' on':''}" data-id="${esc(t.id)}">
+      <input type="radio" name="skyAct" ${t.id===SK.data.active?'checked':''} aria-label="${esc(T('{n} ist die aktive Aufgabe',{n:t.name}))}" title="${esc(T('Aktive Aufgabe am Sender'))}">
+      <span class="nm">${esc(t.name)}${t.id===SK.data.active?` <span class="tag">${esc(T('aktiv'))}</span>`:''}</span>
+      <span class="meta">${esc(t.cls)} · ${r0(t.dist)} m · ${r0(t.dir)}°${t.slot?.date?' · '+esc(t.slot.date.slice(5))+' '+esc(t.slot.time):''}</span></li>`).join('');
+    $('#skyPilot').value=SK.data.pilot||''; $('#skyPilotId').value=SK.data.pilotId||'';
+  }
+  // ---- Widget-Einstellungen
+  function renderSettings(){
+    const st=SKY.settingsOf(SK.data.settings), groups=[...new Set(SKY.SETTINGS.map(d=>d.g))];
+    $('#skySet').innerHTML=groups.map(g=>`<fieldset><legend>${esc(T(g))}</legend>`+SKY.SETTINGS.filter(d=>d.g===g).map(d=>{
+      const id='skyS_'+d.k, l=esc(T(d.l));
+      if (d.t==='bool') return `<label class="chk"><input type="checkbox" id="${id}" data-k="${d.k}" ${st[d.k]?'checked':''}> ${l}</label>`;
+      if (d.t==='text') return `<label>${l} <input type="text" id="${id}" data-k="${d.k}" maxlength="20" value="${esc(st[d.k])}"></label>`;
+      if (d.t==='sel') return `<label>${l} <select id="${id}" data-k="${d.k}">${d.opts.map(([v,n])=>`<option value="${v}" ${v===st[d.k]?'selected':''}>${esc(T(n))}</option>`).join('')}</select></label>`;
+      return `<label>${l} <span><input type="number" id="${id}" data-k="${d.k}" min="${d.min}" max="${d.max}" step="1" value="${st[d.k]}"> ${esc(d.u||'')}</span></label>`;
+    }).join('')+'</fieldset>').join('');
+  }
+  // ---- Formular
+  const FIELDS=[['dist','dTP (Abstand O–Ecke)','m'],['dir','Richtung O → TP1','°'],['elev','Platzhöhe (MSL)','m'],['maxH','Max. Einflughöhe','m'],['maxV','Max. Einfluggeschwindigkeit','km/h'],['minF','Mindestspeed im Ziel','km/h'],['work','Arbeitszeit','min'],['maxAlt','Maximalhöhe','m']];
+  function renderForm(){
+    const t=cur(); $('#skyEdit').hidden=!t; if (!t) return;
+    $('#skyName').value=t.name; $('#skyCls').value=t.cls; $('#skyPos').value=`${(+t.lat).toFixed(6)}, ${(+t.lon).toFixed(6)}`;
+    for (const [k] of FIELDS) $('#sky_'+k).value=r0(t[k]);
+    const s=t.slot||{}; $('#skySlotOn').checked=!!t.slot; $('#skySlotDate').value=s.date||''; $('#skySlotTime').value=s.time||''; $('#skySlotLen').value=s.len||15;
+    ['#skySlotDate','#skySlotTime','#skySlotLen'].forEach(q=>$(q).disabled=!t.slot);
+    $('#skyEditInfo').textContent = T('Umfang {u} m',{u:r0(+t.dist*(2+2*Math.SQRT2))});
+    renderZones(); drawTask($('#skyCv'), t, null);
+  }
+  function renderZones(){
+    const t=cur();
+    $('#skyZones').innerHTML = (t.zones||[]).map((z,i)=>`<tr data-z="${i}"><td><input data-k="name" value="${esc(z.name)}" aria-label="${esc(T('Name'))}"></td><td>${z.t==='R'?T('Rechteck'):T('Kreis')}</td>
+      <td><input data-k="pos" value="${(+z.lat).toFixed(6)}, ${(+z.lon).toFixed(6)}" aria-label="${esc(T('Position'))}"></td>
+      <td>${z.t==='R'?`<input data-k="dir" type="number" value="${r0(z.dir)}" aria-label="${esc(T('Richtung'))}"><input data-k="len" type="number" value="${r0(z.len)}" aria-label="${esc(T('Länge'))}"><input data-k="wid" type="number" value="${r0(z.wid)}" aria-label="${esc(T('Breite'))}">`:`<input data-k="r" type="number" value="${r0(z.r)}" aria-label="${esc(T('Radius'))}">`}</td>
+      <td><input data-k="lo" type="number" value="${r0(z.lo)}" aria-label="${esc(T('Von Höhe'))}"><input data-k="hi" type="number" value="${r0(z.hi)}" aria-label="${esc(T('Bis Höhe'))}"></td>
+      <td><button type="button" class="pol-mini-x" data-del="${i}" aria-label="${esc(T('Zone löschen'))}">✕</button></td></tr>`).join('') || `<tr><td colspan="6" class="hint">${esc(T('Keine Sicherheitszonen'))}</td></tr>`;
+    $('#skyZoneAdd').hidden = (t.zones||[]).length>=5;
+  }
+  const parsePos=s=>{ const m=String(s).replace(/[;\s]+/g,' ').match(/(-?\d+(?:\.\d+)?)[ ,]+(-?\d+(?:\.\d+)?)/); return m ? [+m[1], +m[2]] : null; };
+
+  // ---- Zeichnung: Dreieck, Sektoren, Startlinie, Zonen und (bei Flügen) die Spur
+  function drawTask(cv, t, ev){
+    const W=cv.clientWidth||600, H=cv.clientHeight||360, dpr=window.devicePixelRatio||1;
+    cv.width=W*dpr; cv.height=H*dpr; const c=cv.getContext('2d'); c.setTransform(dpr,0,0,dpr,0,0); c.clearRect(0,0,W,H);
+    const g=SKY.geom(t), fg=css('--fg'), mu=css('--muted'), ac=css('--accent'), bad=css('--bad'), good=css('--good'), line=css('--line');
+    let pts=[[0,0],...g.tp.map(p=>[p.x,p.y])];
+    g.tp.forEach(p=>pts.push([p.x+p.bx*Math.min(SKY.SECTOR_R,t.dist*0.6),p.y+p.by*Math.min(SKY.SECTOR_R,t.dist*0.6)]));
+    if (ev) pts=pts.concat(ev.track.filter((_,i)=>i%5===0).map(p=>[p.x,p.y]));
+    let x0=Math.min(...pts.map(p=>p[0])), x1=Math.max(...pts.map(p=>p[0])), y0=Math.min(...pts.map(p=>p[1])), y1=Math.max(...pts.map(p=>p[1]));
+    const sc=Math.min((W-30)/Math.max(1,x1-x0),(H-30)/Math.max(1,y1-y0)), cx=(x0+x1)/2, cy=(y0+y1)/2;
+    const X=x=>W/2+(x-cx)*sc, Y=y=>H/2-(y-cy)*sc;
+    c.lineWidth=1;
+    // Sektoren (Viertelkreise, nach aussen)
+    const sr=SKY.SECTOR_R*sc;
+    g.tp.forEach(p=>{ const a=Math.atan2(-p.by,p.bx); c.beginPath(); c.moveTo(X(p.x),Y(p.y)); c.arc(X(p.x),Y(p.y),sr,a-Math.PI/4,a+Math.PI/4); c.closePath();
+      c.fillStyle='color-mix(in srgb, '+ac+' 10%, transparent)'; c.fill(); c.strokeStyle=ac; c.globalAlpha=.35; c.stroke(); c.globalAlpha=1; });
+    // Start-/Ziellinie
+    const L=Math.min(SKY.LINE_HALF, Math.max(W,H)/sc); c.strokeStyle=good; c.lineWidth=2; c.setLineDash([6,4]);
+    c.beginPath(); c.moveTo(X(-L*g.px),Y(-L*g.py)); c.lineTo(X(L*g.px),Y(L*g.py)); c.stroke(); c.setLineDash([]);
+    // Zonen
+    (t.zones||[]).forEach(z=>{ const [zx,zy]=SKY.toXY(t,g,+z.lat,+z.lon); c.fillStyle='color-mix(in srgb, '+bad+' 22%, transparent)'; c.strokeStyle=bad; c.lineWidth=1; c.beginPath();
+      if (z.t==='R'){ const u=[Math.sin(z.dir*Math.PI/180),Math.cos(z.dir*Math.PI/180)], n=[u[1],-u[0]], hl=z.len/2, hw=z.wid/2;
+        [[hl,hw],[hl,-hw],[-hl,-hw],[-hl,hw]].forEach(([a,b],i)=>{ const px=zx+u[0]*a+n[0]*b, py=zy+u[1]*a+n[1]*b; i?c.lineTo(X(px),Y(py)):c.moveTo(X(px),Y(py)); }); c.closePath(); }
+      else c.arc(X(zx),Y(zy),Math.max(2,z.r*sc),0,2*Math.PI);
+      c.fill(); c.stroke(); });
+    // Dreieck
+    c.strokeStyle=fg; c.lineWidth=1.5; c.beginPath(); g.tp.forEach((p,i)=>i?c.lineTo(X(p.x),Y(p.y)):c.moveTo(X(p.x),Y(p.y))); c.closePath(); c.stroke();
+    // Spur
+    if (ev && ev.track.length){
+      c.lineWidth=1.2; c.strokeStyle=ac; c.globalAlpha=.85; c.beginPath();
+      ev.track.forEach((p,i)=>i?c.lineTo(X(p.x),Y(p.y)):c.moveTo(X(p.x),Y(p.y))); c.stroke(); c.globalAlpha=1;
+      if (ev.start){ const p=ev.track.find(q=>q.t>=ev.start.t); if (p){ c.fillStyle=good; c.beginPath(); c.arc(X(p.x),Y(p.y),4,0,2*Math.PI); c.fill(); } }
+    }
+    c.font='600 12px '+css('--body'); c.fillStyle=fg; c.textAlign='center'; c.textBaseline='middle';
+    g.tp.forEach((p,i)=>c.fillText('TP'+(i+1), X(p.x+p.bx*Math.max(40,t.dist*0.18)), Y(p.y+p.by*Math.max(40,t.dist*0.18))));
+    c.fillStyle=mu; c.fillText('O', X(0)-10*g.ux, Y(0)+10*g.uy);
+    // Nordpfeil und Massstab
+    c.strokeStyle=mu; c.lineWidth=1.5; c.beginPath(); c.moveTo(W-16,34); c.lineTo(W-16,14); c.lineTo(W-20,20); c.moveTo(W-16,14); c.lineTo(W-12,20); c.stroke(); c.fillText('N',W-16,42);
+    const step=[50,100,200,500,1000,2000].find(s=>s*sc>60)||5000; c.beginPath(); c.moveTo(12,H-12); c.lineTo(12+step*sc,H-12); c.stroke(); c.textAlign='left'; c.fillText(step+' m',14,H-22);
+  }
+
+  // ---- Flüge
+  async function flightText(f){ return f.text ?? (f.path ? DESK.readFile(f.path) : ''); }
+  async function evalFlight(f){
+    const key=f.name+'|'+(f.size||0);
+    if (SK.cache.has(key)) return SK.cache.get(key);
+    let r;
+    try{ const igc=SKY.parseIgc(await flightText(f)); const t=SKY.taskOfIgc(igc); r={ igc, task:t, ev:t?SKY.evaluate(t,igc):null }; }
+    catch(err){ r={ error:err.message }; }
+    SK.cache.set(key,r); return r;
+  }
+  async function renderFlights(){
+    const tb=$('#skyFl');
+    if (!SK.flights.length){ tb.innerHTML=`<tr><td colspan="8" class="hint">${esc(DESK?T('Noch keine Flüge. Das Widget legt sie in scripts/skynav/fluege/ ab, die App holt sie beim Anschliessen.'):T('Öffne eine IGC-Datei des Widgets.'))}</td></tr>`; $('#skyDet').hidden=true; return; }
+    const rows=[];
+    for (const [i,f] of SK.flights.entries()){
+      const r=await evalFlight(f), e=r.ev, igc=r.igc;
+      const date=igc?.date||f.name.slice(0,10), nr=(/-(\d\d)\.igc$/i.exec(f.name)||[])[1]||'';
+      rows.push(`<tr data-i="${i}" tabindex="0" ${SK.flSel===i?'aria-selected="true"':''}><td>${esc(date)}${nr?' #'+esc(nr):''}</td><td>${esc(r.task?.name||'–')}</td><td>${esc(igc?.h.GTY||'')}</td>
+        <td>${e?e.n:'–'}</td><td>${e?.n?f1(e.speed):'–'}</td><td>${e?.n?mmss(e.time):'–'}</td><td>${e?e.penalty:'–'}</td>
+        <td><button type="button" class="pol-mini-x" data-dl="${i}" title="${esc(T('IGC herunterladen'))}" aria-label="${esc(T('IGC herunterladen'))}">⤓</button></td></tr>`);
+    }
+    tb.innerHTML=rows.join('');
+    if (SK.flSel!=null && SK.flights[SK.flSel]) showFlight(SK.flSel); else $('#skyDet').hidden=true;
+  }
+  async function showFlight(i){
+    SK.flSel=i; const f=SK.flights[i]; if (!f) return;
+    document.querySelectorAll('#skyFl tr[data-i]').forEach(tr=>tr.setAttribute('aria-selected', +tr.dataset.i===i));
+    const r=await evalFlight(f), e=r.ev; $('#skyDet').hidden=false;
+    if (!e){ $('#skyDetK').innerHTML=''; $('#skyLaps').innerHTML=`<tr><td class="hint">${esc(r.error||T('Die Datei enthält keine Aufgabe (LTSK).'))}</td></tr>`; return; }
+    const k=(l,v,d='')=>`<div class="kpi"><span class="l">${esc(l)}</span><span class="v">${v}</span><span class="d">${d}</span></div>`;
+    $('#skyDetT').textContent=`${f.name} · ${r.task.name} (${r.task.cls}, ${r0(r.task.dist)} m)`;
+    $('#skyDetK').innerHTML = k(T('Dreiecke'), e.n) + k(T('Schnitt'), e.n?f1(e.speed)+'<small>km/h</small>':'–', e.n?T('über {t}',{t:mmss(e.time)}):'')
+      + k(T('Index'), e.n?f1(e.idx)+'<small>%</small>':'–', T('geflogen / Schenkel'))
+      + k(T('Strafe'), e.penalty, e.start?T('Einflug {h} m / {v} km/h',{h:r0(e.start.agl),v:r0(e.start.v3d)}):T('kein gültiger Start'))
+      + k(T('Flugzeit'), mmss(e.flightTime), r.igc.h.PLT?esc(r.igc.h.PLT):'')
+      + k(T('Hinweise'), e.zoneHits.length||e.overMax?'⚠':'✓', esc([e.zoneHits.length?T('{n}× in Sicherheitszone',{n:e.zoneHits.length}):'', e.overMax?T('über der Maximalhöhe'):'', e.end?T('Ende: {e}',{e:T(e.end)}):''].filter(Boolean).join(' · ')));
+    $('#skyLaps').innerHTML = `<tr><th>${esc(T('Runde'))}</th><th>${esc(T('Zeit'))}</th><th>km/h</th><th>${esc(T('Index'))}</th><th>${esc(T('Höhe im Ziel'))}</th><th>${esc(T('Δ Höhe'))}</th><th>${esc(T('Speed im Ziel'))}</th><th>${esc(T('Seit Start'))}</th></tr>`
+      + (e.laps.map(l=>`<tr><td>${l.n}</td><td>${mmss(l.time)}</td><td>${f1(l.speed)}</td><td>${f1(l.idx)} %</td><td>${r0(l.agl)} m</td><td>${l.dAlt>=0?'+':''}${r0(l.dAlt)} m</td><td>${r0(l.v3d)}</td><td>${mmss(l.at)}</td></tr>`).join('') || `<tr><td colspan="8" class="hint">${esc(T('Keine ganze Runde'))}</td></tr>`);
+    drawTask($('#skyFlCv'), r.task, e);
+  }
+
+  // ---- Ereignisse
+  function bind(){
+    $('#skyTasks').addEventListener('click',e=>{ const li=e.target.closest('li[data-id]'); if (!li) return;
+      if (e.target.name==='skyAct'){ SK.data.active=li.dataset.id; save(); }
+      SK.sel=li.dataset.id; renderList(); renderForm(); });
+    $('#skyNew').addEventListener('click',()=>{ const b=cur(); const t=SKY.newTask(b?.cls||'Sport', b?.lat, b?.lon); if (b) t.elev=b.elev; SK.data.tasks.push(t); SK.sel=t.id; save(); renderList(); renderForm(); $('#skyName').select(); });
+    $('#skyDup').addEventListener('click',()=>{ const b=cur(); if (!b) return; const t={...structuredClone(b), id:SKY.newTask().id, name:b.name+' '+T('(Kopie)')}; SK.data.tasks.push(t); SK.sel=t.id; save(); renderList(); renderForm(); });
+    $('#skyDel').addEventListener('click',()=>{ const b=cur(); if (!b || !confirm(T('Aufgabe „{n}“ löschen?',{n:b.name}))) return;
+      SK.data.tasks=SK.data.tasks.filter(t=>t!==b); if (SK.data.active===b.id) SK.data.active=SK.data.tasks[0]?.id||''; SK.sel=SK.data.tasks[0]?.id||null; save(); renderList(); renderForm(); });
+    $('#skyActBtn').addEventListener('click',()=>{ const b=cur(); if (b){ SK.data.active=b.id; save(); renderList(); } });
+    $('#skyExp').addEventListener('click',()=>{ const b=cur(); if (b) dl(fname(b.name)+'.rct', SKY.toRct(b)); });
+    $('#skyImp').addEventListener('click',()=>$('#skyImpFile').click());
+    $('#skyImpFile').addEventListener('change',async e=>{ for (const f of e.target.files){ try{ const t=SKY.fromRct(await f.text()); SK.data.tasks.push(t); SK.sel=t.id; }catch(err){ toast(T('{f}: {e}',{f:f.name,e:err.message})); } }
+      e.target.value=''; save(); renderList(); renderForm(); });
+    $('#skyPilot').addEventListener('input',e=>{ SK.data.pilot=e.target.value; save(); });
+    $('#skyPilotId').addEventListener('input',e=>{ SK.data.pilotId=e.target.value; save(); });
+    $('#skyForm').addEventListener('input',e=>{
+      const t=cur(); if (!t) return; const id=e.target.id;
+      if (id==='skyName') t.name=e.target.value;
+      else if (id==='skyPos'){ const p=parsePos(e.target.value); e.target.setAttribute('aria-invalid',!p); if (!p) return; [t.lat,t.lon]=p; }
+      else if (id.startsWith('sky_')){ const v=+e.target.value; if (!Number.isFinite(v)) return; t[id.slice(4)]= id==='sky_dir'?SKY.norm(v):v; }
+      else if (id==='skySlotOn'){ t.slot = e.target.checked ? {date:new Date().toISOString().slice(0,10), time:'10:00', len:15} : null; renderForm(); }
+      else if (id.startsWith('skySlot') && t.slot){ t.slot={date:$('#skySlotDate').value, time:$('#skySlotTime').value, len:+$('#skySlotLen').value||15}; }
+      $('#skyEditInfo').textContent = T('Umfang {u} m',{u:r0(+t.dist*(2+2*Math.SQRT2))});
+      drawTask($('#skyCv'), t, null); renderList(); save();
+    });
+    $('#skyCls').addEventListener('change',e=>{ const t=cur(); if (!t) return; t.cls=e.target.value; Object.assign(t, CL[t.cls]); renderForm(); renderList(); save(); });
+    $('#skyZones').addEventListener('input',e=>{ const tr=e.target.closest('tr[data-z]'), k=e.target.dataset.k; if (!tr||!k) return; const z=cur().zones[+tr.dataset.z];
+      if (k==='name') z.name=e.target.value; else if (k==='pos'){ const p=parsePos(e.target.value); e.target.setAttribute('aria-invalid',!p); if (!p) return; [z.lat,z.lon]=p; } else { const v=+e.target.value; if (!Number.isFinite(v)) return; z[k]=v; }
+      drawTask($('#skyCv'), cur(), null); save(); });
+    $('#skyZones').addEventListener('click',e=>{ const b=e.target.closest('[data-del]'); if (!b) return; cur().zones.splice(+b.dataset.del,1); renderZones(); drawTask($('#skyCv'), cur(), null); save(); });
+    const addZone=type=>{ const t=cur(); if (!t) return; const g=SKY.geom(t); const [la,lo]=SKY.toLL(t,g,-t.dist*0.6*g.ux,-t.dist*0.6*g.uy);
+      t.zones=t.zones||[]; t.zones.push(type==='R'?{t:'R',name:T('Zone {n}',{n:t.zones.length+1}),lat:la,lon:lo,dir:0,len:200,wid:60,lo:0,hi:9999}:{t:'C',name:T('Zone {n}',{n:t.zones.length+1}),lat:la,lon:lo,r:80,lo:0,hi:9999});
+      renderZones(); drawTask($('#skyCv'), t, null); save(); };
+    $('#skyZoneC').addEventListener('click',()=>addZone('C')); $('#skyZoneR').addEventListener('click',()=>addZone('R'));
+    $('#skyWrite').addEventListener('click',()=>{ if (!DESK){ $('#skyFile').textContent=SKY.toLua(SK.data); store.set('skynav.data',JSON.stringify(SK.data)); dl('aufgaben.lua', SKY.toLua(SK.data)); return; } save(true); });
+    $('#skyFl').addEventListener('click',async e=>{ const d=e.target.closest('[data-dl]'); if (d){ const f=SK.flights[+d.dataset.dl]; dl(f.name, await flightText(f)); return; }
+      const tr=e.target.closest('tr[data-i]'); if (tr) showFlight(+tr.dataset.i); });
+    $('#skyFl').addEventListener('keydown',e=>{ const tr=e.target.closest('tr[data-i]'); if (tr && (e.key==='Enter'||e.key===' ')){ e.preventDefault(); showFlight(+tr.dataset.i); } });
+    $('#skyOpenIgc').addEventListener('click',()=>$('#skyIgcFile').click());
+    $('#skyIgcFile').addEventListener('change',async e=>{ for (const f of e.target.files) SK.flights.unshift({ name:f.name, size:f.size, text:await f.text() }); e.target.value=''; SK.flSel=0; renderFlights(); });
+    $('#skyFetch').addEventListener('click',async ()=>{ try{ const r=await DESK.skynavFetch(); const n=r.reduce((a,x)=>a+(x.flights?.copied.length||0),0); $('#skyFlMsg').textContent=T('{n} neue Flüge geholt',{n}); await refreshFlights(); }catch(err){ $('#skyFlMsg').textContent=skyErr(err); } });
+    $('#skyFolder').addEventListener('click',()=>DESK.skynavOpen());
+    $('#skySet').addEventListener('change',e=>{
+      const k=e.target.dataset.k; if (!k) return;
+      const d=SKY.SETTINGS.find(x=>x.k===k), v=d.t==='bool'?e.target.checked:d.t==='text'?e.target.value:+e.target.value;
+      SK.data.settings=SKY.settingsOf({...SK.data.settings,[k]:v});
+      if (d.t!=='bool' && d.t!=='text') e.target.value=SK.data.settings[k];
+      save();
+    });
+    $('#skySetReset').addEventListener('click',()=>{ SK.data.settings=SKY.settingsOf({}); renderSettings(); save(); });
+    addEventListener('resize',()=>{ if ($('#pane-skynav').hidden) return; const t=cur(); if (t) drawTask($('#skyCv'),t,null); if (SK.flSel!=null) showFlight(SK.flSel); });
+    if (DESK?.onSync) DESK.onSync(s=>{ if (SK.loaded && (s?.state==='done'||s?.state==='idle')) refreshFlights(); });
+  }
+  async function refreshFlights(){ if (!DESK?.skynavGet) return; const r=await DESK.skynavGet(); SK.flights=r.flights||[]; SK.senders=r.senders||SK.senders; if (!$('#pane-skynav').hidden){ txState(); renderFlights(); } }
+  let bound=false;
+  window.skyShow = async function(){
+    if (!bound){ bound=true; bind(); }
+    if (!SK.loaded) await load(); else if (DESK?.skynavGet){ const r=await DESK.skynavGet(); SK.flights=r.flights||[]; SK.senders=r.senders||[]; }
+    $('#skyFile').textContent=SKY.toLua(SK.data);
+    txState(); renderList(); renderForm(); renderSettings(); renderFlights();
+  };
+})();
+if (!document.getElementById('pane-skynav').hidden) window.skyShow();
 let SETTINGS = null, lastSyncAt = 0;
 async function deskBoot(){
   SETTINGS = await DESK.getSettings();
@@ -6177,8 +6744,9 @@ function wgtSummary(w){
   if (!w) return '';
   if (w.error) return ' · '+T('Widgets: {e}',{e:w.error});
   const r=w.results||[], n=r.filter(x=>x.state!=='fehler').length, neu=r.filter(x=>x.state==='neu').length, bad=r.length-n;
-  if (!r.length) return w.fetchError ? ' · '+T('Widgets: keine, GitHub nicht erreichbar') : '';
-  return ' · '+T('Widgets: {n} kopiert',{n}) + (neu ? ' '+T('({n} neu)',{n:neu}) : '') + (bad ? ', '+T('{n} Fehler',{n:bad}) : '');
+  const fl=Array.isArray(w.skynav)?w.skynav.reduce((a,x)=>a+(x.flights?.copied.length||0),0):0, sky=fl?' · '+T('SkyNavigator: {n} neue Flüge',{n:fl}):'';
+  if (!r.length) return (w.fetchError ? ' · '+T('Widgets: keine, GitHub nicht erreichbar') : '') + sky;
+  return ' · '+T('Widgets: {n} kopiert',{n}) + (neu ? ' '+T('({n} neu)',{n:neu}) : '') + (bad ? ', '+T('{n} Fehler',{n:bad}) : '') + sky;
 }
 function showWgtRes(){
   const w=lastSync?.widgets; if (!w) return;
@@ -6883,14 +7451,23 @@ function simLog(){
   });
   // berechnete Werte der App (TAS, Wind, TEK, Netto …) als Quellen mit ƒ; am Sender gibt es sie nicht
   der.forEach(c => { const n = 'ƒ ' + c.name; if (cols[n]) return; cols[n] = {unit: c.unit || '', v: c.vals.map(x => Number.isFinite(x) ? x : null), sw: false, calc: true}; names.push(n); });
-  SL = {t: LOG.t, cols, names, der, model: f?.mid ?? f?.model ?? '', dur: LOG.t.filter(x => !isNaN(x)).pop() || 0};
+  // Senderuhr: Datum und Zeit der ersten Zeile (os.time() wie am Sender in Ortszeit)
+  const e0 = Date.parse(`${LOG.date || ''}T${String(LOG.clock?.[0] || '').trim()}Z`) / 1000;
+  SL = {t: LOG.t, cols, names, der, model: f?.mid ?? f?.model ?? '', dur: LOG.t.filter(x => !isNaN(x)).pop() || 0, epoch0: Number.isFinite(e0) ? Math.floor(e0) : 0};
   return SL;
 }
 let ki = 0;
 function idx(t){ const T = SL.t; if (ki >= T.length || !(T[ki] <= t)) ki = 0;
   if (t - T[ki] > 30){ let lo = ki, hi = T.length - 1; while (lo < hi){ const m = (lo + hi + 1) >> 1; if (T[m] <= t) lo = m; else hi = m - 1; } ki = lo; }
   while (ki + 1 < T.length && T[ki + 1] <= t) ki++; return ki; }
-const val = (n, t) => { const c = SL.cols[n]; return c ? c.v[idx(t)] : undefined; };
+// Schalterstellung wie am Sender (z. B. „SA↑“): 1024 in dieser Stellung, sonst −1024. Oben = −1024 im Log.
+const SW_POS = ['↑', '–', '↓'];
+const swPos = n => { const m = /^(.+)([↑–↓])$/.exec(n || ''); return m && SL?.cols[m[1]]?.sw ? m : null; };
+const val = (n, t) => {
+  const p = swPos(n);
+  if (p){ const v = SL.cols[p[1]].v[idx(t)]; if (v == null) return undefined; return SW_POS[v < -341 ? 0 : v > 341 ? 2 : 1] === p[2] ? 1024 : -1024; }
+  const c = SL.cols[n]; return c ? c.v[idx(t)] : undefined;
+};
 const fmt = s => { s = Math.max(0, Math.floor(s)); return String(Math.floor(s / 60)).padStart(2, '0') + ':' + String(s % 60).padStart(2, '0'); };
 
 // ---------- scripts-Ordner ----------
@@ -7003,8 +7580,8 @@ function showErr(e){
 const scr = g('simScr'), sctx = scr.getContext('2d');
 function newSim(){
   sim = new EthosSim({fengari, shim: g('simShim').textContent, w: W, h: H, model: () => SL.model, board: () => W < 600 ? 'X18S' : 'X20S',
-    value: val, unit: n => SL.cols[n] ? SL.cols[n].unit : undefined, has: n => !!SL.cols[n], log, tone,
-    epoch: 0, fs: {get: fsGet, put: (p, s) => { const k = resolve(p); FS[k] = s; log('info', '/scripts/' + k + ' ' + T('geschrieben (nur im Simulator)')); fillSd(); }}});
+    value: val, unit: n => SL.cols[n] ? SL.cols[n].unit : undefined, has: n => !!SL.cols[n] || !!swPos(n), log, tone,
+    epoch: SL?.epoch0 || 0, fs: {get: fsGet, put: (p, s) => { const k = resolve(p); FS[k] = s; log('info', '/scripts/' + k + ' ' + T('geschrieben (nur im Simulator)')); fillSd(); }}});
   let e = sim.load(code) || sim.create();
   if (!e){
     const st = store.get(cfgKey()) ?? oldCfg(); e = sim.read(st || '');   // alter Stand als Vorlage
@@ -7071,8 +7648,9 @@ function srcOptions(sel, onlySw, value){
   sel.innerHTML = ''; sel.append(new Option('---', ''));
   const a = SL.names.filter(n => SL.cols[n].sw), b = SL.names.filter(n => !SL.cols[n].sw && !SL.cols[n].calc), cc = SL.names.filter(n => SL.cols[n].calc);
   const grp = (lab, list) => { if (!list.length) return; const o = document.createElement('optgroup'); o.label = lab; list.forEach(n => o.append(new Option(n + (SL.cols[n].unit ? ` (${SL.cols[n].unit})` : ''), n))); sel.append(o); };
+  if (onlySw && a.length){ const o = document.createElement('optgroup'); o.label = T('Schalterstellung'); a.forEach(n => SW_POS.forEach(q => o.append(new Option(n + q, n + q)))); sel.append(o); }
   if (onlySw){ grp(T('Schalter'), a); grp(T('Weitere Quellen'), b); grp(T('Berechnet in der App (nicht am Sender)'), cc); } else { grp(T('Telemetrie und Geber'), b); grp(T('Berechnet in der App (nicht am Sender)'), cc); grp(T('Schalter'), a); }
-  if (value && !SL.cols[value]) sel.append(new Option(value + ' ' + T('(nicht im Log)'), value));
+  if (value && !SL.cols[value] && !swPos(value)) sel.append(new Option(value + ' ' + T('(nicht im Log)'), value));
   sel.value = value || '';
 }
 function renderForm(){
