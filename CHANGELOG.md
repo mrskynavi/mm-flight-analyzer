@@ -3,6 +3,7 @@
 ## Unveröffentlicht
 
 - Tab Diagramme: Beim Start der App sind alle Sensor-Gruppen zugeklappt. Ein neu gewählter Sensor kommt mit seinem Diagramm zuoberst dazu statt zuunterst; ist es nicht zu sehen, scrollt die Seite hin.
+- Tab Karte & Wind: Die GPS-Spur liegt jetzt auf dem Luftbild (Schweiz swisstopo, Ausland Esri mit eigenem Schlüssel), der Knopf „Luftbild“ schaltet es aus und ein. Zoomen mit Mausrad oder zwei Fingern (vorher nur mit Strg + Mausrad), ziehen verschiebt, Doppelklick zeigt wieder die ganze Spur. Das Gitter passt sich dem Zoom an.
 
 ## 2026.10.2 – 2026-10-13
 
