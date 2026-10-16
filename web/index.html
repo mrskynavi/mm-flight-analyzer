@@ -1215,7 +1215,7 @@ pre.code{background:var(--bg);border:1px solid var(--line);border-radius:8px;pad
           <div class="simrow"><button type="button" class="btn" id="simApply">Übernehmen</button><button type="button" class="zb" id="simSave" hidden>In den scripts-Ordner speichern</button><button type="button" class="zb" id="simCopy">Code kopieren</button><button type="button" class="zb" id="simOrig">Original laden</button><span class="hint" id="simCodeMsg"></span></div>
         </div>
         <div id="simSd" hidden class="simstack">
-          <p class="hint">Dateien im scripts-Ordner. Das Widget findet sie mit loadfile, io.open oder require, z. B. /scripts/maccready/polaren.lua oder relativ zu seinem Ordner. Fehlt polaren.lua, nimmt der Simulator die Polaren aus dem Tab Polare.</p>
+          <p class="hint">Dateien im scripts-Ordner. Das Widget findet sie mit loadfile, io.open oder require, z. B. /scripts/maccready/polaren.lua oder relativ zu seinem Ordner. Fehlt polaren.lua, nimmt der Simulator die Polaren aus dem Tab Polare. Die Aufgaben (skynav/aufgaben.lua) kommen aus dem Tab SkyNavigator, sobald dort eigene Aufgaben stehen, wie beim Sync auf den Sender.</p>
           <label class="simfl">Datei<select id="simSdSel"></select></label>
           <textarea class="simcode short" id="simSdTxt" spellcheck="false" aria-label="Dateiinhalt"></textarea>
           <div class="simrow"><button type="button" class="zb" id="simSdSave">Übernehmen und Widget neu starten</button></div>
@@ -6386,13 +6386,17 @@ const DESK = window.ethosDesktop || null;
   async function load(){
     if (DESK?.skynavGet){ const r=await DESK.skynavGet(); SK.data=r.data; SK.flights=r.flights||[]; SK.senders=r.senders||[]; SK.dir=r.dir; }
     else { try{ SK.data=JSON.parse(store.get('skynav.data')||'null'); }catch(e){} SK.data=SK.data||{version:1,active:'',pilot:'',pilotId:'',tasks:[]}; }
+    SK.real = SK.data.tasks.length>0;
     if (!SK.data.tasks.length){ const t=SKY.newTask('Sport'); t.name=T('Beispiel Sport'); SK.data.tasks.push(t); SK.data.active=t.id; }
     SK.sel = SK.data.tasks.some(t=>t.id===SK.sel) ? SK.sel : (SK.data.active||SK.data.tasks[0].id);
-    SK.loaded=true;
+    SK.loaded=true; simLua();
   }
+  // Der Simulator nimmt die Aufgaben aus diesem Tab, wie der Sync auf den Sender (nur eigene, nicht das Beispiel)
+  function simLua(){ window.SKY_APP_LUA = SK.real ? SKY.toLua(SK.data) : null; }
   // speichern (verzögert); toSender: gleich auf den angeschlossenen Sender
   function save(toSender){
     clearTimeout(SK.saveT);
+    SK.real=true; simLua();
     SK.saveT=setTimeout(async ()=>{
       const lua=SKY.toLua(SK.data);
       $('#skyFile').textContent=lua;
@@ -6593,6 +6597,8 @@ const DESK = window.ethosDesktop || null;
     $('#skyFile').textContent=SKY.toLua(SK.data);
     txState(); renderList(); renderForm(); renderSettings(); renderFlights();
   };
+  // gleich beim Start laden, damit der Simulator die Aufgaben auch ohne Öffnen des Tabs kennt
+  window.skyReady = load().catch(()=>{});
 })();
 if (!document.getElementById('pane-skynav').hidden) window.skyShow();
 let SETTINGS = null, lastSyncAt = 0;
@@ -7500,7 +7506,7 @@ function resolve(p){
   const low = key.toLowerCase(); return Object.keys(FS).find(k => k.toLowerCase() === low) || key;
 }
 // polaren.lua: liegt sie nicht im Ordner, kommt sie aus dem Tab Polare
-function fsGet(p){ const k = resolve(p); if (k in FS) return FS[k]; if (/^maccready\/polaren\.lua$/i.test(k) && typeof mcFileText === 'function') return mcFileText(); return null; }
+function fsGet(p){ const k = resolve(p); if (/^skynav\/aufgaben\.lua$/i.test(k) && window.SKY_APP_LUA) return window.SKY_APP_LUA; if (k in FS) return FS[k]; if (/^maccready\/polaren\.lua$/i.test(k) && typeof mcFileText === 'function') return mcFileText(); return null; }
 let srcOld = false;   // GitHub nicht erreichbar, letzte Kopie
 function dirInfo(){
   const el = g('simDirInfo'), base = fsDir ? String(fsDir).replace(/[\\/]+$/, '').split(/[\\/]/).slice(-2).join('/') : T('gewählter Ordner');
