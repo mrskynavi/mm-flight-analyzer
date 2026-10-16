@@ -1,5 +1,9 @@
 # Changelog
 
+## Unveröffentlicht
+
+- Tab Diagramme: Beim Start der App sind alle Sensor-Gruppen zugeklappt. Ein neu gewählter Sensor kommt mit seinem Diagramm zuoberst dazu statt zuunterst; ist es nicht zu sehen, scrollt die Seite hin.
+
 ## 2026.10.2 – 2026-10-13
 
 - Wind ruhiger: Der erste Wind-Fit braucht ein volles Fenster (40 Werte, etwa 28 s), damit der Start mit Motor keinen falschen Wind liefert. Danach gilt der Median der letzten 5 guten Fits, einzelne Ausreisser schlagen nicht mehr durch (im SB-10-Log vom 12.10. z. B. 47 km/h nach 25 min). TAS, Steuerkurs, Drift und Gegenwind rechnen mit diesem Wind.
