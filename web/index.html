@@ -3957,10 +3957,29 @@ function kpis(log, ch, runs){
 }
 
 // ---------- GPS-Spur (ohne Kartenhintergrund, Farbe = Höhe) ----------
+// GPS-Spur zum Zeichnen: Ethos schreibt Breite und Länge als zwei Telemetriewerte, die nicht immer in derselben
+// Logzeile neu ankommen. Dann steht kurz die neue Breite mit der alten Länge im Log und die Spur macht eine Stufe.
+// Hier wird jede Koordinate für sich zwischen den Zeitpunkten, an denen sie neu ankommt, linear über die Zeit
+// verbunden; Lücken über 5 s bleiben stehen. Kurs, Wind und Widgets rechnen weiter mit den Rohwerten.
+const GPS_GAP=5;
+function trackGps(log){
+  if (log._trk!==undefined) return log._trk; const g=log.gps; if (!g) return log._trk=null;
+  const n=log.t.length, t=log.t, out=g.map(p=>p&&Math.abs(p[0])>0.01?[p[0],p[1]]:null);
+  for (let c=0;c<2;c++){
+    let a=-1;   // letzte Zeile, in der die Koordinate neu ankam
+    for (let i=0;i<n;i++){
+      if (!out[i]) { a=-1; continue; }
+      if (a>=0 && g[i][c]===g[a][c]) continue;
+      if (a>=0 && t[i]-t[a]<=GPS_GAP) for (let k=a+1;k<i;k++) out[k][c]=g[a][c]+(g[i][c]-g[a][c])*(t[k]-t[a])/(t[i]-t[a]);
+      a=i;
+    }
+  }
+  return log._trk=out;
+}
 function drawTrack(log, ch, runs, th=[]){
   const cv=$('#trk'), ctx=cv.getContext('2d'), W=cv.width, H=cv.height;
   ctx.clearRect(0,0,W,H);
-  const P = (log.gps||[]).map((p,i)=>p&&Math.abs(p[0])>0.01?{la:p[0],lo:p[1],i}:null).filter(Boolean);
+  const P = (trackGps(log)||[]).map((p,i)=>p?{la:p[0],lo:p[1],i}:null).filter(Boolean);
   if (P.length<2){ ctx.fillStyle=css('--muted'); ctx.font='16px sans-serif'; ctx.fillText(T('Keine GPS-Daten im Log.'),20,40); $('#trklegend').innerHTML=''; return; }
   const lat0=P[0].la*Math.PI/180, R=6371000;
   const xy=P.map(p=>({x:(p.lo-P[0].lo)*Math.PI/180*R*Math.cos(lat0), y:(p.la-P[0].la)*Math.PI/180*R, i:p.i}));
@@ -3992,7 +4011,7 @@ function drawTrack(log, ch, runs, th=[]){
   ctx.globalAlpha=1;
   ctx.fillStyle=css('--good'); ctx.beginPath(); ctx.arc(X(xy[0]),Y(xy[0]),7,0,7); ctx.fill();
   ctx.fillStyle=css('--fg'); ctx.font='600 15px sans-serif'; ctx.fillText('Start', X(xy[0])+10, Y(xy[0])+5);
-  const cg = CURSOR!=null && log.gps[CURSOR];
+  const cg = CURSOR!=null && trackGps(log)?.[CURSOR];
   if (cg && Math.abs(cg[0])>0.01){ const q={x:(cg[1]-P[0].lo)*Math.PI/180*R*Math.cos(lat0), y:(cg[0]-P[0].la)*Math.PI/180*R}, qx=X(q), qy=Y(q);
     ctx.strokeStyle=css('--warn'); ctx.lineWidth=3; ctx.fillStyle=css('--bg'); ctx.beginPath(); ctx.arc(qx,qy,10,0,7); ctx.fill(); ctx.stroke();
     ctx.fillStyle=css('--warn'); ctx.beginPath(); ctx.arc(qx,qy,4,0,7); ctx.fill();
@@ -4275,7 +4294,7 @@ function climbTable(){
 const DET={view:'track', col:'net', zv:{k:1,dx:0,dy:0}};
 // Flugbezug in Metern um den Median aller GPS-Fixes (x nach Osten, y nach Norden)
 function geoFrame(){
-  if (LOG._geo!==undefined) return LOG._geo; const g=LOG.gps; if (!g) return LOG._geo=null;
+  if (LOG._geo!==undefined) return LOG._geo; const g=trackGps(LOG); if (!g) return LOG._geo=null;
   const la=[], lo=[]; for (const p of g) if (p && Math.abs(p[0])>0.01){ la.push(p[0]); lo.push(p[1]); }
   if (la.length<10) return LOG._geo=null;
   const lat0=median(la), lon0=median(lo), kx=111320*Math.cos(lat0*D2R), ky=110540, n=LOG.t.length, X=new Float64Array(n).fill(NaN), Y=new Float64Array(n).fill(NaN);
