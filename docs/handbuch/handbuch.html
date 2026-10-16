@@ -504,6 +504,14 @@ a { color: var(--acc); }
 <li>Zoomen mit <span class="btn">−</span> <span class="btn">+</span>, <span class="key">Strg</span> + Mausrad oder Doppelklick; ziehen verschiebt; <span class="btn">Alles</span> zeigt die ganze Spur.</li>
 <li>Unten steht die grösste Entfernung vom Startpunkt.</li>
 </ul>
+<h3>Auswertung unter der Spur</h3>
+<p>Unter der Spur wertet die App den kräftig gezeichneten Teil aus: den Zeitraum, den der Tab Diagramme gerade zeigt, und mit Filter nur die aktiven Einträge. Zoomst Du im Tab Diagramme auf einen Gleitflug oder eine Strecke, siehst Du hier genau dafür die Zahlen. Ohne Zoom und Filter gilt sie für das ganze Log; die Zeile darüber sagt, was gerade zählt.</p>
+<ul>
+<li><b>Strecke</b> über Grund in m (ab 10 km in km), gemessen entlang der Spur ohne die Stufen aus dem Log.</li>
+<li><b>Dauer</b> und <b>Ø Tempo</b> (Strecke durch Dauer, in der Einheit aus den Einstellungen).</li>
+<li><b>Höhengewinn</b> und <b>Höhenverlust</b>: jedes Steigen und Sinken ab 1 m zusammengezählt; <b>Höhe netto</b> ist die Differenz.</li>
+<li><b>Gleitzahl über Grund</b>: Strecke durch netto verlorene Höhe, nur im reinen Gleitflug: mindestens 5 m verloren und höchstens 10 % davon wieder gewonnen. Sonst steht „–“, weil Steigen die Zahl verfälschen würde. Mit Wind ist sie je nach Flugrichtung besser oder schlechter als die Gleitzahl durch die Luft im Tab Diagramme.</li>
+</ul>
 <h2>Wind nach Höhe</h2>
 <p>Die Tabelle teilt die Höhe in Stufen (25, 50 oder 100 m, Feld „Stufe“) und zeigt pro Stufe den durchschnittlichen Wind, die Richtung, aus der er kommt, das Maximum und die Anzahl Wind-Fits. Der Pfeil zeigt, wohin der Wind weht. <b>„wechselnd“</b> heisst, die Richtungen in dieser Stufe streuen stark. Die Stufe des Zeitpunkts ist hervorgehoben, darunter steht der Wind genau am Zeitpunkt.</p>
 <p>Für den Wind braucht es GPS-Position, GPS-Geschwindigkeit und Kurven im Flug. Gerade Strecken liefern keinen Wind.</p>
