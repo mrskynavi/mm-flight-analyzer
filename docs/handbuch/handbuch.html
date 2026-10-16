@@ -509,11 +509,10 @@ a { color: var(--acc); }
 <ul>
 <li><b>Strecke</b> über Grund in m (ab 10 km in km), gemessen entlang der Spur ohne die Stufen aus dem Log.</li>
 <li><b>Dauer</b> und <b>Ø Tempo</b> (Strecke durch Dauer, in der Einheit aus den Einstellungen).</li>
-<li><b>Höhengewinn</b> und <b>Höhenverlust</b>: jedes Steigen und Sinken ab 2 m zusammengezählt, aus der Höhe über 4 s gemittelt, damit Rauschen des Sensors nicht zählt. Auch im reinen Gleitflug gibt es oft etwas Höhengewinn: Böen, Aufwind oder Ziehen nach schneller Fahrt; <b>Höhe netto</b> ist die Differenz.</li>
+<li><b>Höhengewinn</b> und <b>Höhenverlust</b>: jedes Steigen und Sinken ab 2 m zusammengezählt, aus der Höhe über 4 s gemittelt, damit Rauschen des Sensors nicht zählt. <b>Höhe netto</b> ist Einflughöhe minus Endhöhe des Ausschnitts.</li>
 <li><b>Ø Netto</b>: wie stark die Luft im Mittel gestiegen (+) oder gesunken (−) ist, aus dem Netto-Vario über die Zeit gemittelt. Zeiten mit Motor und 15 s danach zählen nicht. Das Netto-Vario braucht eine Polare des Modells (Tab Polare); ohne Polare fehlt der Wert.</li>
-<li><b>Gleitflug</b>: die Zeit im Ausschnitt ohne Steigflug (Motor) und ohne Thermik. Nur sie zählt für die beiden Gleitzahlen, so stören eine Thermik oder ein Motorsteigflug im Ausschnitt nicht.</li>
-<li><b>Gleitzahl über Grund</b>: Strecke im Gleitflug durch die dabei netto verlorene Höhe. Darin stecken Wind, Aufwind und sinkende Luft: Sinkt die Luft, wird sie schlechter, im Hangaufwind besser. Hat das Modell im Gleitflug Höhe gewonnen, steht „–“.</li>
-<li><b>Gleitzahl Modell</b>: so weit gleitet das Modell bei der geflogenen Fahrt in ruhiger Luft. Die Strecke kommt aus der TAS, das Eigensinken aus der Polare des Modells (Tab Polare). Das Netto-Vario rechnet mit derselben Polare, deshalb ist das die Gleitzahl ohne Auf- und Abwind. Sie gibt es nur mit Polare.</li>
+<li><b>Gleitzahl über Grund</b>: Strecke durch Höhe netto (Einflughöhe minus Endhöhe), ab 5 m. Darin stecken Wind, Aufwind und sinkende Luft.</li>
+<li><b>Gleitzahl Modell</b>: die Gleitzahl ohne Auf- und Abwind. Strecke durch die Luft (TAS) durch die Höhe, die das Modell selbst verloren hat: Höhe netto plus Ø Netto mal Dauer. Sinkt die Luft im Mittel mit 0,7 m/s, zählen bei 100 s Gleitflug 70 m nicht gegen das Modell. Sie braucht das Netto-Vario, also eine Polare des Modells (Tab Polare).</li>
 </ul>
 <h2>Wind nach Höhe</h2>
 <p>Die Tabelle teilt die Höhe in Stufen (25, 50 oder 100 m, Feld „Stufe“) und zeigt pro Stufe den durchschnittlichen Wind (Mittel der Windvektoren, wie die Windtabelle im Sollfahrt-Widget), die Richtung, aus der er kommt, das Maximum und die Anzahl Wind-Fits. Der Pfeil zeigt, wohin der Wind weht. <b>„wechselnd“</b> heisst, die Richtungen in dieser Stufe streuen stark. Die Stufe des Zeitpunkts ist hervorgehoben, darunter steht der Wind genau am Zeitpunkt.</p>
