@@ -2,8 +2,12 @@
 
 ## Unveröffentlicht
 
+- Tab Karte & Wind: Unter der GPS-Spur steht eine Auswertung des kräftig gezeichneten Teils (sichtbarer Zeitausschnitt, mit Filter nur aktive Einträge): Strecke, Dauer, Ø Tempo, Höhengewinn und -verlust, Höhe netto (Einflug minus Ende), Ø Netto (Steigen der Luft), Gleitzahl über Grund und Gleitzahl Modell (um das Netto-Steigen der Luft korrigiert, zum Prüfen der Polare). Filter-inaktive Stücke der Spur sind blass.
+- GPS-Spur ohne Stufen: Ethos schreibt Breite und Länge nicht immer in derselben Zeile; die Spur verbindet jetzt jede Koordinate für sich über die Zeit, auch für die Strecke.
+- Wind nach Höhe: Ein Wind-Fit zählt nur noch bei echtem Kreisen, und der Ø pro Stufe ist das Vektormittel. Der Wind liegt damit näher an dem, was das Sollfahrt-Widget zeigt.
 - Tab Diagramme: Beim Start der App sind alle Sensor-Gruppen zugeklappt. Ein neu gewählter Sensor kommt mit seinem Diagramm zuoberst dazu statt zuunterst; ist es nicht zu sehen, scrollt die Seite hin.
 - Tab Karte & Wind: Die GPS-Spur liegt jetzt auf dem Luftbild (Schweiz swisstopo, Ausland Esri mit eigenem Schlüssel), der Knopf „Luftbild“ schaltet es aus und ein. Zoomen mit Mausrad oder zwei Fingern (vorher nur mit Strg + Mausrad), ziehen verschiebt, Doppelklick zeigt wieder die ganze Spur. Das Gitter passt sich dem Zoom an.
+- Simulator ohne Auswahl „Intern | Meine Widgets“: Ist ein Ethos-Sender angeschlossen, zeigt er die Widgets im scripts-Ordner des Senders, sonst die Widgets aus dem GitHub-Repo (Desktop über die Kopie im Benutzerverzeichnis, Web-Version direkt von GitHub, dort optional „Ordner wählen …“). Ist GitHub nicht erreichbar, nimmt er die letzte Kopie, nur ohne Kopie die Beispiel-Widgets der App. Wird der Sender angeschlossen oder abgezogen, wechselt die Quelle von selbst. Die Konfiguration eines Widgets gilt jetzt für alle Quellen (bisherige Einstellungen werden übernommen).
 
 ## 2026.10.2 – 2026-10-13
 

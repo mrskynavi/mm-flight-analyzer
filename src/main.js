@@ -91,9 +91,14 @@ async function simScriptsDir(opts) {
     saveSettings({ simScripts: r.filePaths[0] });
   }
   if (opts?.sender) saveSettings({ simScripts: '' });
-  if (opts?.mine) {   // Meine Widgets: scripts im Benutzerverzeichnis (Kopie von GitHub plus eigene)
+  if (opts?.auto) {   // ohne Auswahl: Widgets auf dem angeschlossenen Sender, sonst die von GitHub (Kopie im Benutzerverzeichnis)
+    for (const r of watcher.ethosRoots || []) {
+      const d = path.join(r, 'scripts');
+      if ((await WG.listWidgets(d)).length) return { dir: d, source: 'sender' };
+    }
+    if (!wgFetch || Date.now() - wgFetch.at > (wgFetch.ok ? 5 * 60 * 1000 : 60 * 1000)) await fetchWidgets();   // offline nicht bei jedem Öffnen warten
     const d = path.join(settings.widgetDir, 'scripts');
-    return fs.existsSync(d) ? { dir: d, source: 'mine' } : null;
+    return (await WG.listWidgets(d)).length ? { dir: d, source: 'github', old: !wgFetch?.ok } : null;
   }
   if (settings.simScripts && fs.existsSync(settings.simScripts)) return { dir: settings.simScripts, source: 'ordner' };
   for (const r of watcher.ethosRoots || []) { const d = path.join(r, 'scripts'); if (fs.existsSync(d)) return { dir: d, source: 'sender' }; }
@@ -101,7 +106,7 @@ async function simScriptsDir(opts) {
 }
 ipcMain.handle('scripts:read', async (_, opts) => {
   const t = await simScriptsDir(opts || {});
-  if (!t) { simDir = null; return { files: {}, error: opts?.sender ? 'Kein Ethos-Sender mit scripts-Ordner angeschlossen.' : opts?.mine ? 'Im Benutzerverzeichnis liegen noch keine Widgets. Hole sie unter ⚙ → Eigene Widgets von GitHub.' : null }; }
+  if (!t) { simDir = null; return { files: {}, error: opts?.sender ? 'Kein Ethos-Sender mit scripts-Ordner angeschlossen.' : null }; }
   simDir = t.dir; simWatch(t.dir);
   return { ...t, files: await S.readScripts(t.dir) };
 });
