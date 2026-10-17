@@ -78,12 +78,13 @@ test('aufgaben.lua: Startfenster in UTC, Texte sicher in Lua-Strings', () => {
 });
 
 test('Widget-Einstellungen: Bereich, Typ und Vorgaben in aufgaben.lua', () => {
-  const st = SKY.settingsOf({ margin: 500, zoomSec: '7', sound: 'ja', compId: 'AB\u00e9C', radMode: 5 });
+  const st = SKY.settingsOf({ margin: 500, zoomSec: '7', sound: 'ja', compId: 'AB\u00e9C', radMode: 5, warnSec: 99 });
   assert.strictEqual(st.margin, 100);
   assert.strictEqual(st.zoomSec, 7);
   assert.strictEqual(st.sound, true);
   assert.strictEqual(st.compId, 'ABC');
-  assert.strictEqual(st.radMode, 1);
+  assert.strictEqual(st.radMode, undefined);
+  assert.strictEqual(st.warnSec, 10);
   assert.strictEqual(st.varioTone, false);
   const lua = SKY.toLua({ tasks: [], settings: { margin: 12, navVoice: false, gliderId: 'HB-1' } });
   assert.match(lua, /settings = \{[^}]*margin = 12[^}]*\}/);
@@ -135,4 +136,12 @@ test('Sync: Aufgaben auf den Sender, Flüge ins Archiv (gleich grosse übersprin
   const fl = await SN.listFlights(archive);
   assert.deepStrictEqual(fl.map(f => f.name), ['2026-10-15-XSN-SKYNAV-01.IGC']);
   assert.ok(fl[0].path.startsWith(path.join(archive, 'SkyNavigator', 'Fluege')));
+});
+
+test('Ziehen an einer Ecke: Richtung O → TP1 so, dass die Ecke zum Zeiger zeigt', () => {
+  for (const [i, x, y, dir] of [[0, 0, 100, 0], [0, 100, 0, 90], [1, 0, 100, 90], [1, -100, 0, 0], [2, 0, -100, 0], [2, -100, 0, 90]]) {
+    assert.strictEqual(SKY.cornerDir(i, x, y), dir);
+    const t = { ...SKY.newTask('Sport'), dir }, g = SKY.geom(t), c = g.tp[i];
+    assert.ok(Math.abs(Math.atan2(c.x, c.y) - Math.atan2(x, y)) < 1e-9 || Math.abs(Math.abs(Math.atan2(c.x, c.y) - Math.atan2(x, y)) - 2 * Math.PI) < 1e-9);
+  }
 });
