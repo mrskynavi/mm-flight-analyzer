@@ -375,12 +375,12 @@ a { color: var(--acc); }
 <tr><td class="c"><span class="num">6</span></td><td>Rot markieren</td><td>Färbt die Zeit rot, in der ein gewählter Schalter in einem gewählten Zustand stand (siehe unten).</td></tr>
 <tr><td class="c"><span class="num">7</span></td><td>Übersichtsleiste</td><td>Höhenprofil des ganzen Fluges. Das helle Fenster ist der sichtbare Ausschnitt: ziehen verschiebt, an den Rändern ziehen macht ihn grösser oder kleiner, Doppelklick zeigt alles.</td></tr>
 <tr><td class="c"><span class="num">8</span></td><td>Zeitpunkt</td><td>Zeitstrahl wie in <a href="#k7">Kapitel 7</a>.</td></tr>
-<tr><td class="c"><span class="num">9</span></td><td>Griff ⋮⋮, ▲ ▼ und ✕</td><td>Diagramm am Griff ziehen oder mit den Pfeilen verschieben, um die Reihenfolge zu ändern. Die Reihenfolge bleibt gespeichert. ✕ schliesst das Diagramm; das wirkt genau wie ein Klick auf den Sensor oben, der Knopf ist danach nicht mehr umrandet.</td></tr>
+<tr><td class="c"><span class="num">9</span></td><td>Griff ⋮⋮, ▲ ▼ und ✕</td><td>Diagramm am Griff ziehen oder mit den Pfeilen verschieben, um die Reihenfolge zu ändern. Ein neu gewählter Sensor kommt zuoberst dazu. Die Reihenfolge bleibt gespeichert. ✕ schliesst das Diagramm; das wirkt genau wie ein Klick auf den Sensor oben, der Knopf ist danach nicht mehr umrandet.</td></tr>
 </table>
 <h2>Sensoren in Gruppen</h2>
 <p>Die Sensoren stehen nach Thema in Gruppen: Flug, Navigation &amp; Wind, Antrieb &amp; Akku, Bordstrom, Servos, Lage &amp; Beschleunigung, Empfang, Senderakku und Sonstiges. Berechnete Werte (<b>ƒ</b>) stehen bei ihrem Thema, die Leistung des Reglers also bei Antrieb &amp; Akku. Gruppen ohne Sensoren im Log erscheinen nicht. Ethos- und Jeti-Sensoren landen in denselben Gruppen.</p>
 <p>Innerhalb einer Gruppe steht vorne, was Du bei diesem Modell am häufigsten einschaltest. Die App zählt das selbst mit, markieren musst Du nichts. Ein neues Modell startet mit den Zahlen aller Modelle. Bei gleich vielen Klicks gilt eine feste Reihenfolge, z. B. Spannung, Strom, Leistung, Verbrauch, Energie, Drehzahl, Temperatur. Neu sortiert wird erst beim nächsten Öffnen eines Logs, damit beim Klicken nichts verrutscht.</p>
-<p>Ein Klick auf den Gruppennamen klappt die Gruppe zu oder auf. Eine zugeklappte Gruppe zeigt noch eine Zeile Sensoren; was keinen Platz mehr hat, steckt im Knopf „+ 5 weitere“, der die Gruppe wieder aufklappt. Ist darunter ein eingeschalteter Sensor, steht das auf dem Knopf. Welche Gruppen zu sind, merkt sich die App pro Modell.</p>
+<p>Ein Klick auf den Gruppennamen klappt die Gruppe zu oder auf. Eine zugeklappte Gruppe zeigt noch eine Zeile Sensoren; was keinen Platz mehr hat, steckt im Knopf „+ 5 weitere“, der die Gruppe wieder aufklappt. Ist darunter ein eingeschalteter Sensor, steht das auf dem Knopf. Beim Start der App sind alle Gruppen zu; was Du auf- oder zuklappst, bleibt so, bis Du die App neu startest.</p>
 <p>Mit „Sender-Kanäle …“ kommen unter „Sender“ die Gruppen Knüppel, Drehgeber &amp; Potis, Schalter, Logische Schalter und Kanäle dazu. Schalter und Kanäle, die sich im ganzen Log nie ändern, stehen abgedunkelt am Schluss ihrer Gruppe. Die Zahl neben dem Gruppennamen zeigt, wie viele sich ändern, z. B. 18/64.</p>
 <p>Die Auswahllisten (Filter, Thermik- und Steigflug-Schalter, Höhenquelle, Rot markieren) haben dieselben Gruppen als Zwischentitel. Kommt ein Sensorname im Log doppelt vor, hängt die App das Funkband an, z. B. „EMPF. (2.4G)“ und „EMPF. (Lora)“.</p>
 
@@ -402,11 +402,11 @@ a { color: var(--acc); }
 <h2>Berechnete Werte (ƒ)</h2>
 <ul>
 <li><b>Leistung</b> = Strom × Spannung für jedes Paar mit gleichem Präfix (ESC, BEC, SRV1 …), <b>Energie</b> = Leistung über die Zeit aufsummiert.</li>
-<li><b>GPS Kurs (ber.), Windgeschw., Windrichtung, TAS</b> rechnen wie die Lua-Widgets „GPS Course“ und „Wind Estimator“ mit deren Standardwerten (40 Werte alle 0,7 s, Fit jede Sekunde, Kurs ab 3 m Abstand). Vor dem ersten gültigen Fit zeigt der Wind 0 und die TAS die Geschwindigkeit über Grund, genau wie am Sender.</li>
+<li><b>GPS Kurs (ber.), Windgeschw., Windrichtung, TAS</b> rechnen wie die Lua-Widgets „GPS Course“ und „Wind Estimator“ mit deren Standardwerten (40 Werte alle 0,7 s, Fit jede Sekunde, Kurs ab 3 m Abstand). Ein Wind-Fit zählt aber wie im Sollfahrt-Widget nur bei echtem Kreisen (etwa 270° Kurswechsel im Fenster); eine einzelne Kurve reicht nicht. Vor dem ersten gültigen Fit zeigt der Wind 0 und die TAS die Geschwindigkeit über Grund, genau wie am Sender.</li>
 <li><b>Steuerkurs (windkorr.)</b> = Richtung, in die die Nase zeigt (Bodenvektor minus Windvektor). <b>Drift</b> = Kurs über Grund minus Steuerkurs, positiv heisst nach rechts versetzt. <b>Gegenwind</b> = Windanteil gegen die Flugrichtung, negativ heisst Rückenwind.</li>
 <li><b>Distanz zum Start</b> = waagrechte Distanz zum ersten GPS-Fix. <b>Effektive Distanz</b> = schräg vom Startpunkt zum Modell, mit der Höhe über dem Start.</li>
 <li><b>Winkel zum Start</b> = Winkel zwischen der Längsachse des Modells (Steuerkurs, ohne Wind der GPS Kurs) und der Linie vom Modell zum Startort. 0° heisst, die Nase zeigt zum Start, ±180° das Heck, ±90° fliegt das Modell quer dazu. Positiv: Der Start liegt rechts. Nützlich zum Beispiel, um Empfangseinbrüche mit der Lage der Antennen zu vergleichen. Unter 10 m Abstand zum Start gibt es keinen Wert.</li>
-<li><b>Vario TEK</b> = Vario plus Änderung der Fahrt umgerechnet in Höhe (TAS²/2g), also ohne die Stösse vom Ziehen und Drücken. <b>Netto-Vario</b> = Vario TEK plus Eigensinken aus der Polare des Modells (<a href="#k12">Kapitel 12</a>); es zeigt, wie die Luft steigt oder sinkt. Ohne gespeicherte Polare nimmt die App eine aus dem offenen Log. Während der Motor läuft und 15 s danach bleiben beide leer.</li>
+<li><b>Vario TEK</b> = Vario plus Änderung der Fahrt umgerechnet in Höhe (TAS²/2g), also ohne die Stösse vom Ziehen und Drücken. <b>Netto-Vario</b> = Steigrate der Höhe (wie bei der Polare; ohne Höhe das Vario) plus Fahrt-Energie plus Eigensinken aus der Polare des Modells (<a href="#k12">Kapitel 12</a>); es zeigt, wie die Luft steigt oder sinkt. Ohne gespeicherte Polare nimmt die App eine aus dem offenen Log. Während der Motor läuft und 15 s danach bleiben beide leer.</li>
 <li><b>Gleitzahl</b> = geflogene Strecke durch Höhenverlust, jeweils über 10 s gerechnet (5 s vor und nach dem Zeitpunkt). Die Strecke kommt aus der TAS, also durch die Luft; ohne Wind aus der GPS-Geschwindigkeit. Werte gibt es nur im Gleitflug, also mit Motor aus und mindestens 0,2 m/s Sinken; beim Steigen und mit Motor bleibt die Kurve leer. Gleitzahl 20 heisst 20 m weit pro Meter Höhe. Im Steigen der Thermik wird sie gross, weil die Luft mitträgt; aussagekräftig sind ruhige Gleitstrecken.</li>
 </ul>
 <p>Diese Erklärungen findest Du in der App auch hinter dem <span class="btn">ⓘ</span> neben „Kanäle“.</p>
@@ -481,7 +481,7 @@ a { color: var(--acc); }
 <li><b>Filter anwenden:</b> Es zählen nur Einträge, die bei allen Filtern im Tab Diagramme im Bereich liegen (<a href="#k10">Kapitel 10</a>), und zwar in allen gewählten Logs des Modells. So entsteht z. B. eine Polare nur aus ruhiger Luft oder nur aus einem Höhenbereich. Ändern sich die Filter, rechnet die Polare neu.</li>
 </ul>
 <h2>So wird gerechnet</h2>
-<p>Jeder Punkt ist eine Sekunde Gleitflug: Motor aus (und 15 s danach), geradeaus (Kursänderung unter 8°/s) und ohne starkes Beschleunigen. Die Fahrt ist die TAS, ohne Wind die GPS-Geschwindigkeit; das Sinken kommt vom Vario, korrigiert um Fahrtänderungen. Pro 4-km/h-Klasse zählt der Median. Details stehen im ⓘ neben „Polare“.</p>
+<p>Jeder Punkt ist eine Sekunde Gleitflug: Motor aus (und 15 s danach), geradeaus (Kursänderung unter 8°/s) und ohne starkes Beschleunigen. Die Fahrt ist die TAS, ohne Wind die GPS-Geschwindigkeit; das Sinken kommt aus der Höhe (Flughöhe, ohne Höhe vom Vario), korrigiert um Fahrtänderungen. Pro 4-km/h-Klasse zählt der Median. Details stehen im ⓘ neben „Polare“.</p>
 <h2>Für MacCready / Lua-Widget</h2>
 <p>Unter dem Diagramm stehen die Kennzahlen für ein MacCready-Widget auf dem Sender. Die App nähert die physikalische Polare im Fahrtbereich mit Gleitpunkten durch eine Parabel an: <b>Vario = a·v² + b·v + c</b>, Ergebnis in m/s mit Sinken negativ. Mit <span class="btn">m/s</span> oder <span class="btn">km/h</span> wählst Du, für welche Einheit von v die Koeffizienten gelten; jeder Wert hat einen Knopf <span class="btn">Kopieren</span>. Darunter stehen der gültige Bereich, geringstes Sinken und beste Gleitzahl der Parabel, die Abweichung zur Polare und eine 3-Punkte-Polare.</p>
 <ul>
@@ -498,15 +498,25 @@ a { color: var(--acc); }
 <figure><img src="bilder/13-karte.png" alt=""><figcaption>GPS-Spur und Wind nach Höhe</figcaption></figure>
 <h2>GPS-Spur</h2>
 <ul>
-<li>Die Spur ist von oben gesehen, Norden oben, ohne Kartenhintergrund. Das Gitter hat 100 m Abstand.</li>
-<li>Die Farbe zeigt die Höhe (Legende unten). <b>Weiss</b> sind Steigflüge, <b>grün</b> Thermik. Kräftig gezeichnet ist der Zeitraum, den der Tab Diagramme gerade zeigt.</li>
+<li>Die Spur ist von oben gesehen, Norden oben, auf dem Luftbild: in der Schweiz von swisstopo, im Ausland von Esri. Für Esri brauchst Du einen eigenen Schlüssel unter <span class="btn">⚙</span> → <b>Luftbild im Ausland (Esri-Schlüssel)</b> (<a href="#k23">Kapitel 23</a>). <span class="btn">Luftbild</span> schaltet den Hintergrund aus und ein. Das Gitter passt sich dem Zoom an, unten links steht sein Abstand.</li>
+<li>Die Farbe zeigt das <b>Netto-Steigen der Luft</b> (Netto-Vario, Legende unten): <b>blau</b> sinkende Luft, <b>rot</b> steigende, beige ruhige; ab ±1,5 m/s voll gesättigt. Grau ist die Zeit mit Motor und 15 s danach, <b>weiss</b> (auf dem Luftbild) bzw. schwarz sind Steigflüge, Thermik ist dicker gezeichnet. Ohne Polare gibt es kein Netto-Vario, dann zeigt die Farbe wie früher die Höhe und Thermik ist grün. Kräftig gezeichnet ist der Zeitraum, den der Tab Diagramme gerade zeigt.</li>
 <li>„Start“ markiert den Startpunkt, der orange Kreis den Zeitpunkt mit Uhrzeit und Höhe.</li>
-<li>Zoomen mit <span class="btn">−</span> <span class="btn">+</span>, <span class="key">Strg</span> + Mausrad oder Doppelklick; ziehen verschiebt; <span class="btn">Alles</span> zeigt die ganze Spur.</li>
+<li>Zoomen mit Mausrad, zwei Fingern oder <span class="btn">−</span> <span class="btn">+</span>; ziehen verschiebt; Doppelklick oder <span class="btn">Alles</span> zeigt die ganze Spur.</li>
 <li>Unten steht die grösste Entfernung vom Startpunkt.</li>
 </ul>
+<h3>Auswertung unter der Spur</h3>
+<p>Unter der Spur wertet die App den kräftig gezeichneten Teil aus: den Zeitraum, den der Tab Diagramme gerade zeigt, und mit Filter nur die aktiven Einträge. Zoomst Du im Tab Diagramme auf einen Gleitflug oder eine Strecke, siehst Du hier genau dafür die Zahlen. Ohne Zoom und Filter gilt sie für das ganze Log; die Zeile darüber sagt, was gerade zählt.</p>
+<ul>
+<li><b>Strecke</b> über Grund in m (ab 10 km in km), gemessen entlang der Spur ohne die Stufen aus dem Log.</li>
+<li><b>Dauer</b> und <b>Ø Tempo</b> (Strecke durch Dauer, in der Einheit aus den Einstellungen).</li>
+<li><b>Höhengewinn</b> und <b>Höhenverlust</b>: jedes Steigen und Sinken ab 2 m zusammengezählt, aus der Höhe über 4 s gemittelt, damit Rauschen des Sensors nicht zählt. <b>Höhe netto</b> ist Einflughöhe minus Endhöhe des Ausschnitts.</li>
+<li><b>Ø Netto</b>: wie stark die Luft im Mittel gestiegen (+) oder gesunken (−) ist, aus dem Netto-Vario über die Zeit gemittelt. Zeiten mit Motor und 15 s danach zählen nicht. Das Netto-Vario braucht eine Polare des Modells (Tab Polare); ohne Polare fehlt der Wert.</li>
+<li><b>Gleitzahl über Grund</b>: Strecke durch Höhe netto (Einflughöhe minus Endhöhe), ab 5 m. Darin stecken Wind, Aufwind und sinkende Luft.</li>
+<li><b>Gleitzahl Modell</b>: die Gleitzahl ohne Auf- und Abwind. Strecke durch die Luft (TAS) durch die Höhe, die das Modell selbst verloren hat: Höhe netto plus Ø Netto mal Dauer. Sinkt die Luft im Mittel mit 0,7 m/s, zählen bei 100 s Gleitflug 70 m nicht gegen das Modell. Sie braucht das Netto-Vario, also eine Polare des Modells (Tab Polare).</li>
+</ul>
 <h2>Wind nach Höhe</h2>
-<p>Die Tabelle teilt die Höhe in Stufen (25, 50 oder 100 m, Feld „Stufe“) und zeigt pro Stufe den durchschnittlichen Wind, die Richtung, aus der er kommt, das Maximum und die Anzahl Wind-Fits. Der Pfeil zeigt, wohin der Wind weht. <b>„wechselnd“</b> heisst, die Richtungen in dieser Stufe streuen stark. Die Stufe des Zeitpunkts ist hervorgehoben, darunter steht der Wind genau am Zeitpunkt.</p>
-<p>Für den Wind braucht es GPS-Position, GPS-Geschwindigkeit und Kurven im Flug. Gerade Strecken liefern keinen Wind.</p>
+<p>Die Tabelle teilt die Höhe in Stufen (25, 50 oder 100 m, Feld „Stufe“) und zeigt pro Stufe den durchschnittlichen Wind (Mittel der Windvektoren, wie die Windtabelle im Sollfahrt-Widget), die Richtung, aus der er kommt, das Maximum und die Anzahl Wind-Fits. Der Pfeil zeigt, wohin der Wind weht. <b>„wechselnd“</b> heisst, die Richtungen in dieser Stufe streuen stark. Die Stufe des Zeitpunkts ist hervorgehoben, darunter steht der Wind genau am Zeitpunkt.</p>
+<p>Für den Wind braucht es GPS-Position, GPS-Geschwindigkeit und Kreise im Flug. Wie im Sollfahrt-Widget zählt ein Wind-Fit nur, wenn Du im Fenster von etwa 28 s rund 270° kurvst; Dreiecks-Ecken und gerade Strecken liefern keinen Wind. Die Tabelle zeigt trotzdem alle Höhenstufen, die der Flug erreicht hat; wo nicht gekreist wurde, steht „kein Wind: in dieser Höhe nicht gekreist“.</p>
 
 <!-- 13 -->
 <h1 id="k14"><span class="n">14</span>Tab „Alle Werte“</h1>
@@ -524,7 +534,7 @@ a { color: var(--acc); }
 <figure><img src="bilder/27-simulator.png" alt=""><figcaption>Simulator mit dem Sollfahrt-Widget, Beispiel-Log bei Minute 20</figcaption></figure>
 <table>
 <tr><th class="c">Nr.</th><th>Element</th><th>Funktion</th></tr>
-<tr><td class="c"><span class="num">1</span></td><td>Quelle</td><td><b>Intern</b>: die Beispiel-Widgets, die mit der App kommen (Sollfahrt, Thermik, Steigflüge). <b>Meine Widgets</b>: die Widgets im Benutzerverzeichnis, also Deine Kopie von GitHub (<a href="#k17">Kapitel 17</a>) und eigene Ordner dort. In der Web-Version wählst Du dafür einen scripts-Ordner.</td></tr>
+<tr><td class="c"><span class="num">1</span></td><td>Quelle</td><td>Woher die Widgets kommen, wählt der Simulator selbst. Ist ein Ethos-Sender angeschlossen, nimmt er die Widgets in dessen scripts-Ordner („7 Widgets vom Sender“). Sonst zeigt er die Widgets aus Deinem GitHub-Repo („6 Widgets von GitHub“, <a href="#k17">Kapitel 17</a>); die Desktop-App holt sie dafür ins Benutzerverzeichnis, eigene Ordner dort erscheinen auch. In der Web-Version kommen sie direkt von GitHub, mit <span class="btn">Ordner wählen …</span> nimmst Du stattdessen einen scripts-Ordner, zum Beispiel den auf dem Sender. Ist GitHub nicht erreichbar, nimmt er die letzte Kopie und nur ohne jede Kopie die Beispiel-Widgets der App (Sollfahrt, Thermik, Steigflüge). Die Konfiguration eines Widgets gilt für alle Quellen.</td></tr>
 <tr><td class="c"><span class="num">2</span></td><td>Widget</td><td>Jeder Unterordner mit einer main.lua, mit Name und Version.</td></tr>
 <tr><td class="c"><span class="num">3</span></td><td>Bildschirm</td><td>Hohe Auflösung (800 × 480, z. B. X20) oder niedrige (480 × 320, z. B. X18). Das Widget bekommt die Fläche eines Vollbild-Widgets.</td></tr>
 <tr><td class="c"><span class="num">4</span></td><td>Konfiguration</td><td>Die Felder des Widgets wie in Ethos unter „Widget konfigurieren“: Quellen, Zahlen, Auswahl. Eine Änderung gilt sofort, das Log läuft weiter. Die Konfiguration wird wie in Ethos pro Modell gespeichert.</td></tr>
@@ -830,7 +840,7 @@ a { color: var(--acc); }
 <h2>Geschwindigkeit</h2>
 <p>Unter <span class="btn">⚙</span> → <b>Geschwindigkeit</b> wählst Du die Einheit für alle Geschwindigkeiten: km/h (Standard), kn, m/s oder mph. Loggt ein Sensor in einer anderen Einheit (z. B. GPS-Geschwindigkeit in Knoten), rechnet die App um: Diagramme, Kennzahlen, Min/Ø/Max, Werte am Zeitpunkt, Filter, berechnete Werte wie TAS, Wind und Gegenwind sowie die Polare. Das Vario bleibt in m/s, die Rohdaten zeigen die Werte wie im Log. Nach dem Speichern wird das offene Log neu eingelesen; Filter auf einer Geschwindigkeit fallen dabei weg.</p>
 <h2>Esri-Schlüssel für Luftbilder</h2>
-<p>Die Karte im Tab Thermik zeigt in der Schweiz Luftbilder von swisstopo, ohne Schlüssel. Für Luftbilder im Ausland trägst Du unter <span class="btn">⚙</span> → <b>Luftbild im Ausland (Esri-Schlüssel)</b> einen eigenen API-Schlüssel von Esri (ArcGIS Location Platform, kostenloses Konto) ein. Ohne Schlüssel bleibt der Hintergrund im Ausland leer. Der Schlüssel bleibt nur auf diesem Gerät.</p>
+<p>Die Karten in den Tabs Thermik und Karte &amp; Wind zeigen in der Schweiz Luftbilder von swisstopo, ohne Schlüssel. Für Luftbilder im Ausland trägst Du unter <span class="btn">⚙</span> → <b>Luftbild im Ausland (Esri-Schlüssel)</b> einen eigenen API-Schlüssel von Esri (ArcGIS Location Platform, kostenloses Konto) ein. Ohne Schlüssel bleibt der Hintergrund im Ausland leer. Der Schlüssel bleibt nur auf diesem Gerät.</p>
 <h2>Sprache</h2>
 <p>Die Oberfläche gibt es auf Deutsch und Englisch (<span class="btn">⚙</span> → <b>Sprache</b>). Die Sensornamen stammen aus dem Log und bleiben in der Sprache des Senders.</p>
 <figure><img src="bilder/19-englisch.png" alt=""><figcaption>Englische Oberfläche</figcaption></figure>
@@ -857,7 +867,7 @@ a { color: var(--acc); }
 <tr><td>Zwischenspeicher der Log-Details (Dauer, Sensoren)</td><td>Ebenfalls im Speicher der App, damit die Log-Liste schnell erscheint.</td></tr>
 </table>
 <h2>Einstellungen pro Modell</h2>
-<p>Die App merkt sich die Einstellungen der Auswertung <b>pro Modell</b>: gewählte Kanäle und Reihenfolge der Diagramme, wie oft Du welchen Sensor einschaltest, zugeklappte Gruppen, „Einzeln/Überlagert“, „Sender-Kanäle anzeigen“, Thermik- und Steigflug-Schalter mit Höhenquelle, Schwelle und Balkenhöhe, den Verbrauchs-Sensor, „Rot markieren“ sowie Höhenquelle und Stufe von „Wind nach Höhe“. Öffnest Du ein Log, kommen die Einstellungen dieses Modells zurück. Ein Modell, das noch keine eigenen Einstellungen hat, startet mit den zuletzt benutzten.</p>
+<p>Die App merkt sich die Einstellungen der Auswertung <b>pro Modell</b>: gewählte Kanäle und Reihenfolge der Diagramme, wie oft Du welchen Sensor einschaltest, „Einzeln/Überlagert“, „Sender-Kanäle anzeigen“, Thermik- und Steigflug-Schalter mit Höhenquelle, Schwelle und Balkenhöhe, den Verbrauchs-Sensor, „Rot markieren“ sowie Höhenquelle und Stufe von „Wind nach Höhe“. Öffnest Du ein Log, kommen die Einstellungen dieses Modells zurück. Ein Modell, das noch keine eigenen Einstellungen hat, startet mit den zuletzt benutzten.</p>
 <p>Sprache, Darstellung, Geschwindigkeitseinheit und der zuletzt offene Tab gelten für alle Modelle.</p>
 
 <!-- 19 -->
@@ -925,7 +935,7 @@ a { color: var(--acc); }
 
 <h2>Allgemein</h2>
 <h3>Werden meine Logs irgendwohin hochgeladen?</h3>
-<p>Nein. Die App liest die Dateien nur auf Deinem Gerät. Ins Internet geht nur die Abfrage nach einer neuen Version auf GitHub. Liegt Dein Archiv in Google Drive oder OneDrive, synchronisiert natürlich dieses Programm die Dateien.</p>
+<p>Nein. Die App liest die Dateien nur auf Deinem Gerät. Ins Internet gehen nur die Abfrage nach einer neuen Version und das Holen der Widgets, beides von GitHub. Liegt Dein Archiv in Google Drive oder OneDrive, synchronisiert natürlich dieses Programm die Dateien.</p>
 <h3>Kann ich die App auf mehreren Computern nutzen?</h3>
 <p>Ja. Installiere sie überall und wähle denselben Archiv-Ordner in Google Drive oder OneDrive.</p>
 <h3>Funktioniert die App mit anderen Sendern?</h3>
@@ -946,7 +956,7 @@ a { color: var(--acc); }
 <tr><td>Zeitstrahl</td><td>Ziehen, Klick</td><td>Zeitpunkt setzen</td></tr>
 <tr><td>Zeitstrahl (Fokus)</td><td><span class="key">←</span> <span class="key">→</span> / mit <span class="key">Shift</span> / <span class="key">Bild ↑</span> <span class="key">Bild ↓</span></td><td>1 / 10 / 100 Datensätze</td></tr>
 <tr><td>Rohdaten</td><td>Klick auf Zeile</td><td>Zeitpunkt setzen</td></tr>
-<tr><td>GPS-Spur</td><td>Ziehen, <span class="key">Strg</span> + Mausrad, Doppelklick</td><td>Verschieben, zoomen, hineinzoomen</td></tr>
+<tr><td>GPS-Spur, Karte Thermik</td><td>Ziehen, Mausrad oder zwei Finger, Doppelklick</td><td>Verschieben, zoomen, ganze Spur zeigen</td></tr>
 <tr><td>Tabs (Fokus)</td><td><span class="key">←</span> <span class="key">→</span> <span class="key">Pos1</span> <span class="key">Ende</span></td><td>Tab wechseln</td></tr>
 <tr><td>Log-Feld</td><td><span class="key">↓</span> <span class="key">↑</span> <span class="key">Enter</span> <span class="key">Esc</span></td><td>Liste öffnen, wählen, öffnen, schliessen</td></tr>
 <tr><td>Fenster</td><td>CSV-Dateien hineinziehen</td><td>Logs öffnen</td></tr>
