@@ -137,3 +137,11 @@ test('Sync: Aufgaben auf den Sender, Flüge ins Archiv (gleich grosse übersprin
   assert.deepStrictEqual(fl.map(f => f.name), ['2026-10-15-XSN-SKYNAV-01.IGC']);
   assert.ok(fl[0].path.startsWith(path.join(archive, 'SkyNavigator', 'Fluege')));
 });
+
+test('Ziehen an einer Ecke: Richtung O → TP1 so, dass die Ecke zum Zeiger zeigt', () => {
+  for (const [i, x, y, dir] of [[0, 0, 100, 0], [0, 100, 0, 90], [1, 0, 100, 90], [1, -100, 0, 0], [2, 0, -100, 0], [2, -100, 0, 90]]) {
+    assert.strictEqual(SKY.cornerDir(i, x, y), dir);
+    const t = { ...SKY.newTask('Sport'), dir }, g = SKY.geom(t), c = g.tp[i];
+    assert.ok(Math.abs(Math.atan2(c.x, c.y) - Math.atan2(x, y)) < 1e-9 || Math.abs(Math.abs(Math.atan2(c.x, c.y) - Math.atan2(x, y)) - 2 * Math.PI) < 1e-9);
+  }
+});
