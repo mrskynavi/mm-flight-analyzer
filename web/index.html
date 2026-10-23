@@ -425,9 +425,9 @@ td.mut{color:var(--muted)}
 /* Tab SkyNavigator */
 .sky .sky-t.on{border-color:var(--accent);background:var(--accent-soft)}
 .sky-sets fieldset.gf{grid-column:1/-1}
-.sky-gf{display:flex;gap:6px;background:#000;padding:8px;border-radius:8px}
+.sky-gf{display:flex;gap:6px;background:#000;padding:8px;border-radius:8px;min-width:0}
 .sky-gf>div{flex:1;min-width:0;background:#111;padding:8px 10px;display:flex;flex-direction:column;gap:6px}
-.sky-sets .sky-gf select{align-self:flex-start;max-width:100%;width:auto;background:#111;color:#bbb;border:1px solid #3a8fd8;border-radius:6px;font-size:.8rem;font-weight:600;padding:3px 6px}
+.sky-sets .sky-gf select{align-self:flex-start;max-width:100%;width:auto;background:#111;color:#bbb;border:1px solid #3a8fd8;border-radius:6px;font-size:.8rem;font-weight:600;padding:3px 6px;min-width:0;text-overflow:ellipsis}
 .sky-sets .sky-gf .v{font-size:2.2rem;line-height:1.1;font-weight:500;color:#fff;white-space:nowrap;overflow:hidden}
 .sky-sets .sky-gf .v.good{color:#3c3}.sky-sets .sky-gf .v.warn{color:#f5a623}.sky-sets .sky-gf .v.info{color:#4da3ff}
 .sky .sky-t .tag{font:600 .7rem var(--mono);color:var(--good)}
@@ -442,7 +442,7 @@ td.mut{color:var(--muted)}
 .sky-form label>span{display:flex;gap:6px;align-items:center}
 .sky-form label>span input{width:100%}
 .sky-sets{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:10px}
-.sky-sets fieldset{border:1px solid var(--line);border-radius:8px;padding:6px 10px 8px;margin:0;display:grid;gap:6px;align-content:start;font-size:.82rem;color:var(--muted)}
+.sky-sets fieldset{border:1px solid var(--line);border-radius:8px;padding:6px 10px 8px;margin:0;min-width:0;display:grid;gap:6px;align-content:start;font-size:.82rem;color:var(--muted)}
 .sky-sets legend{padding:0 4px;color:var(--fg);font-weight:600}
 .sky-sets label{display:flex;gap:8px;align-items:center;justify-content:space-between}
 .sky-sets label.chk{justify-content:flex-start}
