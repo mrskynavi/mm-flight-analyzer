@@ -92,6 +92,16 @@ test('Widget-Einstellungen: Bereich, Typ und Vorgaben in aufgaben.lua', () => {
   assert.match(lua, /gliderId = "HB-1"/);
 });
 
+test('Seite Gleiten: drei Felder unten, Nummern wie im Widget', () => {
+  const st = SKY.settingsOf({ glideF1: 9, glideF2: 99, glideF3: '0' });
+  assert.deepStrictEqual([st.glideF1, st.glideF2, st.glideF3], [9, 2, 0]);
+  assert.deepStrictEqual(SKY.GLIDE_FIELDS.map(f => f[0]), [...Array(18).keys()]);
+  assert.deepStrictEqual(SKY.THERM_FIELDS.map(f => f[0]), [...Array(13).keys()]);
+  assert.deepStrictEqual([SKY.settingsOf({ thermF2: 12, thermF3: 13 }).thermF2, SKY.settingsOf({ thermF3: 13 }).thermF3], [12, 4]);
+  const lua = SKY.toLua({ tasks: [], settings: {} });
+  assert.match(lua, /glideF1 = 1, glideF2 = 2, glideF3 = 4/);
+});
+
 test('IGC lesen und Wertung nachrechnen: zwei Runden, Strafe aus dem Einflug', () => {
   const task = { ...SKY.newTask('Sport'), dir: 250 };
   const igc = SKY.parseIgc(igcFlight(task, 2, { agl: 410, kmh: 100 }));
