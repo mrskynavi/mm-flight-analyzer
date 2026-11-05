@@ -24,6 +24,35 @@ function ejectCommand(root, platform = process.platform) {
   return ['gio', ['mount', '-e', root]];
 }
 
+// macOS: Ein Ethos-Sender meldet sich als zwei USB-Laufwerke (zwei LUNs, z.B. RADIO und FLASH).
+// Wirft man nur eines aus, meldet macOS beim Abziehen "nicht ausgeworfen". Darum alle Laufwerke
+// desselben Geräts suchen: externe USB-Laufwerke mit demselben Gerätenamen (MediaName ohne die LUN-Endung).
+function plistValue(xml, key) {
+  const m = new RegExp(`<key>${key}</key>\\s*<(string|true|false|integer)\\s*/?>([^<]*)`).exec(String(xml || ''));
+  if (!m) return null;
+  return m[1] === 'true' ? true : m[1] === 'false' ? false : m[2].trim();
+}
+function diskInfo(target, run = execFile) {
+  return new Promise(res => run('diskutil', ['info', '-plist', target], { timeout: 10000 }, (err, out) => {
+    if (err) return res(null);
+    res({ whole: plistValue(out, 'ParentWholeDisk'), media: plistValue(out, 'MediaName') || plistValue(out, 'IORegistryEntryName') || '',
+      bus: plistValue(out, 'BusProtocol') || '', internal: plistValue(out, 'Internal') === true, mount: plistValue(out, 'MountPoint') || target });
+  }));
+}
+// "FrSky X20S Flash Media" und "FrSky X20S Radio Media" gehören zusammen: ohne "Media" und ohne letztes Wort vergleichen
+const deviceKey = media => String(media || '').replace(/\s+Media$/i, '').trim().split(/\s+/).slice(0, -1).join(' ').toLowerCase();
+
+// Liefert die ganzen Platten (disk4, disk5), die zu den gefundenen Sender-Laufwerken gehören, plus die Namen der Laufwerke
+async function senderDisks(roots, vols = [], { run = execFile } = {}) {
+  const own = (await Promise.all(roots.map(r => diskInfo(r, run)))).filter(i => i && i.whole);
+  if (!own.length) return { disks: [], mounts: roots };
+  const keys = new Set(own.map(i => deviceKey(i.media)).filter(Boolean));
+  const others = (await Promise.all(vols.filter(v => !roots.includes(v.root)).map(v => diskInfo(v.root, run))))
+    .filter(i => i && i.whole && !i.internal && /usb/i.test(i.bus) && keys.has(deviceKey(i.media)));
+  const all = [...own, ...others];
+  return { disks: [...new Set(all.map(i => i.whole))], mounts: [...new Set(all.map(i => i.mount))] };
+}
+
 function eject(root, { platform = process.platform, run = execFile } = {}) {
   const [cmd, args] = ejectCommand(root, platform);
   return new Promise((res, rej) => run(cmd, args, { windowsHide: true, timeout: 20000 }, (err, out, errOut) => {
@@ -33,4 +62,4 @@ function eject(root, { platform = process.platform, run = execFile } = {}) {
   }));
 }
 
-module.exports = { volumeOf, ejectCommand, eject };
+module.exports = { volumeOf, ejectCommand, eject, senderDisks, deviceKey, plistValue };
