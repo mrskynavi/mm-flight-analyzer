@@ -1,5 +1,10 @@
 # Changelog
 
+## Unveröffentlicht
+
+- macOS: «Auswerfen» wirft jetzt alle Laufwerke des Senders aus (z.B. RADIO und FLASH). Bisher blieb das zweite eingebunden und macOS meldete beim Abziehen «nicht ausgeworfen».
+- Neuer Knopf «Sender zeigen» in der Sync-Zeile öffnet den Sender-Ordner im Finder, auch wenn macOS das Laufwerk in der Seitenleiste ausblendet. Der Pfad steht im Tooltip.
+
 ## 2026.10.2 – 2026-10-13
 
 - Wind ruhiger: Der erste Wind-Fit braucht ein volles Fenster (40 Werte, etwa 28 s), damit der Start mit Motor keinen falschen Wind liefert. Danach gilt der Median der letzten 5 guten Fits, einzelne Ausreisser schlagen nicht mehr durch (im SB-10-Log vom 12.10. z. B. 47 km/h nach 25 min). TAS, Steuerkurs, Drift und Gegenwind rechnen mit diesem Wind.

@@ -68,10 +68,21 @@ ipcMain.handle('sender:eject', async () => {
   if (!roots.length) throw new Error('Kein Sender angeschlossen.');
   watcher.paused = true;
   try {
-    for (const r of roots) await E.eject(r);
+    // macOS: alle Laufwerke des Senders (auch FLASH bzw. die zweite LUN) als ganze Platte auswerfen
+    let targets = roots;
+    if (process.platform === 'darwin') { const d = await E.senderDisks(roots, vols); if (d.disks.length) targets = d.disks; }
+    for (const r of targets) await E.eject(r);
     watcher.roots = []; watcher.ethosRoots = []; watcher.synced.clear();
     watcher.set({ ...watcher.status, connected: false, ejected: true });
   } finally { watcher.paused = false; }
+});
+// Sender-Ordner im Finder/Explorer zeigen (macOS blendet ein Laufwerk manchmal in der Seitenleiste aus)
+ipcMain.handle('sender:reveal', async () => {
+  const d = (watcher.ethosRoots || [])[0] || watcher.roots[0];
+  if (!d) throw new Error('Kein Sender angeschlossen.');
+  const err = await shell.openPath(d);
+  if (err) throw new Error(err);
+  return d;
 });
 // Polaren fürs MacCready-Widget: scripts/maccready/polaren.lua auf jedem angeschlossenen Ethos-Sender
 ipcMain.handle('sender:polarsTarget', () => ({ roots: watcher.ethosRoots || [] }));
