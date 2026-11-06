@@ -7,6 +7,7 @@ contextBridge.exposeInMainWorld('ethosDesktop', {
   pickFolder: current => ipcRenderer.invoke('dialog:folder', current),
   syncNow: () => ipcRenderer.invoke('sync:now'),
   ejectSender: () => ipcRenderer.invoke('sender:eject'),
+  revealSender: () => ipcRenderer.invoke('sender:reveal'),
   syncStatus: () => ipcRenderer.invoke('sync:status'),
   onSync: cb => ipcRenderer.on('sync:status', (_, s) => cb(s)),
   listArchive: () => ipcRenderer.invoke('archive:list'),

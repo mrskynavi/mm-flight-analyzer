@@ -18,6 +18,8 @@
 - Flüge im gleichen Tab: Liste mit Dreiecken, Schnitt, Zeit und Strafe; pro Flug Kennzahlen, Spur über der Aufgabe, Tabelle je Runde und Download der IGC-Datei. Die Wertung rechnet die App aus der IGC-Datei nach (Aufgabe aus den LTSK-Zeilen), auch für eine geöffnete IGC-Datei.
 - SkyNavigator: Die Skizze der Aufgabe liegt auf dem Luftbild (in der Schweiz swisstopo, im Ausland Esri, Knopf „Luftbild“ an/aus), auch die Spur der Flüge. Dreieck und Sicherheitszonen setzt Du direkt in der Skizze, mit Maus oder Finger: Ziehen im Dreieck oder an O verschiebt es, Ziehen an einer Ecke dreht es (Richtung O → TP1), Zonen verschieben, Kreis-Radius sowie Richtung, Länge und Breite des Rechtecks an den Punkten ändern. Die Felder links gehen mit. Die Karte selbst verschiebst Du durch Ziehen neben der Aufgabe und zoomst mit Mausrad, zwei Fingern oder − / +; Doppelklick oder „Alles“ zeigt wieder die ganze Aufgabe. Neue Aufgabe: Karte an den Ort schieben, „Neu“ und dann in die Karte klicken, dort liegt der Ursprung O; „O setzen“ macht das auch für eine bestehende Aufgabe.
 - Simulator: Sprachdateien der Widgets (playFile, z. B. links.wav und rechts.wav der Kurs-Ansage im SkyNavigator) werden jetzt hörbar, die App spricht den Dateinamen. Die .wav-Dateien selbst lädt der Simulator nicht, sie gelten als vorhanden.
+- macOS: «Auswerfen» wirft jetzt alle Laufwerke des Senders aus (z.B. RADIO und FLASH). Bisher blieb das zweite eingebunden und macOS meldete beim Abziehen «nicht ausgeworfen».
+- Neuer Knopf «Sender zeigen» in der Sync-Zeile öffnet den Sender-Ordner im Finder, auch wenn macOS das Laufwerk in der Seitenleiste ausblendet. Der Pfad steht im Tooltip.
 
 ## 2026.10.2 – 2026-10-13
 
