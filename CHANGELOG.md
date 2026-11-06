@@ -1,5 +1,9 @@
 # Changelog
 
+## Unveröffentlicht
+
+- Simulator: Sprachdateien der Widgets (playFile, z. B. links.wav und rechts.wav der Kurs-Ansage im SkyNavigator) werden jetzt hörbar, die App spricht den Dateinamen. Die .wav-Dateien selbst lädt der Simulator nicht, sie gelten als vorhanden.
+
 ## 2026.10.2 – 2026-10-13
 
 - Wind ruhiger: Der erste Wind-Fit braucht ein volles Fenster (40 Werte, etwa 28 s), damit der Start mit Motor keinen falschen Wind liefert. Danach gilt der Median der letzten 5 guten Fits, einzelne Ausreisser schlagen nicht mehr durch (im SB-10-Log vom 12.10. z. B. 47 km/h nach 25 min). TAS, Steuerkurs, Drift und Gegenwind rechnen mit diesem Wind.
