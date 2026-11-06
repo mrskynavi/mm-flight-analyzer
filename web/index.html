@@ -3715,17 +3715,24 @@ function distanceM(lat1, lon1, lat2, lon2){
   const dLat=(lat2-lat1)*D2R, dLon=(lon2-lon1)*D2R*Math.cos((lat1+lat2)/2*D2R);
   return Math.sqrt(dLat*dLat+dLon*dLon)*6371000;
 }
-// GPS Course: neuer Fix = GPS-Zeit hat sich geändert; Kurs = Azimut zum letzten Fix, erst ab 3 m Abstand
-const MIN_FIX_DISTANCE=3.0;
+// GPS Course: Kurs = Azimut zum letzten Fix, erst ab 3 m Abstand.
+// Ethos loggt Breite und Länge als zwei Telemetriewerte, die oft nicht in derselben Zeile neu sind
+// (rund ein Drittel der Fixe). Ein halber Fix liegt neben der Spur und verdreht den Kurs um bis zu 45°.
+// Darum gilt ein Fix erst, wenn beide Werte neu sind, oder HALF_FIX_WAIT s nach der ersten Änderung
+// (genau Nord/Süd oder Ost/West ändert sich nur ein Wert).
+const MIN_FIX_DISTANCE=3.0, HALF_FIX_WAIT=0.8;
 function gpsCourse(log){
   const n=log.t.length, out=new Array(n).fill(NaN);
-  let lastLat=null, lastLon=null, lastKey=null, course=NaN;
+  let lastLat=null, lastLon=null, course=NaN, prev=null, newLat=false, newLon=false, pendT=null;
   for (let i=0;i<n;i++){
     const g=log.gps[i];
-    const key = log.gpsTime ? log.gpsTime[i] : (g ? g[0]+' '+g[1] : null);   // ohne GPS-Zeit-Spalte: Positionswechsel
-    if (key!==lastKey){
-      lastKey=key;
-      if (g){
+    if (g){
+      if (!prev || g[0]!==prev[0]) newLat=true;
+      if (!prev || g[1]!==prev[1]) newLon=true;
+      if ((newLat||newLon) && pendT==null) pendT=log.t[i];
+      prev=g;
+      if (pendT!=null && ((newLat&&newLon) || log.t[i]-pendT>=HALF_FIX_WAIT)){
+        newLat=newLon=false; pendT=null;
         if (lastLat!=null){ if (distanceM(lastLat,lastLon,g[0],g[1])>=MIN_FIX_DISTANCE){ course=bearingDeg(lastLat,lastLon,g[0],g[1]); lastLat=g[0]; lastLon=g[1]; } }
         else { lastLat=g[0]; lastLon=g[1]; }
       }
