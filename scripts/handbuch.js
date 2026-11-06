@@ -186,7 +186,7 @@ async function screenshots() {
   await p.waitForTimeout(800);
   await p.fill('#simGotoIn', '20:00'); await p.press('#simGotoIn', 'Enter');
   await p.waitForFunction(() => document.querySelector('#simProg').hidden, null, { timeout: 120000 }); await p.waitForTimeout(1500);
-  await badges(p, [['#simSrcSeg', 1, 'b'], ['#simSel', 2, 'b'], ['#simSize', 3, 'b'], ['#simForm', 4, 'l'], ['#simScr', 5, 'tl'], ['#simTl', 6, 'l'], ['#simPlay', 7, 'b'], ['#simSpeed', 8, 'br']]);
+  await badges(p, [['#simDirInfo', 1, 'b'], ['#simSel', 2, 'b'], ['#simSize', 3, 'b'], ['#simForm', 4, 'l'], ['#simScr', 5, 'tl'], ['#simTl', 6, 'l'], ['#simPlay', 7, 'b'], ['#simSpeed', 8, 'br']]);
   await shot(p, '27-simulator', { ...(await from(p, '.simbar')), height: 780 });
   await badges(p, []);
   // Eigene Widgets (Dialog unter ⚙)

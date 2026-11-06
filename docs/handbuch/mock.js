@@ -1,7 +1,7 @@
 (() => {
   const P = window.__MOCK || {};
   if (!P.desktop) return;
-  let syncCb = null, updCb = null;
+  const syncCbs = []; let updCb = null;
   const csv = () => window.__CSV;
   const base = '/Users/christoph/Library/CloudStorage/OneDrive-Persönlich/Ethos Logs';
   const logs = [
@@ -17,7 +17,7 @@
     syncNow: async () => window.__STATUS,
     ejectSender: async () => {},
     syncStatus: async () => window.__STATUS,
-    onSync: cb => { syncCb = cb; },
+    onSync: cb => { syncCbs.push(cb); },
     listArchive: async () => logs,
     saveToArchive: async () => ({ existed:false }),
     openArchive: async () => '',
@@ -41,7 +41,12 @@
       widgets:[['sollfahrt','Sollfahrt','1.1'],['polarflug','Polarflug','1.1'],['thermik','Thermik','1.0'],['steigfluege','Steigflüge','1.0'],['wind','Wind','1.0'],['gpscourse','GPS Course','1.0']].map(([name,title,version])=>({ name, title, version })),
       fetch:{ ok:true, at:Date.parse('2026-10-13T17:40:00+02:00'), loaded:2, same:4 }, copy:null, senders:['/Volumes/RADIO'] }),
     widgetFetch: async () => window.ethosDesktop.widgetInfo(),
+    // Simulator: kein Sender mit scripts-Ordner, also die Widgets von GitHub aus dem Benutzerverzeichnis
+    simScripts: async () => ({ source:'github', dir:'/Users/christoph/Documents/MM Flight Analyzer/Widgets/scripts',
+      files:{ 'sollfahrt/main.lua':document.getElementById('simW_sollf').textContent, 'thermik/main.lua':document.getElementById('simW_therm').textContent,
+        'steigfluege/main.lua':document.getElementById('simW_climb').textContent } }),
+    simWrite: async rel => '/Users/christoph/Documents/MM Flight Analyzer/Widgets/scripts/' + rel,
     widgetCopy: async () => ({ copied:5 }),
   };
-  window.__setSync = s => { window.__STATUS = s; syncCb && syncCb(s); };
+  window.__setSync = s => { window.__STATUS = s; syncCbs.forEach(cb => cb(s)); };
 })();
