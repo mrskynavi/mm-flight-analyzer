@@ -1421,7 +1421,7 @@ system = stubTable("system", {
       lcdWidth = hi and 800 or 480, lcdHeight = hi and 480 or 320} end,
   getTime = function() return J.clock() end,
   playNumber = function(v, unit, dec) J.log("ansage", string.format("%." .. (dec or 0) .. "f", v or 0), unit or 0) end,
-  playFile = function(f) J.log("ansage", "Datei " .. tostring(f)) end,
+  playFile = function(f) J.log("ansage", "Datei " .. tostring(f), -1) end,   -- -1: Dateiname wird gesprochen
   playTone = function(f, d) J.tone(f or 0, d or 100) end,
   playHaptic = function() J.log("ansage", "Vibration") end,
   getAudioVoice = function() return "AUDIO:/de" end,
@@ -1459,7 +1459,10 @@ io = {
   open = function(p, mode)
     mode = mode or "r"
     if mode:sub(1, 1) == "r" then
-      local t = J.fs_get(p); if not t then return nil, p .. ": Datei fehlt" end
+      local t = J.fs_get(p)
+      -- Sprachdateien (.wav) laedt der Simulator nicht; sie gelten als vorhanden, playFile spricht ihren Namen
+      if not t and p:lower():match("%.wav$") then t = "" end
+      if not t then return nil, p .. ": Datei fehlt" end
       local pos = 1
       local f = {}
       function f:read(fmt)
@@ -8098,7 +8101,11 @@ function tone(f, ms){
 }
 const UNIT_TXT = {4:['km/h','Kilometer pro Stunde'], 5:['m/s','Meter pro Sekunde'], 3:['m','Meter'], 1:['V','Volt'], 2:['A','Ampere'], 6:['%','Prozent']};
 function log(kind, text, t, unit){
-  if (kind === 'ansage' && unit !== undefined){
+  if (kind === 'ansage' && unit === -1){
+    // Sprachdatei (playFile): den Dateinamen sprechen, z. B. ".../audio/links.wav" -> "links"
+    const word = String(text).replace(/^Datei /, '').replace(/^.*[\\/]/, '').replace(/\.[a-z0-9]+$/i, '').replace(/[_-]+/g, ' ');
+    if (audioOk()) try { const u = new SpeechSynthesisUtterance(word); u.lang = 'de-DE'; speechSynthesis.speak(u); } catch(e){}
+  } else if (kind === 'ansage' && unit !== undefined){
     if (audioOk()) try { const u = new SpeechSynthesisUtterance(String(text).replace('.', ',') + ' ' + (UNIT_TXT[unit]?.[1] || '')); u.lang = 'de-DE'; speechSynthesis.speak(u); } catch(e){}
     text += ' ' + (UNIT_TXT[unit]?.[0] || '');
   }
