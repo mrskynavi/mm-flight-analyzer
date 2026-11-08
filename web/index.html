@@ -1340,7 +1340,14 @@ system = stubTable("system", {
       lcdWidth = hi and 800 or 480, lcdHeight = hi and 480 or 320} end,
   getTime = function() return J.clock() end,
   playNumber = function(v, unit, dec) J.log("ansage", string.format("%." .. (dec or 0) .. "f", v or 0), unit or 0) end,
-  playFile = function(f) J.log("ansage", "Datei " .. tostring(f)) end,
+  -- Sprachdateien: Der Simulator hat keine .wav-Dateien, er spricht den Dateinamen (einflug_ok.wav -> "einflug ok",
+  -- /audio/de/default/system/15.wav -> "15"). Ohne Ton bleibt nur die Zeile im Protokoll.
+  playFile = function(f)
+    local name = tostring(f):match("([^/\\]+)$") or tostring(f)
+    local word = name:gsub("%.[Ww][Aa][Vv]$", ""):gsub("_", " ")
+    if word:lower() == "einflug ok" then word = "Einflug OK" end
+    J.log("ansage", word .. "  (" .. name .. ")", 0, word)
+  end,
   playTone = function(f, d) J.tone(f or 0, d or 100) end,
   playHaptic = function() J.log("ansage", "Vibration") end,
   getAudioVoice = function() return "AUDIO:/de" end,
@@ -1378,7 +1385,10 @@ io = {
   open = function(p, mode)
     mode = mode or "r"
     if mode:sub(1, 1) == "r" then
-      local t = J.fs_get(p); if not t then return nil, p .. ": Datei fehlt" end
+      local t = J.fs_get(p)
+      -- .wav liegen nicht im Simulator-Ordner: so tun, als gaebe es sie (Sprachdateien des Widgets, Zahlen des Senders)
+      if not t and tostring(p):lower():match("%.wav$") then t = "" end
+      if not t then return nil, p .. ": Datei fehlt" end
       local pos = 1
       local f = {}
       function f:read(fmt)
@@ -7335,7 +7345,7 @@ kiKeyRefresh();
       reg('__val', n => { self.used.add(n); return n in self.written ? self.written[n] : opts.value(n, self.t); });
       reg('__unit', n => opts.unit(n));
       reg('__setval', (n, v) => { self.written[n] = v; });
-      reg('__log', (k, s, u) => opts.log(k, s, self.t, u));
+      reg('__log', (k, s, u, say) => opts.log(k, s, self.t, u, say));
       reg('__tone', (f, ms) => opts.tone && opts.tone(f, ms, self.t));
       reg('__fs_get', p => opts.fs.get(p));
       reg('__fs_put', (p, s) => opts.fs.put(p, s));
@@ -7476,8 +7486,10 @@ function tone(f, ms){
     o.connect(gn).connect(actx.destination); o.start(t0); o.stop(t0 + d + .02); } catch(e){}
 }
 const UNIT_TXT = {4:['km/h','Kilometer pro Stunde'], 5:['m/s','Meter pro Sekunde'], 3:['m','Meter'], 1:['V','Volt'], 2:['A','Ampere'], 6:['%','Prozent']};
-function log(kind, text, t, unit){
-  if (kind === 'ansage' && unit !== undefined){
+function log(kind, text, t, unit, say){
+  if (kind === 'ansage' && say){   // Sprachdatei (playFile): Wort sprechen, Zeile mit Dateiname
+    if (audioOk()) try { const u = new SpeechSynthesisUtterance(String(say)); u.lang = 'de-DE'; speechSynthesis.speak(u); } catch(e){}
+  } else if (kind === 'ansage' && unit !== undefined){
     if (audioOk()) try { const u = new SpeechSynthesisUtterance(String(text).replace('.', ',') + ' ' + (UNIT_TXT[unit]?.[1] || '')); u.lang = 'de-DE'; speechSynthesis.speak(u); } catch(e){}
     text += ' ' + (UNIT_TXT[unit]?.[0] || '');
   }
