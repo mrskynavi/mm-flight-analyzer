@@ -87,6 +87,7 @@ test('Widget-Einstellungen: Bereich, Typ und Vorgaben in aufgaben.lua', () => {
   assert.strictEqual(st.warnSec, 10);
   assert.strictEqual(st.varioTone, true);
   assert.deepStrictEqual([st.vzLo, st.vzHi], [3, 1]);
+  assert.deepStrictEqual([st.vtStyle, SKY.settingsOf({ vtStyle: 3 }).vtStyle, SKY.settingsOf({ vtStyle: 7 }).vtStyle], [1, 3, 1]);
   assert.strictEqual(SKY.settingsOf({ vzLo: 50 }).vzLo, 20);
   const lua = SKY.toLua({ tasks: [], settings: { margin: 12, navVoice: false, gliderId: 'HB-1' } });
   assert.match(lua, /settings = \{[^}]*margin = 12[^}]*\}/);
