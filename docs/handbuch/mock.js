@@ -1,7 +1,7 @@
 (() => {
   const P = window.__MOCK || {};
   if (!P.desktop) return;
-  let syncCb = null, updCb = null;
+  const syncCbs = []; let updCb = null;
   const csv = () => window.__CSV;
   const base = '/Users/christoph/Library/CloudStorage/OneDrive-Persönlich/Ethos Logs';
   const logs = [
@@ -17,7 +17,7 @@
     syncNow: async () => window.__STATUS,
     ejectSender: async () => {},
     syncStatus: async () => window.__STATUS,
-    onSync: cb => { syncCb = cb; },
+    onSync: cb => { syncCbs.push(cb); },
     listArchive: async () => logs,
     saveToArchive: async () => ({ existed:false }),
     openArchive: async () => '',
@@ -41,7 +41,21 @@
       widgets:[['sollfahrt','Sollfahrt','1.1'],['polarflug','Polarflug','1.1'],['thermik','Thermik','1.0'],['steigfluege','Steigflüge','1.0'],['wind','Wind','1.0'],['gpscourse','GPS Course','1.0']].map(([name,title,version])=>({ name, title, version })),
       fetch:{ ok:true, at:Date.parse('2026-10-13T17:40:00+02:00'), loaded:2, same:4 }, copy:null, senders:['/Volumes/RADIO'] }),
     widgetFetch: async () => window.ethosDesktop.widgetInfo(),
+    // Simulator: kein Sender mit scripts-Ordner, also die Widgets von GitHub aus dem Benutzerverzeichnis
+    simScripts: async () => ({ source:'github', dir:'/Users/christoph/Documents/MM Flight Analyzer/Widgets/scripts',
+      files:{ 'sollfahrt/main.lua':document.getElementById('simW_sollf').textContent, 'thermik/main.lua':document.getElementById('simW_therm').textContent,
+        'steigfluege/main.lua':document.getElementById('simW_climb').textContent } }),
+    simWrite: async rel => '/Users/christoph/Documents/MM Flight Analyzer/Widgets/scripts/' + rel,
     widgetCopy: async () => ({ copied:5 }),
+    // SkyNavigator: eine Aufgabe am Platz des Beispiel-Logs, Sender angeschlossen
+    skynavGet: async () => ({ data: window.__SKYDATA || { version:1, active:'mglinth', pilot:'Christoph Mächler', pilotId:'', settings:{}, tasks:[
+        { id:'mglinth', name:'MgLinth Sport', cls:'Sport', lat:47.200324, lon:8.960282, elev:410, dir:124, dist:350, maxH:400, maxV:120, minF:20, work:30, maxAlt:750, slot:null,
+          zones:[{ t:'C', name:'Parkplatz', lat:47.1985, lon:8.9545, r:60, lo:0, hi:9999 }] },
+        { id:'home', name:'Home', cls:'Light', lat:47.2201, lon:8.9461, elev:410, dir:274, dist:200, maxH:250, maxV:70, minF:10, work:20, maxAlt:350, slot:null, zones:[] }] },
+      flights:[], senders:['/Volumes/RADIO'], dir:'/Users/christoph/Ethos Logs/SkyNavigator' }),
+    skynavSave: async () => ({ written:['/Volumes/RADIO/scripts/skynav/aufgaben.lua'] }),
+    skynavFetch: async () => [],
+    skynavOpen: async () => {},
   };
-  window.__setSync = s => { window.__STATUS = s; syncCb && syncCb(s); };
+  window.__setSync = s => { window.__STATUS = s; syncCbs.forEach(cb => cb(s)); };
 })();

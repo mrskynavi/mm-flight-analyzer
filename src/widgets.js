@@ -10,8 +10,8 @@ const DEFAULT_REPO = 'mrskynavi/mm-ethos-widgets';
 const DEFAULT_BRANCH = 'main';
 // Dateien, die ein Widget braucht; Daten am Sender (punkte_*.txt …) kommen nie aus dem Repo
 const WIDGET_EXT = /\.(lua|luac|png|bmp|jpg|wav|txt|json|cfg|ini)$/i;
-// polaren.lua schreibt die App selbst (Tab Polare), sie wird nie aus dem Repo überschrieben
-const SKIP = /^scripts\/maccready\/polaren\.lua$/i;
+// polaren.lua (Tab Polare) und skynav/aufgaben.lua (Tab SkyNavigator) schreibt die App selbst, nie aus dem Repo
+const SKIP = /^scripts\/(maccready\/polaren|skynav\/aufgaben)\.lua$/i;
 
 function defaultDir(home = require('os').homedir()) {
   return path.join(home, 'Documents', 'MM Flight Analyzer', 'Widgets');

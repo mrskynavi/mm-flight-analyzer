@@ -7,6 +7,7 @@ contextBridge.exposeInMainWorld('ethosDesktop', {
   pickFolder: current => ipcRenderer.invoke('dialog:folder', current),
   syncNow: () => ipcRenderer.invoke('sync:now'),
   ejectSender: () => ipcRenderer.invoke('sender:eject'),
+  revealSender: () => ipcRenderer.invoke('sender:reveal'),
   syncStatus: () => ipcRenderer.invoke('sync:status'),
   onSync: cb => ipcRenderer.on('sync:status', (_, s) => cb(s)),
   listArchive: () => ipcRenderer.invoke('archive:list'),
@@ -32,4 +33,8 @@ contextBridge.exposeInMainWorld('ethosDesktop', {
   widgetInfo: () => ipcRenderer.invoke('widgets:info'),
   widgetFetch: () => ipcRenderer.invoke('widgets:fetch'),
   widgetCopy: () => ipcRenderer.invoke('widgets:copy'),
+  skynavGet: () => ipcRenderer.invoke('skynav:get'),
+  skynavSave: (data, lua, toSender) => ipcRenderer.invoke('skynav:save', data, lua, toSender),
+  skynavFetch: () => ipcRenderer.invoke('skynav:fetch'),
+  skynavOpen: () => ipcRenderer.invoke('skynav:open'),
 });

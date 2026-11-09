@@ -17,7 +17,7 @@ const CSV = fs.readFileSync(path.join(WEB, 'beispiel.csv'), 'utf8');
 const CHART = fs.readFileSync(path.join(ROOT, 'node_modules', 'chart.js', 'dist', 'chart.umd.js'), 'utf8');
 const LUA = fs.readFileSync(path.join(ROOT, 'node_modules', 'fengari-web', 'dist', 'fengari-web.js'), 'utf8');
 const MOCK = fs.readFileSync(path.join(SRC, 'mock.js'), 'utf8');
-let browser;
+let browser, SAT = false;   // SAT: Luftbild-Kacheln von swisstopo laden (nur für die SkyNavigator-Bilder)
 
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const inline = s => esc(s).replace(/`([^`]+)`/g, '<code>$1</code>').replace(/\*\*([^*]+)\*\*/g, '<b>$1</b>');
@@ -52,6 +52,7 @@ async function open(opts = {}) {
       if (f === 'beispiel.csv') return r.fulfill({ body: CSV, contentType: 'text/csv' });
       return r.fulfill({ path: path.join(WEB, f) });
     }
+    if (SAT && u.hostname === 'wmts.geo.admin.ch') return r.continue();
     return r.abort();
   });
   await ctx.addInitScript(`window.__MOCK=${JSON.stringify({ version: VERSION, ...(opts.mock || {}) })};`);
@@ -186,7 +187,7 @@ async function screenshots() {
   await p.waitForTimeout(800);
   await p.fill('#simGotoIn', '20:00'); await p.press('#simGotoIn', 'Enter');
   await p.waitForFunction(() => document.querySelector('#simProg').hidden, null, { timeout: 120000 }); await p.waitForTimeout(1500);
-  await badges(p, [['#simSrcSeg', 1, 'b'], ['#simSel', 2, 'b'], ['#simSize', 3, 'b'], ['#simForm', 4, 'l'], ['#simScr', 5, 'tl'], ['#simTl', 6, 'l'], ['#simPlay', 7, 'b'], ['#simSpeed', 8, 'br']]);
+  await badges(p, [['#simDirInfo', 1, 'b'], ['#simSel', 2, 'b'], ['#simSize', 3, 'b'], ['#simForm', 4, 'l'], ['#simScr', 5, 'tl'], ['#simTl', 6, 'l'], ['#simPlay', 7, 'b'], ['#simSpeed', 8, 'br']]);
   await shot(p, '27-simulator', { ...(await from(p, '.simbar')), height: 780 });
   await badges(p, []);
   // Eigene Widgets (Dialog unter ⚙)
@@ -194,6 +195,16 @@ async function screenshots() {
   await p.click('#openWgt'); await p.waitForTimeout(400); await p.evaluate(() => document.activeElement.blur());
   await shot(p, '28-widgets', await clipOf(p, '#wgtDlg', 20));
   await p.evaluate(() => { for (const d of document.querySelectorAll('dialog[open]')) d.close(); });
+  // SkyNavigator: Aufgabe mit Skizze (auf dem Luftbild, wenn swisstopo erreichbar ist) und Widget-Einstellungen
+  SAT = true;
+  await p.click('#tab-skynav'); await p.waitForTimeout(1500);
+  await p.waitForFunction(() => ![...SATT.values()].some(e => e.st === 'load'), null, { timeout: 20000 }).catch(() => {});
+  await p.waitForTimeout(1000);
+  await badges(p, [['#skyTasks', 1, 'l'], ['#skyNew', 2, 'b'], ['#skyPilot', 3, 'l'], ['#skyCls', 4, 'rr'], ['#skyPos', 5, 'l'], ['#skySlotOn', 6, 'l'], ['#skyCv', 7, 'tl'], ['#skySetO', 8, 'b'], ['#skyZoneC', 9, 'b'], ['#skyActBtn', 10, 'b'], ['#skyWrite', 11, 'b']]);
+  await shot(p, '29-skynav', { ...(await from(p, '.tabs')), height: 860 });
+  await badges(p, []);
+  await shot(p, '30-skynav-einstellungen', { ...(await clipOf(p, 'section:has(#skySet)', 8)), height: 640 });
+  SAT = false;
   await p.context().close();
 
   // Sync-Zustände
