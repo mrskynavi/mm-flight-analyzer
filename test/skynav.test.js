@@ -87,6 +87,7 @@ test('Widget-Einstellungen: Bereich, Typ und Vorgaben in aufgaben.lua', () => {
   assert.strictEqual(st.warnSec, 10);
   assert.strictEqual(st.varioTone, true);
   assert.deepStrictEqual([st.vzLo, st.vzHi], [3, 1]);
+  assert.deepStrictEqual([st.vtGlide, SKY.settingsOf({ vtGlide: 99 }).vtGlide], [5, 30]);
   assert.deepStrictEqual([st.vDamp, SKY.settingsOf({ vDamp: 99 }).vDamp], [4, 20]);
   assert.deepStrictEqual([st.vtRange, SKY.settingsOf({ vtRange: 1 }).vtRange], [10, 3]);
   assert.deepStrictEqual([st.vtStyle, SKY.settingsOf({ vtStyle: 4 }).vtStyle, SKY.settingsOf({ vtStyle: 7 }).vtStyle], [1, 4, 1]);
