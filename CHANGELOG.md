@@ -1,6 +1,6 @@
 # Changelog
 
-## Unveröffentlicht
+## 2026.11.0 – 2026-11-09
 
 - Tab Polare: Neuer Fahrtfilter „Fahrt für Kurve ab … bis …“. Nur Gleitpunkte in diesem Fahrtbereich zählen für Klassen und Kurve, z. B. ab 40 km/h, wenn das Modell im Langsamflug nicht mehr sauber fliegt; solche langsamen Klassen zogen die Kurve A·v³ + B/v hoch, die beste Gleitzahl wurde kleiner und lag bei zu hoher Fahrt. Punkte ausserhalb bleiben hell sichtbar, ihre Mediane als leere Rauten. Der Filter wirkt auf die Fahrt der Polare (TAS, sonst GPS), gehört zur fixierten Version (Status, Vergleich und Versionen zeigen ihn) und gilt damit auch für Netto-Vario, MacCready und polaren.lua (vMin beginnt beim Filter). Ändern öffnet einen Entwurf. Liegen beste Gleitzahl oder geringstes Sinken unter dem Filter, ist die Kurve dort dünn gestrichelt verlängert, mit Hinweis. Standard: aus. Die KI kann den Filter mit fahrt_ab und fahrt_bis setzen.
 - Tab Polare: Die Polare jedes Modells ist fixiert und hat eine Versionsnummer. Neue Logs, Filter oder ein App-Update ändern sie nicht mehr; Netto-Vario, MacCready-Block und polaren.lua nutzen nur die fixierte Version. „Auswahl ändern“ öffnet einen Entwurf (neue Logs nicht angehakt, Entwurf orange gestrichelt neben der fixierten Polare, Kennzahlen alt → neu), „Vergleichen & übernehmen“ zeigt alt und neu mit Sollfahrt und a/b/c und macht daraus die nächste Version, auf Wunsch gleich mit polaren.lua auf den Sender. Die letzten 10 Versionen lassen sich vergleichen und zurückholen. Beim ersten Öffnen wird die bisherige Auswahl Version 1.
@@ -20,6 +20,10 @@
 - Simulator: Sprachdateien der Widgets (playFile, z. B. links.wav und rechts.wav der Kurs-Ansage im SkyNavigator) werden jetzt hörbar, die App spricht den Dateinamen. Die .wav-Dateien selbst lädt der Simulator nicht, sie gelten als vorhanden.
 - macOS: «Auswerfen» wirft jetzt alle Laufwerke des Senders aus (z.B. RADIO und FLASH). Bisher blieb das zweite eingebunden und macOS meldete beim Abziehen «nicht ausgeworfen».
 - Neuer Knopf «Sender zeigen» in der Sync-Zeile öffnet den Sender-Ordner im Finder, auch wenn macOS das Laufwerk in der Seitenleiste ausblendet. Der Pfad steht im Tooltip.
+- SkyNavigator: Die Einstellungen des Widgets stellst Du jetzt im Tab SkyNavigator ein (Kasten „Widget-Einstellungen“, gelten für alle Aufgaben und gehen mit aufgaben.lua auf den Sender). Am Sender bleiben nur Aufgabe, Sensoren, Schalter und das Startfenster von Hand. Gruppen: Töne (Gleitwinkel-, Sollfahrt- und Einflug-Ton, Kurs-Kommandos, Wendeton), Varioton des Widgets mit Klang XCSoar, OpenVario, XCVario oder Ethos/EdgeTX, Dämpfung, Bereich und Totzonen, Start, Weg (Reserve im Sektor, Vorhalt, Eckansicht vor und nach der Wende), Querlage (Vorausschau, Nachtrimmen), automatische Seitenwahl, die Werte unten auf der Seite Gleiten und links auf der Seite Thermik (mit Vorschau), rote Linie zum besten Steigen, Sollfahrt, Restzeit-Sollfahrt (Zeit-MC) und IGC-Kennungen. „Vorgaben“ stellt alles zurück. Den Wenderadius lernt das Widget selbst pro Modell und Ecke.
+- SkyNavigator: Die Flugauswertung zeigt pro Runde und für den ganzen Flug den Index (geflogene Strecke im Verhältnis zum Umfang des Dreiecks).
+- Simulator: Das Widget SkyNavigator nimmt die Aufgaben direkt aus dem Tab SkyNavigator, Sprachdateien werden als Wort gesprochen.
+- Handbuch: neues Kapitel 19 „SkyNavigator: GPS Triangle fliegen“ mit allen Schritten vom Widget auf dem Sender über Aufgabe, Einstellungen und Konfiguration am Sender bis zum Wertungsflug (Scharfstellen, Anflug, Gleiten und Wenden, Thermik, Ziel) und zur Auswertung, mit Bildern der Widget-Seiten. Dazu „Sender zeigen“ und Auswerfen aller Laufwerke in Kapitel 6.
 
 ## 2026.10.2 – 2026-10-13
 

@@ -47,6 +47,15 @@
         'steigfluege/main.lua':document.getElementById('simW_climb').textContent } }),
     simWrite: async rel => '/Users/christoph/Documents/MM Flight Analyzer/Widgets/scripts/' + rel,
     widgetCopy: async () => ({ copied:5 }),
+    // SkyNavigator: eine Aufgabe am Platz des Beispiel-Logs, Sender angeschlossen
+    skynavGet: async () => ({ data: window.__SKYDATA || { version:1, active:'mglinth', pilot:'Christoph Mächler', pilotId:'', settings:{}, tasks:[
+        { id:'mglinth', name:'MgLinth Sport', cls:'Sport', lat:47.200324, lon:8.960282, elev:410, dir:124, dist:350, maxH:400, maxV:120, minF:20, work:30, maxAlt:750, slot:null,
+          zones:[{ t:'C', name:'Parkplatz', lat:47.1985, lon:8.9545, r:60, lo:0, hi:9999 }] },
+        { id:'home', name:'Home', cls:'Light', lat:47.2201, lon:8.9461, elev:410, dir:274, dist:200, maxH:250, maxV:70, minF:10, work:20, maxAlt:350, slot:null, zones:[] }] },
+      flights:[], senders:['/Volumes/RADIO'], dir:'/Users/christoph/Ethos Logs/SkyNavigator' }),
+    skynavSave: async () => ({ written:['/Volumes/RADIO/scripts/skynav/aufgaben.lua'] }),
+    skynavFetch: async () => [],
+    skynavOpen: async () => {},
   };
   window.__setSync = s => { window.__STATUS = s; syncCbs.forEach(cb => cb(s)); };
 })();

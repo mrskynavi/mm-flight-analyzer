@@ -92,15 +92,17 @@ a { color: var(--acc); }
   <li><a href="#k16">Tab „Simulator“: Widgets am Computer testen</a></li>
   <li><a href="#k17">Eigene Widgets von GitHub auf den Sender</a></li>
   <li><a href="#k18">Polare erfliegen und das Modell optimal einstellen</a></li>
-  <li><a href="#k19">KI-Auswertung</a></li>
-  <li><a href="#k20">So kommst Du zu einem Anthropic-API-Schlüssel</a></li>
-  <li><a href="#k21">Beispielfragen für die KI</a></li>
-  <li><a href="#k22">MCP-Server: die App aus Claude bedienen</a></li>
-  <li><a href="#k23">Darstellung, Sprache und Web-Version</a></li>
-  <li><a href="#k24">Was die App speichert</a></li>
-  <li><a href="#k25">Troubleshooting und FAQ</a></li>
-  <li><a href="#k26">Kurzreferenz Maus und Tastatur</a></li>
-  <li><a href="#k27">Änderungen pro Version</a></li>
+  <li><a href="#k19">SkyNavigator: GPS Triangle fliegen</a>
+    <ol><li>Was Du brauchst</li><li>Widget auf den Sender</li><li>Aufgabe anlegen</li><li>Widget in der App einstellen</li><li>Sender konfigurieren</li><li>Vor dem Start prüfen</li><li>Der Wertungsflug</li><li>Auswerten und verbessern</li></ol></li>
+  <li><a href="#k20">KI-Auswertung</a></li>
+  <li><a href="#k21">So kommst Du zu einem Anthropic-API-Schlüssel</a></li>
+  <li><a href="#k22">Beispielfragen für die KI</a></li>
+  <li><a href="#k23">MCP-Server: die App aus Claude bedienen</a></li>
+  <li><a href="#k24">Darstellung, Sprache und Web-Version</a></li>
+  <li><a href="#k25">Was die App speichert</a></li>
+  <li><a href="#k26">Troubleshooting und FAQ</a></li>
+  <li><a href="#k27">Kurzreferenz Maus und Tastatur</a></li>
+  <li><a href="#k28">Änderungen pro Version</a></li>
 </ol>
 </div>
 
@@ -126,10 +128,10 @@ a { color: var(--acc); }
 <tr><td><b>Die App für Dich bedienen</b></td><td>„Erstelle eine Polare ohne Thermik“ oder „Zoome auf den zweiten Steigflug und zeig Höhe, Vario und Strom“. Die KI setzt Filter, Zeitbereich und Diagramme selbst, und alles lässt sich rückgängig machen.</td></tr>
 </table>
 <div class="tip"><b>Ein Beispiel</b>Du fragst: „Wie war meine Thermik heute?“ Die KI antwortet etwa: „Du hattest drei Thermik-Phasen. Die beste bei 12:40 brachte 140 m in 2 Minuten, im Schnitt 1,2 m/s. Bei 18:05 bist Du nach 30 s aus einem guten Bart geflogen, das Vario zeigte noch 1,5 m/s.“ Ein Klick auf 12:40 zeigt die Stelle in den Diagrammen.</div>
-<p>Die KI-Auswertung ist freiwillig und braucht einen eigenen API-Schlüssel von Anthropic; eine Auswertung kostet meist nur wenige Rappen. Wie Du zum Schlüssel kommst, steht Schritt für Schritt in <a href="#k20">Kapitel 20</a>, viele Fragen zum Ausprobieren in <a href="#k21">Kapitel 21</a>, alles zur Bedienung in <a href="#k19">Kapitel 19</a>. Nutzt Du Claude Desktop, kannst Du die App auch ohne Schlüssel direkt aus dem Chat bedienen, über den MCP-Server (<a href="#k22">Kapitel 22</a>).</p>
+<p>Die KI-Auswertung ist freiwillig und braucht einen eigenen API-Schlüssel von Anthropic; eine Auswertung kostet meist nur wenige Rappen. Wie Du zum Schlüssel kommst, steht Schritt für Schritt in <a href="#k21">Kapitel 21</a>, viele Fragen zum Ausprobieren in <a href="#k22">Kapitel 22</a>, alles zur Bedienung in <a href="#k20">Kapitel 20</a>. Nutzt Du Claude Desktop, kannst Du die App auch ohne Schlüssel direkt aus dem Chat bedienen, über den MCP-Server (<a href="#k23">Kapitel 23</a>).</p>
 <p>Die Logs bleiben immer auf Deinem Gerät bzw. in Deinem eigenen Archivordner. Die App schickt keine Logdaten ins Internet, ausser Du startest eine KI-Auswertung: Dann gehen nur die gewählten Kanäle als zusammengefasste Zahlenreihen an Claude, nie die Logdatei selbst.</p>
 <div class="note"><b>Hinweis</b>Der MM Flight Analyzer ist ein Werkzeug von Mächler Modelle. Er ist nicht mit den Herstellern von Ethos oder Jeti verbunden. Ethos ist eine Marke ihres Inhabers.</div>
-<p>Diese Anleitung beschreibt Version {{VERSION}}. Was sich in welcher Version geändert hat, steht in <a href="#k27">Kapitel 27</a>. Die Screenshots zeigen die Desktop-App in der dunklen Darstellung mit dem Beispiel-Log eines Elektroseglers (SB-10).</p>
+<p>Diese Anleitung beschreibt Version {{VERSION}}. Was sich in welcher Version geändert hat, steht in <a href="#k28">Kapitel 28</a>. Die Screenshots zeigen die Desktop-App in der dunklen Darstellung mit dem Beispiel-Log eines Elektroseglers (SB-10).</p>
 
 <!-- 2 -->
 <h1 id="k2"><span class="n">2</span>Installation</h1>
@@ -157,7 +159,7 @@ a { color: var(--acc); }
 <li>Lade <code>MM-Flight-Analyzer-{{VERSION}}.dmg</code> herunter und öffne die Datei per Doppelklick.</li>
 <li>Ziehe <b>MM Flight Analyzer</b> in den Ordner <b>Programme</b>.</li>
 <li>Beim ersten Start blockiert macOS die App, weil sie nicht von einem registrierten Entwickler stammt. Öffne <b>Systemeinstellungen → Datenschutz &amp; Sicherheit</b>, scrolle nach unten und klicke bei „MM Flight Analyzer wurde blockiert“ auf <b>Dennoch öffnen</b>. Bestätige danach noch einmal mit „Öffnen“.</li>
-<li>Wenn Du den Sender zum ersten Mal anschliesst, fragt macOS, ob die App auf <b>Wechselmedien</b> zugreifen darf. Wähle <b>Erlauben</b>. Ohne diese Erlaubnis kann die App keine Logs vom Sender holen (siehe <a href="#k25">Troubleshooting</a>).</li>
+<li>Wenn Du den Sender zum ersten Mal anschliesst, fragt macOS, ob die App auf <b>Wechselmedien</b> zugreifen darf. Wähle <b>Erlauben</b>. Ohne diese Erlaubnis kann die App keine Logs vom Sender holen (siehe <a href="#k26">Troubleshooting</a>).</li>
 </ol>
 <div class="tip"><b>Tipp</b>macOS merkt sich die Erlaubnis. Die Frage kommt nur einmal, nicht für jede Datei.</div>
 
@@ -190,8 +192,8 @@ a { color: var(--acc); }
 <tr><td><b>Archiv-Ordner</b></td><td>Wohin die Logs kopiert werden. <span class="btn">Wählen …</span> öffnet die Ordnerauswahl. Am besten ein Ordner in Google Drive oder OneDrive, dann hast Du die Logs auf allen Geräten. Pro Modell entsteht ein Unterordner.</td></tr>
 <tr><td><b>Automatisch synchronisieren …</b></td><td>Ein: Sobald der Sender angeschlossen ist, holt die App neue Logs. Aus: Die Sync-Zeile zeigt „Automatischer Sync aus“.</td></tr>
 <tr><td><b>Importierte Logs immer ins Archiv kopieren</b></td><td>Logs, die Du über „Import …“ öffnest, landen dann automatisch auch im Archiv.</td></tr>
-<tr><td><b>KI-Auswertung …</b></td><td>API-Schlüssel, Modell und Optionen für die KI-Auswertung (<a href="#k19">Kapitel 19</a>). Daneben steht, ob ein Schlüssel hinterlegt ist.</td></tr>
-<tr><td><b>MCP …</b></td><td>Nur Desktop-App: MCP-Server ein- und ausschalten, damit Claude Desktop die App bedienen kann (<a href="#k22">Kapitel 22</a>). Standard aus.</td></tr>
+<tr><td><b>KI-Auswertung …</b></td><td>API-Schlüssel, Modell und Optionen für die KI-Auswertung (<a href="#k20">Kapitel 20</a>). Daneben steht, ob ein Schlüssel hinterlegt ist.</td></tr>
+<tr><td><b>MCP …</b></td><td>Nur Desktop-App: MCP-Server ein- und ausschalten, damit Claude Desktop die App bedienen kann (<a href="#k23">Kapitel 23</a>). Standard aus.</td></tr>
 <tr><td><b>Eigene Widgets</b></td><td>Nur Desktop-App: Widgets von GitHub holen und beim Anschliessen auf den Sender kopieren (<a href="#k17">Kapitel 17</a>).</td></tr>
 <tr><td><b>Version</b> und <b>Nach Updates suchen</b></td><td>Zeigt die installierte Version und sucht auf Knopfdruck nach einer neueren (siehe <a href="#k2">Kapitel 2.4</a>).</td></tr>
 </table>
@@ -214,7 +216,7 @@ a { color: var(--acc); }
 <tr><td class="c"><span class="num">10</span></td><td>Archiv öffnen</td><td>Öffnet den Archivordner im Explorer bzw. Finder.</td></tr>
 <tr><td class="c"><span class="num">11</span></td><td>Tabs</td><td>Übersicht, Diagramme, Thermik, Motorsteigflüge, Polare, Karte &amp; Wind, Alle Werte, Rohdaten. Die App merkt sich den zuletzt offenen Tab.</td></tr>
 <tr><td class="c"><span class="num">12</span></td><td>Dateizeile</td><td>Herkunft (<b>Archiv</b>, <b>Geladen</b> oder <b>Beispiel: Dein Log</b>), Dateiname, Zeitraum und Anzahl Sensoren. Bei importierten Logs steht hier der Knopf „Im Archiv sichern“.</td></tr>
-<tr><td class="c"><span class="num">13</span></td><td>✦ KI-Auswertung</td><td>Öffnet rechts das Panel der KI-Auswertung, in jedem Tab. Erscheint nur, wenn ein API-Schlüssel hinterlegt ist (<a href="#k19">Kapitel 19</a>).</td></tr>
+<tr><td class="c"><span class="num">13</span></td><td>✦ KI-Auswertung</td><td>Öffnet rechts das Panel der KI-Auswertung, in jedem Tab. Erscheint nur, wenn ein API-Schlüssel hinterlegt ist (<a href="#k20">Kapitel 20</a>).</td></tr>
 </table>
 <div class="tip"><b>Tipp</b>Ist noch kein Log vorhanden, öffnet die App ein Beispiel-Log. Daran kannst Du alles ausprobieren. Sobald Logs im Archiv liegen, verschwindet das Beispiel.</div>
 
@@ -289,6 +291,7 @@ a { color: var(--acc); }
 
 <h2>Auswerfen</h2>
 <p><span class="btn">⏏ Auswerfen</span> wirft den Sender so aus wie der Finder (Mac) bzw. „Auswerfen“ im Explorer (Windows). Klappt es nicht, zum Beispiel weil noch eine Datei auf dem Sender offen ist, steht der Grund in der Sync-Zeile („Auswerfen fehlgeschlagen: …“). Während ein Sync läuft, ist Auswerfen nicht möglich.</p>
+<p>Auf dem Mac wirft <span class="btn">⏏ Auswerfen</span> alle Laufwerke des Senders aus (z. B. RADIO und FLASH), damit macOS beim Abziehen nicht „nicht ausgeworfen“ meldet. <span class="btn">Sender zeigen</span> öffnet den Ordner des Senders im Finder bzw. Explorer, auch wenn macOS das Laufwerk in der Seitenleiste ausblendet; der Pfad steht im Tooltip.</p>
 
 <!-- 7 -->
 <h1 id="k7"><span class="n">7</span>Der Zeitpunkt</h1>
@@ -454,7 +457,7 @@ a { color: var(--acc); }
 <li><b>Ideale Spur</b> kreist mit Deinem Radius und Deiner Fahrt sauber um den Bartkern (Netto 3 s) und wandert mit dem Wind mit.</li>
 <li><b>Ursprung (geschätzt):</b> Die App rechnet zurück, wo die Luft am Boden losgestiegen ist: von der Einstiegshöhe mit dem mittleren positiven Netto-Steigen, mit dem Wind getrieben, plus 20 %, weil Thermik nahe am Boden langsamer steigt. Mit <b>Gelände</b> rechnet sie mit der Höhe über dem Boden am Ursprung (Höhenmodell AWS Terrain Tiles, weltweit). Der orange Bereich reicht von 0,8- bis 1,4-mal dieser Distanz entlang der Windlinie. Such darin nach Auslösern wie Baumreihen, Höfen, Feldrändern oder Dämmen. Unter 0,5 m/s ist die Schätzung unsicher.</li>
 <li><b>Heatmap</b> legt die Ursprungsbereiche aller aktiven Thermiken übereinander. Wo es rot wird, lösen sich an diesem Tag vermutlich immer wieder Bärte ab.</li>
-<li><b>Luftbild:</b> in der Schweiz von swisstopo, im Ausland von Esri. Für Esri brauchst Du einen eigenen Schlüssel unter <span class="btn">⚙</span> → <b>Luftbild im Ausland (Esri-Schlüssel)</b> (<a href="#k23">Kapitel 23</a>).</li>
+<li><b>Luftbild:</b> in der Schweiz von swisstopo, im Ausland von Esri. Für Esri brauchst Du einen eigenen Schlüssel unter <span class="btn">⚙</span> → <b>Luftbild im Ausland (Esri-Schlüssel)</b> (<a href="#k24">Kapitel 24</a>).</li>
 <li>Mausrad oder zwei Finger zoomen, Ziehen verschiebt, Doppelklick zeigt wieder alles.</li>
 </ul>
 <h2>Motorsteigflüge</h2>
@@ -508,7 +511,7 @@ a { color: var(--acc); }
 <figure><img src="bilder/13-karte.png" alt=""><figcaption>GPS-Spur und Wind nach Höhe</figcaption></figure>
 <h2>GPS-Spur</h2>
 <ul>
-<li>Die Spur ist von oben gesehen, Norden oben, auf dem Luftbild: in der Schweiz von swisstopo, im Ausland von Esri. Für Esri brauchst Du einen eigenen Schlüssel unter <span class="btn">⚙</span> → <b>Luftbild im Ausland (Esri-Schlüssel)</b> (<a href="#k23">Kapitel 23</a>). <span class="btn">Luftbild</span> schaltet den Hintergrund aus und ein. Das Gitter passt sich dem Zoom an, unten links steht sein Abstand.</li>
+<li>Die Spur ist von oben gesehen, Norden oben, auf dem Luftbild: in der Schweiz von swisstopo, im Ausland von Esri. Für Esri brauchst Du einen eigenen Schlüssel unter <span class="btn">⚙</span> → <b>Luftbild im Ausland (Esri-Schlüssel)</b> (<a href="#k24">Kapitel 24</a>). <span class="btn">Luftbild</span> schaltet den Hintergrund aus und ein. Das Gitter passt sich dem Zoom an, unten links steht sein Abstand.</li>
 <li>Die Farbe zeigt das <b>Netto-Steigen der Luft</b> (Netto-Vario, Legende unten): <b>blau</b> sinkende Luft, <b>rot</b> steigende, beige ruhige; ab ±1,5 m/s voll gesättigt. Grau ist die Zeit mit Motor und 15 s danach, <b>weiss</b> (auf dem Luftbild) bzw. schwarz sind Steigflüge, Thermik ist dicker gezeichnet. Ohne Polare gibt es kein Netto-Vario, dann zeigt die Farbe wie früher die Höhe und Thermik ist grün. Kräftig gezeichnet ist der Zeitraum, den der Tab Diagramme gerade zeigt.</li>
 <li>„Start“ markiert den Startpunkt, der orange Kreis den Zeitpunkt mit Uhrzeit und Höhe.</li>
 <li>Zoomen mit Mausrad, zwei Fingern oder <span class="btn">−</span> <span class="btn">+</span>; ziehen verschiebt; Doppelklick oder <span class="btn">Alles</span> zeigt die ganze Spur.</li>
@@ -584,7 +587,7 @@ a { color: var(--acc); }
 <tr><td><b>Polarflug</b></td><td>Hilft beim Erfliegen der Polare: zählt Messpunkte pro Fahrtbereich, zeigt die Polare und schreibt sie auf Wunsch in polaren.lua (<a href="#k18">Kapitel 18</a>).</td></tr>
 <tr><td><b>Thermik</b>, <b>Steigflüge</b></td><td>Balken pro Thermik- bzw. Steigflug-Phase mit Ø Steigen und Höhengewinn, so wie die gleichnamigen Tabs der App.</td></tr>
 <tr><td><b>Wind</b>, <b>GPS Course</b></td><td>Wind, Windrichtung und TAS aus dem GPS bzw. der Kurs aus zwei GPS-Positionen, als Quellen für andere Widgets.</td></tr>
-<tr><td><b>SkyNavigator</b></td><td>Navigation für GPS Triangle mit Start-, Gleit-, Thermik- und Wertungsseite. Die Aufgaben kommen aus dem Tab SkyNavigator.</td></tr>
+<tr><td><b>SkyNavigator</b></td><td>Navigation für GPS Triangle mit Übersicht-, Start-, Gleit-, Thermik- und Wertungsseite. Die Aufgaben und Einstellungen kommen aus dem Tab SkyNavigator (<a href="#k19">Kapitel 19</a>).</td></tr>
 </table>
 <figure class="half"><img src="bilder/28-widgets.png" alt=""><figcaption>⚙ Einstellungen → Eigene Widgets</figcaption></figure>
 <h2>So läuft es ab</h2>
@@ -661,11 +664,189 @@ a { color: var(--acc); }
 <p>Ob sich Ballast lohnt, zeigt schon vor dem Flug der Regler <b>Ballast</b> im Tab Polare: Die Polare verschiebt sich zu höherer Fahrt, die Tabelle zeigt Sollfahrt und Schnitt für MC 0 bis 3. Der Regler <b>Verschmutzung</b> zeigt, was Mücken oder Regen auf den Flächen kosten.</p>
 <div class="note"><b>Genauigkeit</b>Die erflogene Polare ist so gut wie die Sensoren und die Luft. Ein barometrisches Vario mit gutem GPS reicht; ein Staurohr macht die Fahrt genauer. Vergleiche nur Polaren, die mit genug Punkten im selben Fahrtbereich entstanden sind. Unterschiede unter etwa 5 % liegen oft im Rauschen.</div>
 
+<!-- 19 -->
+<h1 id="k19"><span class="n">19</span>SkyNavigator: GPS Triangle fliegen</h1>
+<p><b>GPS Triangle</b> ist ein Wettbewerb für Segelflugmodelle: In einer festen Arbeitszeit fliegst Du so viele Runden wie möglich um ein rechtwinkliges Dreieck. Die Wendepunkte siehst Du nicht, ein GPS im Modell zeichnet den Flug auf und entscheidet, ob Start, Wenden und Ziel gelten. Gerade darum ist Navigation alles: Wer die Ecken knapp, aber sicher erwischt, mit der richtigen Fahrt gleitet und die Arbeitszeit ausnutzt, fliegt mehr Runden.</p>
+<p>Der <b>SkyNavigator</b> besteht aus zwei Teilen, die zusammenarbeiten:</p>
+<ul>
+<li>dem <b>Tab SkyNavigator</b> in der App: Dort legst Du die Aufgaben an (Ort, Richtung, Grösse, Limits, Startfenster, Sicherheitszonen), stellst das Widget ein und wertest die geflogenen Runden aus.</li>
+<li>dem Ethos-<b>Widget SkyNavigator</b> am Sender: Es führt Dich im Flug von der Startlinie um alle Ecken bis ins Ziel, mit Anzeige, Tönen und Ansagen, rechnet die Wertung live und schreibt den Flug als IGC-Datei.</li>
+</ul>
+<p>Die Regeln folgen der „GPS Triangle Definition V1.7b“ und den Reglementen der Klassen Light, Sport und Scale. Das folgende Kapitel geht Schritt für Schritt durch alles, was Du für einen erfolgreichen Wertungsflug brauchst.</p>
+<table>
+<tr><th>Schritt</th><th>Wo</th><th>Ergebnis</th></tr>
+<tr><td>1. Voraussetzungen prüfen</td><td>Modell, Sensoren, Sender</td><td>GPS, Vario und Schalter sind da</td></tr>
+<tr><td>2. Widget auf den Sender</td><td>⚙ → Eigene Widgets</td><td>scripts/skynav/ auf dem Sender, Widget auf einem Bildschirm</td></tr>
+<tr><td>3. Aufgabe anlegen</td><td>Tab SkyNavigator</td><td>Dreieck am richtigen Ort, als aktiv markiert</td></tr>
+<tr><td>4. Widget einstellen</td><td>Tab SkyNavigator → Widget-Einstellungen</td><td>Töne, Seiten, Sollfahrt nach Deinem Geschmack</td></tr>
+<tr><td>5. Sender anschliessen und konfigurieren</td><td>Sync, dann am Sender</td><td>aufgaben.lua auf dem Sender, Sensoren und Schalter zugeordnet</td></tr>
+<tr><td>6. Vor dem Start prüfen</td><td>am Platz</td><td>Checkliste erfüllt</td></tr>
+<tr><td>7. Wertungsflug</td><td>Widget im Flug</td><td>Runden, Schnitt, IGC-Datei</td></tr>
+<tr><td>8. Auswerten und verbessern</td><td>Tab SkyNavigator, Simulator</td><td>Runden im Detail, bessere Einstellungen</td></tr>
+</table>
+
+<h2>1. Was Du brauchst</h2>
+<table>
+<tr><th>Was</th><th>Nötig?</th><th>Wozu</th></tr>
+<tr><td><b>Ethos-Sender</b> und die <b>Desktop-App</b> (Windows oder Mac)</td><td>ja</td><td>Die Desktop-App kopiert Widget und Aufgaben auf den Sender und holt die Flüge zurück. Mit der Web-Version geht es auch, dann kopierst Du aufgaben.lua von Hand nach scripts/skynav/.</td></tr>
+<tr><td><b>GPS</b> im Modell (Position, Geschwindigkeit, am besten auch Zeit)</td><td>ja</td><td>Ohne GPS keine Navigation und keine Wertung. Je öfter das GPS sendet, desto genauer Ecken und Linie. Die GPS-Zeit macht das Startfenster unabhängig von der Senderuhr.</td></tr>
+<tr><td><b>Höhe</b>: Vario-Höhe (relativ zum Start) oder GPS-Höhe über Meer</td><td>ja</td><td>Einflughöhe, Maximalhöhe und Sicherheitszonen. Mit GPS-Höhe ü. M. zieht das Widget die Platzhöhe der Aufgabe ab.</td></tr>
+<tr><td><b>Vario</b> (TE oder barometrisch)</td><td>empfohlen</td><td>Netto, Sollfahrt, Thermik-Seite und Varioton. Ein barometrisches Vario kompensiert das Widget selbst.</td></tr>
+<tr><td><b>Polare</b> in scripts/maccready/polaren.lua</td><td>empfohlen</td><td>Sollfahrt (SOLL/IST), Netto und Restzeit-Sollfahrt. Wie Du sie bekommst, steht in <a href="#k18">Kapitel 18</a>. Ohne Polare navigiert das Widget trotzdem und zeigt „Polare fehlt“.</td></tr>
+<tr><td><b>Scharf-Schalter</b> (ARM), Taster oder Kippschalter</td><td>empfohlen</td><td>Damit stellst Du den Start scharf, ohne auf den Bildschirm zu tippen.</td></tr>
+<tr><td>MC-Poti, Ballast-Poti, Seiten-Schalter, Ton-Schalter</td><td>freiwillig</td><td>MC und Ballast im Flug ändern, Seiten fest wählen, Töne abschalten.</td></tr>
+<tr><td>Querlage (Rollwinkel), AccZ, AccX, Nickwinkel</td><td>freiwillig</td><td>Querlage: Kurvenbeginn früher erkennen. AccZ (mit AccX und Nickwinkel): schnellerer Varioton.</td></tr>
+</table>
+
+<h2>2. Das Widget auf den Sender bringen</h2>
+<ol>
+<li>Unter <span class="btn">⚙</span> → <span class="btn">Widgets …</span> beim Widget <b>SkyNavigator</b> das Häkchen „Auf den Sender“ setzen (<a href="#k17">Kapitel 17</a>).</li>
+<li>Sender anschliessen. Die App kopiert das Widget mit seinen Sprachdateien nach <b>scripts/skynav/</b>. Die Sync-Zeile meldet z. B. „Widgets: 7 kopiert“.</li>
+<li>Sender auswerfen und <b>neu starten</b>: Ethos lädt neue Lua-Skripte erst nach einem Neustart.</li>
+<li>Am Sender einen Bildschirm mit <b>einem Feld über die ganze Fläche</b> anlegen (Vollbild) und dort das Widget <b>SkyNavigator</b> wählen. Am besten ein eigener Bildschirm nur für den Wettbewerb.</li>
+</ol>
+
+<h2>3. Die Aufgabe anlegen</h2>
+<p>Im Tab <b>SkyNavigator</b> legst Du für jeden Platz und jede Klasse eine Aufgabe an. Die App merkt sich alle Aufgaben; am Sender wählst Du später nur noch, welche gilt.</p>
+<figure><img src="bilder/29-skynav.png" alt=""><figcaption>Tab SkyNavigator: Aufgabenliste, Daten der Aufgabe und Skizze auf dem Luftbild</figcaption></figure>
+<table>
+<tr><th class="c">Nr.</th><th>Element</th><th>Funktion</th></tr>
+<tr><td class="c"><span class="num">1</span></td><td>Aufgaben</td><td>Alle Aufgaben mit Klasse, dTP und Richtung. Ein Klick wählt sie zum Bearbeiten. Der Punkt und „AKTIV“ markieren die Aufgabe, die am Sender gilt.</td></tr>
+<tr><td class="c"><span class="num">2</span></td><td>Neu, Import .rct</td><td><span class="btn">Neu</span> legt eine Aufgabe dort an, wo die Karte gerade steht, und schaltet „O setzen“ ein: Klick in die Karte setzt den Ursprung. <span class="btn">Import .rct</span> liest eine Aufgabe im Format der Triangle Definition (z. B. vom Veranstalter).</td></tr>
+<tr><td class="c"><span class="num">3</span></td><td>Pilot, Pilot-ID</td><td>Kommen in die IGC-Datei.</td></tr>
+<tr><td class="c"><span class="num">4</span></td><td>Name, Klasse</td><td>Die Klasse setzt dTP und alle Limits nach Reglement (Tabelle unten). Du kannst sie danach einzeln ändern.</td></tr>
+<tr><td class="c"><span class="num">5</span></td><td>Ursprung O, dTP, Richtung, Platzhöhe, Limits</td><td><b>O</b> ist die Mitte der langen Seite (Hypotenuse), durch O geht die Start- und Ziellinie. <b>dTP</b> ist der Abstand von O zu jeder Ecke, <b>Richtung O → TP1</b> dreht das Dreieck. <b>Platzhöhe (MSL)</b> braucht es, wenn das Widget mit GPS-Höhe über Meer rechnet. Dazu Max. Einflughöhe und -geschwindigkeit, Mindestspeed im Ziel, Arbeitszeit und Maximalhöhe.</td></tr>
+<tr><td class="c"><span class="num">6</span></td><td>Startfenster</td><td>Datum, Uhrzeit (Ortszeit) und Länge, wenn der Veranstalter Dir ein Fenster zuteilt. Ein Start ausserhalb gilt nicht. Ohne Häkchen kannst Du jederzeit starten.</td></tr>
+<tr><td class="c"><span class="num">7</span></td><td>Skizze</td><td>Dreieck, Viertelkreis-Sektoren der Ecken, Start-/Ziellinie (grün gestrichelt) und Sicherheitszonen, in der Schweiz auf dem Luftbild von swisstopo, im Ausland von Esri (mit eigenem Schlüssel unter ⚙). Ziehen im Dreieck oder an O verschiebt es, Ziehen an einer Ecke dreht es. Ziehen daneben verschiebt die Karte, Mausrad oder zwei Finger zoomen, <span class="btn">Alles</span> oder Doppelklick zeigt wieder die ganze Aufgabe. <span class="btn">Luftbild</span> schaltet das Bild aus und ein.</td></tr>
+<tr><td class="c"><span class="num">8</span></td><td>O setzen</td><td>Danach in die Karte klicken: dort liegt der Ursprung. Esc bricht ab.</td></tr>
+<tr><td class="c"><span class="num">9</span></td><td>Sicherheitszonen</td><td>Bis 5 Zonen als Kreis oder Rechteck, mit Höhenbereich über Platz (z. B. Parkplatz, Strasse, Zuschauer). In der Skizze verschieben und an den Punkten Radius, Richtung, Länge und Breite ändern.</td></tr>
+<tr><td class="c"><span class="num">10</span></td><td>Als aktiv markieren, Duplizieren, Export .rct, Löschen</td><td>Die aktive Aufgabe ist am Sender vorgewählt. Duplizieren ist praktisch für die gleiche Aufgabe in einer anderen Klasse.</td></tr>
+<tr><td class="c"><span class="num">11</span></td><td>Auf Sender schreiben</td><td>Schreibt scripts/skynav/aufgaben.lua sofort auf den angeschlossenen Sender. Sonst geschieht das bei jedem Anschliessen von selbst.</td></tr>
+</table>
+<table>
+<tr><th>Klasse</th><th>dTP</th><th>Max. Einflughöhe</th><th>Max. Einfluggeschw.</th><th>Mindestspeed Ziel</th><th>Arbeitszeit</th><th>Maximalhöhe</th></tr>
+<tr><td><b>Light</b></td><td>200 m</td><td>250 m</td><td>70 km/h</td><td>10 km/h</td><td>20 min</td><td>350 m</td></tr>
+<tr><td><b>Sport</b></td><td>350 m</td><td>400 m</td><td>120 km/h</td><td>20 km/h</td><td>30 min</td><td>750 m</td></tr>
+<tr><td><b>Scale</b></td><td>500 m</td><td>500 m</td><td>120 km/h</td><td>20 km/h</td><td>30 min</td><td>750 m</td></tr>
+</table>
+<p>So ist das Dreieck aufgebaut: TP1 liegt in der Richtung, die Du einstellst, TP3 genau gegenüber, TP2 im rechten Winkel dazu. Die Start- und Ziellinie geht durch O, rechtwinklig zur langen Seite. Gestartet wird von der Seite von TP3 her über die Linie Richtung TP1, dann geht es um TP1, TP2 und TP3 und wieder über die Linie: Das ist eine Runde. Eine Ecke gilt, sobald ein GPS-Punkt im Viertelkreis (1,5 km Radius) hinter der Ecke liegt.</p>
+<div class="tip"><b>Tipp</b>Leg das Dreieck so, dass Du alle drei Ecken gut siehst und keine Ecke über Zuschauern, Strassen oder Gebäuden liegt. Was nicht überflogen werden darf, trägst Du als Sicherheitszone ein; das Widget warnt mit einem tiefen Ton, sobald Du hineinfliegst.</div>
+
+<h2>4. Das Widget in der App einstellen</h2>
+<p>Unter der Aufgabe stehen die <b>Widget-Einstellungen</b>. Sie gelten für alle Aufgaben und gehen mit aufgaben.lua auf den Sender, so musst Du am Sender kaum etwas eintippen. <span class="btn">Vorgaben</span> stellt alles zurück. Die Standardwerte passen für den Anfang; ändere erst etwas, wenn Dich im Flug etwas stört.</p>
+<figure><img src="bilder/30-skynav-einstellungen.png" alt=""><figcaption>Widget-Einstellungen im Tab SkyNavigator</figcaption></figure>
+<table>
+<tr><th>Gruppe</th><th>Was Du einstellst</th></tr>
+<tr><td><b>Töne</b></td><td>Ton allgemein, Ereignisse auch auf anderen Seiten melden, Gleitwinkel-Ton beim Anflug, Sollfahrt-Ton, Kurs-Kommandos („30 rechts“), Varioton des Widgets mit Klang (XCSoar, OpenVario, XCVario, Ethos/EdgeTX), Dämpfung, Bereich und Totzonen. Ist der Varioton des Widgets an, schaltest Du den Vario-Ton des Senders aus. „Kommando ab“ und „höchstens alle“ bestimmen, ab welcher Kursabweichung und wie oft eine Ansage kommt.</td></tr>
+<tr><td><b>Start</b></td><td>Einflugfenster unter dem Limit (Zielhöhe für den Anflug), Vibration ab Limit minus x km/h, Massstab der Start-Seite, ob ein hoher Ton „zu tief“ oder „zu hoch“ bedeutet.</td></tr>
+<tr><td><b>Weg</b></td><td>Reserve im Sektor (so weit innen plant das Widget die Kurve), Wendeton (Sekunden vor dem Kurvenbeginn), Vorhalt für die Kurveneinleitung, wie lange die Eckansicht vor und nach dem Wendepunkt stehen bleibt.</td></tr>
+<tr><td><b>Querlage</b></td><td>Vorausschau mit dem Rollwinkel-Sensor und Nachtrimmen des Nullpunkts im geraden Flug.</td></tr>
+<tr><td><b>Seiten</b></td><td>Seite automatisch wechseln (siehe unten), solange kein Seiten-Schalter ein ist.</td></tr>
+<tr><td><b>Gleiten: Werte unten</b>, <b>Thermik: Werte</b></td><td>Welche Werte in den Feldern der Seiten Gleiten und Thermik stehen. Die Vorschau zeigt sie mit Beispielwerten; auf die Beschriftung tippen und wählen.</td></tr>
+<tr><td><b>Thermik: Karte</b></td><td>Rote Linie vom Modell zum besten Steigen der Spur.</td></tr>
+<tr><td><b>Sollfahrt</b></td><td>MC ohne Poti, MC-Maximum am Poti, Fluggewicht und Verschmutzung der Polare, Totzone für den Sollfahrt-Ton.</td></tr>
+<tr><td><b>Restzeit-Sollfahrt</b></td><td>Zeit-MC statt festem MC: Das Widget rechnet aus Restzeit, Wind, Höhe und Steigen, wie viele Dreiecke noch passen, und zeigt den MC, der sie am schnellsten schafft. Dazu Zeitreserve, Pilotfaktor und tiefste Gleithöhe.</td></tr>
+<tr><td><b>IGC</b></td><td>Wettbewerbskennung und Kennzeichen für die IGC-Datei.</td></tr>
+</table>
+
+<h2>5. Sender anschliessen und das Widget konfigurieren</h2>
+<p>Beim Anschliessen schreibt die App die Aufgaben und Einstellungen nach <b>scripts/skynav/aufgaben.lua</b>. Danach stellst Du am Sender einmal pro Modell ein, woher das Widget seine Werte nimmt: Widget lange antippen → <b>Widget konfigurieren</b>.</p>
+<table>
+<tr><th>Feld am Sender</th><th>Was wählen</th></tr>
+<tr><td><b>Aufgabe</b></td><td>„Aktive Aufgabe der App“ oder eine bestimmte Aufgabe. Steht hier „aufgaben.lua fehlt“, war der Sender seit dem Anlegen nicht angeschlossen.</td></tr>
+<tr><td><b>GPS</b>, <b>GPS-Geschw.</b>, <b>GPS-Höhe (ü. M.)</b>, <b>GPS-Zeit</b></td><td>Die Sensoren Deines GPS. Ohne GPS-Zeit nimmt das Widget die Senderuhr (Uhrzeit dann mit *); stell sie in diesem Fall genau.</td></tr>
+<tr><td><b>Relative Höhe</b>, <b>Höhe für Wertung</b></td><td>Die Höhe des Varios (relativ zum Start). „Höhe für Wertung“ entscheidet, ob Einflughöhe und Zonen mit dieser Höhe oder mit GPS-Höhe minus Platzhöhe gerechnet werden.</td></tr>
+<tr><td><b>Vario</b>, <b>Vario-Art</b></td><td>Der Vario-Sensor und ob er schon kompensiert ist (TE) oder barometrisch misst.</td></tr>
+<tr><td><b>Schalter Seite …</b></td><td>Freiwillig: ein Schalter pro Seite. Solange er ein ist, gilt diese Seite.</td></tr>
+<tr><td><b>Scharf-Schalter (ARM)</b>, <b>Ton-Schalter</b></td><td>Schalter zum Scharfstellen; Ton-Schalter schaltet alle Töne des Widgets ab.</td></tr>
+<tr><td><b>Kurs-Ticker</b></td><td>Leise Klicks auf der Seite Gleiten, wenn die Ablage vom Kurs wächst.</td></tr>
+<tr><td><b>MC-Quelle</b>, <b>Ballast-Quelle</b>, <b>Ballast maximal</b></td><td>Poti für MC (Anschlag oben = MC ZEIT) und Ballast (0 bis 100 % von „Ballast maximal“ in kg). Ohne Ballast-Quelle gilt Ballast maximal fix.</td></tr>
+<tr><td><b>Querlage</b>, <b>AccZ</b>, <b>AccX</b>, <b>Nickwinkel</b></td><td>Freiwillig, siehe oben. <span class="btn">Jetzt nullen</span> mit waagrechten Flügeln setzt den Nullpunkt der Querlage.</td></tr>
+<tr><td><b>Startfenster von Hand</b></td><td>Stunde, Minute und Länge, wenn Dir das Fenster erst am Platz gesagt wird. −1 bei der Stunde nimmt das Fenster der Aufgabe.</td></tr>
+</table>
+<p>Alle anderen Einstellungen kommen aus der App („Weitere Einstellungen: in der App“).</p>
+
+<h2>6. Vor dem Start prüfen</h2>
+<ul>
+<li>In der Kopfzeile des Widgets steht <b>BEREIT</b> und kein rotes <b>GPS?</b>. Die Uhrzeit rechts ohne * heisst, dass sie vom GPS kommt.</li>
+<li>Die Übersicht zeigt die richtige Aufgabe, Dein Modell steht auf dem Platz neben O.</li>
+<li>Auf der Seite Start steht das Startfenster („Fenster öffnet in …“, „FENSTER OFFEN“ oder „kein Startfenster“) und die Arbeitszeit.</li>
+<li>Seite Gleiten: Statt „Polare fehlt“ stehen SOLL, IST und MC.</li>
+<li>Mit Querlage-Sensor: Flügel waagrecht und nullen.</li>
+<li>Ton laut genug, der Vario-Ton des Senders aus, wenn der Varioton des Widgets an ist.</li>
+</ul>
+<div class="tip"><b>Tipp</b>Spiel ein altes Log vom gleichen Platz im Tab Simulator mit dem Widget SkyNavigator ab (<a href="#k16">Kapitel 16</a>). Der Simulator nimmt die Aufgaben direkt aus dem Tab SkyNavigator. So hörst und siehst Du Anflug, Wendeton und Ansagen schon am Schreibtisch und lernst die Seiten kennen.</div>
+
+<h2>7. Der Wertungsflug</h2>
+<p>Das Widget hat fünf Seiten, unten als Reiter. Tippen auf einen Reiter wechselt die Seite. Ist „Seite automatisch“ an, wechselt das Widget selbst: nach dem Start auf <b>Gleiten</b>, bei einem Einflug mit Strafe auf <b>Start</b> (bis Du zwei Drittel des Wegs zu TP1 geflogen bist), nach Landung oder Ende der Arbeitszeit auf <b>Wertung</b>. Tippst Du selbst eine Seite an, bleibt sie, bis die Automatik das nächste Ziel hat. Ein eingeschalteter Seiten-Schalter geht immer vor.</p>
+<p>Die Kopfzeile zeigt immer die Restzeit (REST), den Zustand (BEREIT, &gt;&gt; SCHARF &lt;&lt;, RUNDE 1 TP1 …) und die Uhrzeit. Töne für Start, Ecken und Ziel und der Wendeton kommen immer, auch wenn eine andere Seite oder ein anderer Bildschirm offen ist.</p>
+
+<h3>Steigen und scharf stellen</h3>
+<figure><img src="bilder/skynav-uebersicht.png" alt=""><figcaption>Seite Übersicht (im Simulator): Aufgabe, Spur, nächstes Ziel, Start und Runden</figcaption></figure>
+<p>Steig mit Motor oder in der Thermik auf Ausgangshöhe. Die Übersicht zeigt Aufgabe, Spur und das nächste Ziel. Vor dem Anflug stellst Du <b>scharf</b>: Scharf-Schalter betätigen oder auf der Seite Start auf <span class="btn">SCHARF (tippen)</span> tippen. Ein Doppelton bestätigt, die Kopfzeile zeigt <b>&gt;&gt; SCHARF &lt;&lt;</b>, und die IGC-Aufzeichnung beginnt (mit 90 s Vorlauf). Ein Start gilt nur, wenn das Widget scharf ist.</p>
+
+<h3>Anflug auf die Startlinie</h3>
+<figure><img src="bilder/skynav-start.png" alt=""><figcaption>Seite Start (im Simulator): Draufsicht mit Linie, Gleitpfad und Werte an der Linie</figcaption></figure>
+<p>Die Seite <b>Start</b> zeigt links die Linie (gelb) mit dem Startsektor, in der Mitte den <b>Gleitpfad</b> und rechts die Werte, die Du an der Linie haben wirst: Höhe und Speed an der Linie mit den Limits, dazu die Zeit bis zur Linie. Das Widget rechnet aus Sinken und Annäherung, wie hoch Du an der Linie sein wirst, und vergleicht das mit dem Einflugfenster knapp unter der maximalen Einflughöhe. Ein Pfeil und „ZU TIEF“ oder „ZU HOCH“ zeigen, was zu tun ist.</p>
+<ul>
+<li><b>Gleitwinkel-Ton</b> (Standard): hoher, schneller werdender Ton = zu tief, Höhe sparen; tiefer Dauerton = zu hoch, mehr sinken; leiser Takt = im Fenster. In den Einstellungen lässt sich das umdrehen.</li>
+<li><b>Vibration</b>, wenn Du an der Linie zu schnell wärst (Limit minus 3 km/h).</li>
+</ul>
+<p>Flieg von der Seite von TP3 über die Linie Richtung TP1. Der Start gilt beim Überqueren der Linie; Höhe und Speed zählen vom letzten GPS-Punkt davor. Mit Startfenster gilt der Start nur, wenn es offen ist („Start ungültig: Fenster noch zu“).</p>
+<p>Nach dem Start sagt das Widget <b>„Einflug OK“</b> oder die Strafpunkte an. Strafe: 50 Punkte plus 2 Punkte pro Meter zu hoch und 2 Punkte pro km/h zu schnell. Ist der Einflug misslungen und noch keine Runde fertig, stellst Du einfach noch einmal scharf: Das Widget startet neu („Neustart: wieder scharf“) und Du fliegst die Linie erneut an.</p>
+
+<h3>Gleiten und wenden</h3>
+<figure><img src="bilder/skynav-gleiten.png" alt=""><figcaption>Seite Gleiten (im Simulator): Sollfahrt links, Kurs und Ablage oben, drei Werte unten</figcaption></figure>
+<p>Die Seite <b>Gleiten</b> ist die Hauptseite im Flug. Das Widget plant den schnellsten Weg um die nächsten drei Ecken, mit Kurven im aktuellen Wenderadius und mit dem Wind, und sagt Dir, wohin Du fliegen sollst:</p>
+<ul>
+<li><b>Kurs</b> oben: „65° RECHTS &gt;“ heisst 65° nach rechts drehen. Der Balken darunter zeigt die Ablage vom geplanten Weg, der Pfeil das Modell. Bei grosser Abweichung steht „WEIT DANEBEN“ mit Richtung und Distanz zur Ecke. Die <b>Kurs-Kommandos</b> sagen „30 links“ oder „15 rechts“ an, vor allem wenn die Ablage wächst; dazu klickt der Kurs-Ticker.</li>
+<li><b>Sollfahrt</b> links: SOLL (Sollfahrt für MC, Netto und Wind), IST (gemessene Fahrt, grün im Bereich), MC und NETTO, daneben der Balken „schneller/bremsen“ mit Ton. Den MC änderst Du auf dieser Seite mit dem Drehgeber oder dem MC-Poti. <b>MC ZEIT</b> (blau) ist der Zeit-MC der Restzeit-Sollfahrt: Tippen auf das MC-Feld schaltet zwischen festem MC und MC ZEIT um, mit Poti ist es der Anschlag oben.</li>
+<li><b>Unten drei Werte</b>, Standard: Distanz zur nächsten Ecke, „Wenden in“ (Zeit bis zum Kurvenbeginn) und Höhe an der Ziellinie (Reserve).</li>
+</ul>
+<p>Vor jeder Ecke:</p>
+<ol>
+<li>Etwa 10 s vorher wechselt die Grafik in die <b>Eckansicht</b> mit Sektor und geplanter Kurve.</li>
+<li>Der <b>Wendeton</b> zählt mit kurzen Piepsern herunter und endet mit einem hohen Ton: <b>jetzt einkurven</b>.</li>
+<li>Sobald ein GPS-Punkt im Sektor liegt, kommt ein Dreiklang aufwärts mit Vibration: <b>Ecke erreicht</b>. Die Eckansicht bleibt noch kurz stehen, dann zeigt das Widget den Weg zur nächsten Ecke.</li>
+</ol>
+<p>Den Wenderadius lernt das Widget pro Modell und Ecke selbst aus Deinen Kurven; nach ein paar Wenden wird der geplante Kurvenbeginn immer genauer.</p>
+
+<h3>Thermik</h3>
+<figure><img src="bilder/skynav-thermik.png" alt=""><figcaption>Seite Thermik (im Simulator): Werte links, Spur nach Steigen eingefärbt, Wind und nächste Ecke</figcaption></figure>
+<p>Beim Kreisen hilft die Seite <b>Thermik</b>: Vario, Ø Steigen im Bart, Höhengewinn und Höhe, rechts die Spur der letzten Kreise nach Steigen eingefärbt, mit Wind und Richtung zur nächsten Ecke. Der Kasten <b>Endanflug</b> sagt ab der zweiten Runde, ab welcher Höhe die restlichen Dreiecke ohne weiteren Bart reichen („NOCH TANKEN“ oder Endanflug). Beim Kreisen kommt auf jeder Seite der Varioton des Widgets.</p>
+
+<h3>Ziel, Zonen und Ende</h3>
+<p>Nach TP3 fliegst Du wieder über die Linie. Bist Du schneller als der Mindestspeed und noch in der Arbeitszeit, zählt die <b>Runde</b>: zwei Töne und die Ansage der Rundenzahl. Danach geht es direkt in die nächste Runde. Fliegst Du in eine Sicherheitszone, kommt ein tiefer Ton und unten steht „SICHERHEITSZONE“; über der Maximalhöhe steht „MAXIMALHÖHE“. Beides merkt sich das Widget für die Wertung.</p>
+<p>Mit dem Ende der Arbeitszeit oder der Landung stoppt die Wertung, ein tiefer Ton bestätigt, und die Seite <b>Wertung</b> zeigt Dreiecke, Schnitt, Flugzeit, Strafe und pro Runde Zeit, km/h, Index (geflogene Strecke im Verhältnis zum Umfang, 100 = genau auf dem Dreieck), Höhe und Höhenänderung. Mit dem Drehgeber scrollst Du die Tabelle.</p>
+<p>Willst Du in der Luft einen <b>neuen Wertungsflug</b> beginnen, z. B. nach einem weiteren Motorsteigflug, stellst Du zweimal kurz nacheinander scharf (tippen innert 4 s, Schalter zweimal umlegen innert 3 s). Am Boden setzt <span class="btn">NEUER FLUG</span> (zweimal tippen) alles zurück.</p>
+
+<h2>8. Nach dem Flug: auswerten und verbessern</h2>
+<p>Das Widget schreibt den Flug als IGC-Datei nach scripts/skynav/fluege/. Beim nächsten Anschliessen holt die App die Flüge ins Archiv (Ordner SkyNavigator/Fluege), auch auf Knopfdruck mit <span class="btn">Vom Sender holen</span>. Unter <b>Flüge</b> im Tab SkyNavigator steht jeder Flug mit Aufgabe, Modell, Dreiecken, Schnitt, Zeit und Strafe. Ein Klick zeigt Kennzahlen, die Spur über der Aufgabe und eine Tabelle je Runde, dazu den Download der IGC-Datei für den Veranstalter. Die Wertung rechnet die App aus der IGC-Datei selbst nach; <span class="btn">IGC öffnen</span> wertet auch eine Datei von anderswo aus.</p>
+<p>Zum Verbessern:</p>
+<ul>
+<li><b>Index pro Runde</b> anschauen: Werte deutlich über 100 heissen weite Kurven oder Umwege. Liegt der Index an einer Ecke immer hoch, früher einkurven (Vorhalt, Reserve im Sektor) oder enger kreisen.</li>
+<li>Das Log des Flugs im <b>Simulator</b> mit dem Widget abspielen und Einstellungen ausprobieren: Wendeton früher oder später, andere Werte unten, Varioton ruhiger. Was passt, stellst Du im Tab SkyNavigator ein; es geht beim nächsten Anschliessen auf den Sender.</li>
+<li>Mit einer besseren <b>Polare</b> (<a href="#k18">Kapitel 18</a>) stimmen Sollfahrt, Netto und Restzeit-Sollfahrt besser.</li>
+</ul>
+
+<h2>Wenn etwas nicht klappt</h2>
+<table>
+<tr><th>Meldung oder Problem</th><th>Ursache und Lösung</th></tr>
+<tr><td>„aufgaben.lua fehlt“ bzw. „keine Aufgabe in aufgaben.lua“</td><td>Aufgabe im Tab SkyNavigator anlegen und Sender mit der Desktop-App anschliessen, oder <span class="btn">Auf Sender schreiben</span>.</td></tr>
+<tr><td>Rotes „GPS?“ in der Kopfzeile</td><td>Keine neuen GPS-Werte. Quelle „GPS“ in der Konfiguration prüfen, GPS-Empfang abwarten.</td></tr>
+<tr><td>„Start ungültig: Fenster noch zu“ oder „Fenster vorbei“</td><td>Startfenster der Aufgabe oder von Hand prüfen. Ohne GPS-Zeit muss die Senderuhr stimmen.</td></tr>
+<tr><td>Start wird nicht erkannt</td><td>Nicht scharf gestellt, oder die Linie in die falsche Richtung überflogen (von TP1 her statt von TP3 her).</td></tr>
+<tr><td>„Ziel ungültig (Speed/Arbeitszeit)“</td><td>Beim Überfliegen der Linie langsamer als der Mindestspeed, oder die Arbeitszeit war vorbei.</td></tr>
+<tr><td>„Polare fehlt (Sollfahrt aus)“</td><td>Für dieses Modell steht keine Polare in polaren.lua (<a href="#k18">Kapitel 18</a>). Die Navigation läuft trotzdem.</td></tr>
+<tr><td>Kein Luftbild hinter der Aufgabe in der App</td><td>Das Luftbild braucht Internet. Ausserhalb der Schweiz braucht es einen Esri-Schlüssel unter <span class="btn">⚙</span>. Ist der Knopf <span class="btn">Luftbild</span> aus, zeigt die Skizze nur die Aufgabe.</td></tr>
+<tr><td>Neues Widget oder neue Version wirkt nicht</td><td>Ethos lädt Lua-Skripte erst nach einem Neustart des Senders.</td></tr>
+</table>
+
 <!-- 15 -->
-<h1 id="k19"><span class="n">19</span>KI-Auswertung</h1>
+<h1 id="k20"><span class="n">20</span>KI-Auswertung</h1>
 <p>Die KI-Auswertung schickt einen Ausschnitt des offenen Logs an Claude (von Anthropic) und zeigt die Analyse in einem Panel rechts, neben dem Tab, den Du gerade ansiehst. Auf Wunsch bedient die KI auch die App: Sie setzt Filter, wählt einen Zeitbereich, blendet Diagramme ein und erstellt eine Polare. Die Funktion ist freiwillig und braucht einen eigenen API-Schlüssel.</p>
 <h2>Einrichten</h2>
-<p>Zuerst brauchst Du einen API-Schlüssel von Anthropic. Wie Du ihn bekommst, was er kostet und wie Du ihn sicher aufbewahrst, steht Schritt für Schritt in <a href="#k20">Kapitel 20</a>. Den Schlüssel trägst Du unter <span class="btn">⚙</span> → <span class="btn">KI-Auswertung …</span> ein, mit <span class="btn">Prüfen</span> und <span class="btn">Speichern</span>.</p>
+<p>Zuerst brauchst Du einen API-Schlüssel von Anthropic. Wie Du ihn bekommst, was er kostet und wie Du ihn sicher aufbewahrst, steht Schritt für Schritt in <a href="#k21">Kapitel 21</a>. Den Schlüssel trägst Du unter <span class="btn">⚙</span> → <span class="btn">KI-Auswertung …</span> ein, mit <span class="btn">Prüfen</span> und <span class="btn">Speichern</span>.</p>
 <p>Erst wenn ein Schlüssel hinterlegt ist, erscheint rechts neben den Tabs der Knopf <span class="btn">✦ KI-Auswertung</span>. Er steht in jedem Tab an derselben Stelle; auf dem Handy zeigt er nur das ✦. Die Desktop-App legt den Schlüssel verschlüsselt im Schlüsselbund des Betriebssystems ab; auf dem Mac fragt macOS beim ersten Mal, ob die App darauf zugreifen darf. Die Web-Version speichert ihn im Speicher des Browsers auf diesem Gerät. <span class="btn">Schlüssel entfernen</span> löscht ihn.</p>
 <figure class="half"><img src="bilder/22-ki-einstellungen.png" alt=""><figcaption>Einstellungen der KI-Auswertung</figcaption></figure>
 <table>
@@ -685,9 +866,9 @@ a { color: var(--acc); }
 <div class="tip"><b>Kosten</b>Jede Anfrage kostet je nach Datenmenge und Modell meist wenige Rappen und wird über Dein Anthropic-Konto abgerechnet. Ist das Guthaben leer, meldet das Panel das.</div>
 
 <!-- API-Schlüssel -->
-<h1 id="k20"><span class="n">20</span>So kommst Du zu einem Anthropic-API-Schlüssel</h1>
+<h1 id="k21"><span class="n">21</span>So kommst Du zu einem Anthropic-API-Schlüssel</h1>
 <p>Für die KI-Auswertung braucht die App einen eigenen <b>API-Schlüssel</b> von Anthropic, der Firma hinter Claude. Der Schlüssel ist eine lange Zeichenfolge, die mit <code>sk-ant-</code> beginnt. Mit ihm bezahlt die App jede Anfrage aus Deinem eigenen Guthaben. Ein Claude-Abo (Pro, Max) ist dafür weder nötig noch reicht es: Abo und API-Guthaben sind zwei getrennte Dinge.</p>
-<div class="note"><b>Ohne Schlüssel</b>Hast Du ein Claude-Abo und nutzt Claude Desktop, brauchst Du keinen Schlüssel: Über den MCP-Server bedient Claude Desktop die App direkt (<a href="#k22">Kapitel 22</a>).</div>
+<div class="note"><b>Ohne Schlüssel</b>Hast Du ein Claude-Abo und nutzt Claude Desktop, brauchst Du keinen Schlüssel: Über den MCP-Server bedient Claude Desktop die App direkt (<a href="#k23">Kapitel 23</a>).</div>
 <h2>1. Konto anlegen</h2>
 <ol>
 <li>Im Browser <code>platform.claude.com</code> öffnen (die Claude-Plattform für Entwickler, früher <code>console.anthropic.com</code>).</li>
@@ -747,7 +928,7 @@ a { color: var(--acc); }
 </table>
 
 <!-- Beispielfragen -->
-<h1 id="k21"><span class="n">21</span>Beispielfragen für die KI</h1>
+<h1 id="k22"><span class="n">22</span>Beispielfragen für die KI</h1>
 <p>Ins Feld <b>Frage oder Auftrag</b> darfst Du schreiben wie zu einem erfahrenen Fliegerkollegen. Die folgenden Beispiele sind zum Ausprobieren gedacht. Sie funktionieren in der KI-Auswertung und genauso in Claude Desktop über MCP. Am besten wählst Du vorher das passende Log und die Kanäle, um die es geht.</p>
 <h2>Analyse</h2>
 <table>
@@ -784,7 +965,7 @@ a { color: var(--acc); }
 <div class="tip"><b>Tipp</b>Kommt eine Antwort ungenau zurück, frag nach: „Rechne das nur für die Zeit mit Motor aus“ oder „Erklär mir, wie Du auf die Gleitzahl kommst“. Die KI kennt nur die Daten, die mitgeschickt wurden; was fehlt, kannst Du in der Zeile „Gesendete Daten“ dazuwählen.</div>
 
 <!-- 16 -->
-<h1 id="k22"><span class="n">22</span>MCP-Server: die App aus Claude bedienen</h1>
+<h1 id="k23"><span class="n">23</span>MCP-Server: die App aus Claude bedienen</h1>
 <p>MCP (Model Context Protocol) ist ein offener Standard, über den KI-Programme mit anderen Programmen sprechen. Die Desktop-App hat einen eingebauten MCP-Server. Ist er eingeschaltet, kann <b>Claude Desktop</b>, <b>Claude Code</b> oder ein anderes MCP-fähiges Programm die offene App bedienen: Zustand lesen, Daten lesen, Logs auflisten und öffnen, Filter und Zeitbereich setzen, Diagramme zeigen, den Tab wechseln, eine Polare erstellen und alles rückgängig machen. Das sind dieselben Aktionen wie bei der KI-Auswertung.</p>
 <p>Der Unterschied zur KI-Auswertung: Du schreibst nicht in der App, sondern im Chat von Claude Desktop, und es braucht <b>keinen API-Schlüssel</b>. Die KI läuft über Dein Claude-Konto (in Claude Desktop ist dafür ein Abo wie Pro oder Max sinnvoll). Die Web-Version hat keinen MCP-Server.</p>
 <h2>So hängt alles zusammen</h2>
@@ -828,7 +1009,7 @@ a { color: var(--acc); }
 <li>Den MM Flight Analyzer offen lassen und z. B. fragen: „Welches Log ist im MM Flight Analyzer offen?“</li>
 <li>Beim ersten Werkzeug fragt Claude, ob es <b>mm-flight-analyzer</b> benutzen darf. Mit „Immer erlauben“ fragt es künftig nicht mehr.</li>
 </ol>
-<p>Jede Aktion siehst Du sofort in der App. Beispiele zum Ausprobieren stehen in <a href="#k21">Kapitel 21</a>.</p>
+<p>Jede Aktion siehst Du sofort in der App. Beispiele zum Ausprobieren stehen in <a href="#k22">Kapitel 22</a>.</p>
 <h2>Claude Code</h2>
 <p>In einem Terminal genügt: <code>claude mcp add --transport http mm-flight-analyzer http://127.0.0.1:3917/mcp</code>. Den passenden Befehl mit dem eingestellten Port zeigt auch der MCP-Dialog. Hier gibt es keine Brücke, Claude Code spricht direkt mit der App.</p>
 <h2>Fehlersuche</h2>
@@ -844,7 +1025,7 @@ a { color: var(--acc); }
 </table>
 
 <!-- 17 -->
-<h1 id="k23"><span class="n">23</span>Darstellung, Sprache und Web-Version</h1>
+<h1 id="k24"><span class="n">24</span>Darstellung, Sprache und Web-Version</h1>
 <h2>Hell und dunkel</h2>
 <p>Unter <span class="btn">⚙</span> → <b>Darstellung</b> wählst Du „Wie System“, „Hell“ oder „Dunkel“. „Wie System“ folgt der Einstellung von Windows bzw. macOS.</p>
 <figure><img src="bilder/16-hell.png" alt=""><figcaption>Helle Darstellung</figcaption></figure>
@@ -863,7 +1044,7 @@ a { color: var(--acc); }
 </div>
 
 <!-- 18 -->
-<h1 id="k24"><span class="n">24</span>Was die App speichert</h1>
+<h1 id="k25"><span class="n">25</span>Was die App speichert</h1>
 <table>
 <tr><th>Was</th><th>Wo</th></tr>
 <tr><td>Logs</td><td>Im Archiv-Ordner, ein Unterordner pro Modell. Die App löscht dort nie etwas.</td></tr>
@@ -882,7 +1063,7 @@ a { color: var(--acc); }
 <p>Sprache, Darstellung, Geschwindigkeitseinheit und der zuletzt offene Tab gelten für alle Modelle.</p>
 
 <!-- 19 -->
-<h1 id="k25"><span class="n">25</span>Troubleshooting und FAQ</h1>
+<h1 id="k26"><span class="n">26</span>Troubleshooting und FAQ</h1>
 <div class="faq">
 <h2>Installation und Start</h2>
 <h3>Windows meldet „Der Computer wurde durch Windows geschützt“.</h3>
@@ -954,7 +1135,7 @@ a { color: var(--acc); }
 </div>
 
 <!-- 20 -->
-<h1 id="k26"><span class="n">26</span>Kurzreferenz Maus und Tastatur</h1>
+<h1 id="k27"><span class="n">27</span>Kurzreferenz Maus und Tastatur</h1>
 <table>
 <tr><th>Wo</th><th>Aktion</th><th>Wirkung</th></tr>
 <tr><td>Diagramm</td><td>Ziehen</td><td>Ausschnitt verschieben</td></tr>
@@ -973,7 +1154,7 @@ a { color: var(--acc); }
 <tr><td>Fenster</td><td>CSV-Dateien hineinziehen</td><td>Logs öffnen</td></tr>
 </table>
 <!-- 21 -->
-<h1 id="k27"><span class="n">27</span>Änderungen pro Version</h1>
+<h1 id="k28"><span class="n">28</span>Änderungen pro Version</h1>
 <p>Dieses Kapitel ist das Changelog der App, die neueste Version zuerst.</p>
 <div class="changelog">
 {{CHANGELOG}}
