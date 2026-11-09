@@ -9,6 +9,7 @@ const M = require('./mcp');
 const AI = require('./ai');
 const MG = require('./migrate');
 const WG = require('./widgets');
+const SN = require('./skynav');
 
 // Daten aus dem Ordner der früheren App „Ethos Log Viewer“ übernehmen, bevor irgendetwas den neuen Ordner benutzt
 const MIGRATED = MG.migrate(path.join(app.getPath('appData'), MG.OLD_NAME), app.getPath('userData'));
@@ -184,6 +185,33 @@ ipcMain.handle('widgets:copy', async () => {
   return r;
 });
 
+// ---------- SkyNavigator: Aufgaben auf den Sender, Flüge (IGC) ins Archiv ----------
+async function skynavSync(roots) {
+  const out = [];
+  for (const r of roots) out.push(await SN.syncSender(r, settings.archiveDir));
+  return out;
+}
+async function afterEthos(roots) {
+  const res = settings.widgetAuto === false ? { at: Date.now(), results: [] } : await copyWidgets(roots);
+  try { res.skynav = await skynavSync(roots); } catch (e) { res.skynav = { error: e.message }; }
+  return res;
+}
+ipcMain.handle('skynav:get', async () => ({ data: await SN.loadTasks(settings.archiveDir), flights: await SN.listFlights(settings.archiveDir),
+  senders: watcher.ethosRoots || [], dir: SN.baseDir(settings.archiveDir) }));
+// speichern; toSender: auch gleich auf die angeschlossenen Sender (sonst beim nächsten Anschliessen)
+ipcMain.handle('skynav:save', async (_, data, lua, toSender) => {
+  await SN.saveTasks(settings.archiveDir, data, lua);
+  const written = [];
+  if (toSender) for (const r of watcher.ethosRoots || []) written.push(await SN.writeTasksToSender(r, settings.archiveDir));
+  return { written };
+});
+ipcMain.handle('skynav:fetch', async () => {
+  const roots = watcher.ethosRoots || [];
+  if (!roots.length) throw new Error('Kein Ethos-Sender angeschlossen.');
+  return skynavSync(roots);
+});
+ipcMain.handle('skynav:open', () => { const d = SN.flightDir(settings.archiveDir); fs.mkdirSync(d, { recursive: true }); return shell.openPath(d); });
+
 let lastUpdate = null;
 async function checkUpdate() {
   let u = await U.check(app.getVersion(), netJson);
@@ -253,7 +281,7 @@ ipcMain.handle('clipboard:write', (_, t) => { require('electron').clipboard.writ
 app.whenReady().then(() => {
   loadSettings();
   restartMcp();
-  watcher = new S.SyncWatcher(() => settings, { afterEthos: roots => settings.widgetAuto === false ? null : copyWidgets(roots) });
+  watcher = new S.SyncWatcher(() => settings, { afterEthos: afterEthos });
   fetchWidgets();
   watcher.on('status', s => win && !win.isDestroyed() && win.webContents.send('sync:status', s));
   createWindow();

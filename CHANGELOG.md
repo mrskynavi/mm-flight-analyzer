@@ -1,5 +1,11 @@
 # Changelog
 
+## Unveröffentlicht
+
+- Neuer Tab SkyNavigator für GPS Triangle mit dem gleichnamigen Ethos-Widget: Aufgaben anlegen und verwalten (Klassen Light, Sport und Scale mit den Werten aus dem Reglement, Ursprung, Richtung, dTP, Einflug-Limits, Arbeitszeit, Maximalhöhe, Startfenster in Ortszeit, bis 5 Sicherheitszonen als Kreis oder Rechteck), mit Skizze von Dreieck, Sektoren, Startlinie und Zonen; Import und Export als .rct (Triangle Definition V1.7). Eine Aufgabe ist als aktiv markiert, am Sender lässt sich auch eine andere wählen.
+- Die Desktop-App schreibt die Aufgaben bei jedem Anschliessen des Senders nach scripts/skynav/aufgaben.lua (auf Knopfdruck auch sofort) und holt die Flüge des Widgets (IGC aus scripts/skynav/fluege/) ins Archiv unter SkyNavigator/Fluege. Die Web-Version speichert die Aufgaben im Browser und lädt aufgaben.lua als Datei herunter.
+- Flüge im gleichen Tab: Liste mit Dreiecken, Schnitt, Zeit und Strafe; pro Flug Kennzahlen, Spur über der Aufgabe, Tabelle je Runde und Download der IGC-Datei. Die Wertung rechnet die App aus der IGC-Datei nach (Aufgabe aus den LTSK-Zeilen), auch für eine geöffnete IGC-Datei.
+
 ## 2026.10.2 – 2026-10-13
 
 - Wind ruhiger: Der erste Wind-Fit braucht ein volles Fenster (40 Werte, etwa 28 s), damit der Start mit Motor keinen falschen Wind liefert. Danach gilt der Median der letzten 5 guten Fits, einzelne Ausreisser schlagen nicht mehr durch (im SB-10-Log vom 12.10. z. B. 47 km/h nach 25 min). TAS, Steuerkurs, Drift und Gegenwind rechnen mit diesem Wind.
