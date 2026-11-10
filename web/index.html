@@ -3665,6 +3665,8 @@ const SKY = (() => {
     { g: 'Weg', k: 'zoomAfter', def: 5, min: 0, max: 30, u: 's', l: 'Eckansicht nach der Wende' },
     { g: 'Querlage', k: 'qlTau', def: 15, min: 0, max: 30, u: '0.1 s', l: 'Vorausschau Querlage (0 = aus)' },
     { g: 'Querlage', k: 'qlTrim', t: 'bool', def: true, l: 'Nullpunkt im geraden Flug nachtrimmen' },
+    { g: 'Querlage', k: 'qaTau', def: 25, min: 0, max: 60, u: '0.1 s', l: 'Ohne Lagesensor: Querruder-Knüppel, GPS zieht nach in (0 = nur GPS)' },
+    { g: 'Querlage', k: 'qaRate', def: 30, min: 5, max: 300, u: '°/s', l: 'Ohne Lagesensor: Rollrate bei vollem Querruder (bis gelernt)' },
     { g: 'Seiten', k: 'autoPage', t: 'bool', def: true, l: 'Seite automatisch, wenn kein Seiten-Schalter ein ist' },
     { g: 'Gleiten: Werte unten', k: 'glideF1', t: 'sel', gf: 1, def: 1, opts: GF_OPTS, l: 'Feld links' },
     { g: 'Gleiten: Werte unten', k: 'glideF2', t: 'sel', gf: 2, def: 2, opts: GF_OPTS, l: 'Feld Mitte' },
