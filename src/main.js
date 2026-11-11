@@ -1,5 +1,5 @@
 // Desktop-Hülle: zeigt den MM Flight Analyzer und synchronisiert Logs vom Sender ins Archiv
-const { app, BrowserWindow, ipcMain, dialog, shell, net, safeStorage } = require('electron');
+const { app, BrowserWindow, ipcMain, dialog, shell, net, safeStorage, systemPreferences } = require('electron');
 const fs = require('fs');
 const path = require('path');
 const S = require('./sync');
@@ -209,6 +209,12 @@ ipcMain.handle('skynav:fetch', async () => {
   const roots = watcher.ethosRoots || [];
   if (!roots.length) throw new Error('Kein Ethos-Sender angeschlossen.');
   return skynavSync(roots);
+});
+// Kamera für den QR-Scan (Tab SkyNavigator): macOS fragt einmal nach, Windows erlaubt sie ohne Rückfrage
+ipcMain.handle('camera:ask', async () => {
+  if (process.platform !== 'darwin' || !systemPreferences.askForMediaAccess) return true;
+  if (systemPreferences.getMediaAccessStatus('camera') === 'granted') return true;
+  return systemPreferences.askForMediaAccess('camera');
 });
 ipcMain.handle('skynav:open', () => { const d = SN.flightDir(settings.archiveDir); fs.mkdirSync(d, { recursive: true }); return shell.openPath(d); });
 

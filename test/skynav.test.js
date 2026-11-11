@@ -9,6 +9,8 @@ const SN = require('../src/skynav');
 const html = fs.readFileSync(path.join(__dirname, '..', 'web', 'index.html'), 'utf8');
 const core = /<script id="skynavCore">([\s\S]*?)<\/script>/.exec(html)[1];
 const SKY = new Function(core + ';return SKY;')();
+const codeSrc = /<script id="skynavCode">([\s\S]*?)<\/script>/.exec(html)[1];
+const SC = new Function(codeSrc + ';return SKYCODE;')();
 
 const tmp = () => fs.mkdtempSync(path.join(os.tmpdir(), 'sky-'));
 const put = (p, s) => { fs.mkdirSync(path.dirname(p), { recursive: true }); fs.writeFileSync(p, s); };
@@ -64,6 +66,55 @@ test('.rct hin und zurück mit Zonen', () => {
   assert.strictEqual(b.zones.length, 2);
   assert.deepStrictEqual([b.zones[1].t, b.zones[1].dir, b.zones[1].len], ['R', 30, 300]);
   assert.throws(() => SKY.fromRct('V:02.0'));
+});
+
+test('QR-Code MGU25 V4: Richtung mit Kommastelle bleibt, Code und Prüfwort wie im Systemtool', () => {
+  const t = SKY.fromRct('V:02.0\r\nT:MGU25 V4,47.372627,8.427703,0,287.6,500,500,120,7,30\r\n');
+  assert.strictEqual(t.dir, 287.6);
+  assert.strictEqual(t.cls, 'Scale');
+  assert.match(SKY.toRct(t), /^V:02\.0\r\nT:MGU25 V4,47\.372627,8\.427703,0,287\.6,500,500,120,7,30\r\n$/);
+  // gleiche Werte wie das Lua-Systemtool (scripts/skynavtool/main.lua in mm-ethos-widgets)
+  assert.deepStrictEqual(SC.taskCode(t), ['BVLSKMJTBVTAMVETYH', 'KGPUZVWNZPZXTZPUPM']);
+  assert.strictEqual(SC.word(t), 'KDVM');
+  assert.deepStrictEqual(SC.problems(t), []);
+});
+
+test('Aufgaben-Code: Zonen, Tippfehler korrigiert, zwei Fehler erkannt', () => {
+  const t = { lat: 47.372627, lon: 8.427703, elev: 0, dir: 287.6, dist: 500, maxH: 500, maxV: 120, minF: 7, work: 30,
+    zones: [{ t: 'C', lat: 47.3741, lon: 8.4251, r: 150, lo: 0, hi: 9999 }, { t: 'R', lat: 47.3702, lon: 8.4301, dir: 12.5, len: 400, wid: 120, lo: 0, hi: 300 }] };
+  const c = SC.codes(t);
+  assert.deepStrictEqual(c.map(x => x.lines.join('').length), [36, 25, 30]);
+  assert.strictEqual(SC.word(t), 'FNHU');
+  const s = c[0].lines.join(''), bad = s.slice(0, 5) + (s[5] === 'A' ? 'B' : 'A') + s.slice(6);
+  const d = SC.decodeTask(bad);
+  assert.strictEqual(d.fixed.length, 1);
+  assert.strictEqual(d.fixed[0].pos, 6);
+  assert.deepStrictEqual([d.task.lat, d.task.lon, d.task.dir, d.zones], [47.372627, 8.427703, 287.6, 2]);
+  const two = bad.slice(0, 7) + (bad[7] === 'A' ? 'B' : 'A') + bad.slice(8);
+  assert.match(SC.decodeTask(two).error, /Tippfehler bei Zeichen 1–18/);
+  const z = SC.decodeZone(c[2].lines.join(''), d.task);
+  assert.deepStrictEqual([z.index, z.zone.t, z.zone.lat, z.zone.dir, z.zone.len], [1, 'R', 47.3702, 12.5, 400]);
+  // Zufallsaufgaben hin und zurück
+  for (let i = 0; i < 200; i++) {
+    const r = (a, b) => a + Math.floor(Math.random() * (b - a + 1));
+    const u = { lat: r(-80e6, 80e6) / 1e6, lon: r(-179e6, 179e6) / 1e6, elev: r(-500, 4000), dir: r(0, 3599) / 10, dist: r(50, 1000), maxH: r(0, 1000), maxV: r(0, 1000), minF: r(0, 1000), work: r(1, 120), zones: [] };
+    const back = SC.decodeTask(SC.taskCode(u).join('')).task;
+    for (const k of Object.keys(back)) assert.strictEqual(back[k], u[k], k);
+  }
+});
+
+test('Änderungs-Code: nur die Richtung = 10 Buchstaben, Zonen geändert = neuer Morgen-Code', () => {
+  const base = { lat: 47.372627, lon: 8.427703, elev: 0, dir: 287.6, dist: 500, maxH: 500, maxV: 120, minF: 7, work: 30, zones: [] };
+  const t = { ...base, dir: 290 };
+  const ch = SC.changeCode(base, t);
+  assert.strictEqual(ch.lines.join('').length, 10);
+  assert.deepStrictEqual(ch.changed, [false, false, true, false, false]);
+  const d = SC.decodeChange(ch.lines.join(''), base);
+  assert.strictEqual(d.task.dir, 290);
+  assert.strictEqual(SC.word(d.task), ch.word);
+  assert.match(SC.decodeChange(ch.lines.join(''), { ...base, elev: 400 }).error, /anderen Aufgabe/);
+  assert.ok(SC.changeCode(base, { ...base }).none);
+  assert.ok(SC.changeCode(base, { ...t, zones: [{ t: 'C', lat: 47.37, lon: 8.42, r: 50, lo: 0, hi: 100 }] }).error);
 });
 
 test('aufgaben.lua: Startfenster in UTC, Texte sicher in Lua-Strings', () => {
