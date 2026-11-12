@@ -141,7 +141,7 @@ test('Widget-Einstellungen: Bereich, Typ und Vorgaben in aufgaben.lua', () => {
   assert.deepStrictEqual([st.vtGlide, SKY.settingsOf({ vtGlide: 99 }).vtGlide], [5, 30]);
   assert.deepStrictEqual([st.vDamp, SKY.settingsOf({ vDamp: 99 }).vDamp], [4, 20]);
   assert.deepStrictEqual([st.vtRange, SKY.settingsOf({ vtRange: 1 }).vtRange], [10, 3]);
-  assert.deepStrictEqual([st.vtStyle, SKY.settingsOf({ vtStyle: 4 }).vtStyle, SKY.settingsOf({ vtStyle: 7 }).vtStyle], [1, 4, 1]);
+  assert.strictEqual(st.vtStyle, undefined); // Klang wird seit Widget 1.28 am Sender gewaehlt
   assert.deepStrictEqual([st.thBest, SKY.settingsOf({ thBest: true }).thBest], [false, true]);
   assert.strictEqual(SKY.settingsOf({ vzLo: 50 }).vzLo, 20);
   const lua = SKY.toLua({ tasks: [], settings: { margin: 12, navVoice: false, gliderId: 'HB-1' } });
