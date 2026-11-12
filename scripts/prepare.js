@@ -15,6 +15,9 @@ html = html.replace(luaCdn, '<script src="fengari-web.js"></script>');
 fs.writeFileSync(path.join(out, 'index.html'), html);
 fs.copyFileSync(path.join(root, 'node_modules', 'chart.js', 'dist', 'chart.umd.js'), path.join(out, 'chart.umd.min.js'));
 fs.copyFileSync(path.join(root, 'node_modules', 'fengari-web', 'dist', 'fengari-web.js'), path.join(out, 'fengari-web.js'));
+// Rechenkern (web/core/*.js) neben index.html
+fs.mkdirSync(path.join(out, 'core'), { recursive: true });
+for (const f of fs.readdirSync(path.join(root, 'web', 'core')).filter(f => f.endsWith('.js'))) fs.copyFileSync(path.join(root, 'web', 'core', f), path.join(out, 'core', f));
 for (const f of ['beispiel.csv']) {
   const src = path.join(root, 'web', f);
   if (fs.existsSync(src)) fs.copyFileSync(src, path.join(out, f));
