@@ -80,6 +80,21 @@ test('Polare: Ausreisser-Klassen, abgetrennt und mit wenig Punkten, fallen weg',
   assert.equal(PO.polarClean([...bs, { v: 98, m: 3.5, n: 60 }]).out.length, 0);
   // eine fehlende Klasse ist keine Lücke
   assert.equal(PO.polarClean([...bs, { v: 86, m: w(86), n: 12 }]).out.length, 0);
+  // eine Klasse, die an einem einzigen Flugstück hängt, fällt weg, auch mitten im Fahrtbereich
+  const st = bs.map(b => ({ ...b, one: 0.3 })); st[3].one = 0.8;
+  assert.deepEqual(PO.polarClean(st).out.map(b => b.v), [50]);
+});
+
+test('Polare: Flugstücke je Klasse aus der Zeit der Punkte', () => {
+  // Klasse 46: 20 Punkte am Stück; Klasse 50: 4 Stücke zu 5 Punkten, je 30 s auseinander
+  const t = [], pts = [];
+  for (let i = 0; i < 20; i++) { t.push(i); pts.push([45, 0.5, t.length - 1]); }
+  for (let k = 0; k < 4; k++) for (let i = 0; i < 5; i++) { t.push(100 + k * 30 + i); pts.push([49, 0.5, t.length - 1]); }
+  const next = PO.polarTimes(pts, t); assert.ok(next > t[t.length - 1]);
+  const bs = PO.polarBins(pts);
+  near(bs[0].one, 1, 1e-12); near(bs[1].one, 0.25, 1e-12);
+  // ohne Zeit kein one
+  assert.equal(PO.polarBins(pts.map(p => [p[0], p[1], p[2]]))[0].one, undefined);
 });
 
 test('Polare: Abriss-Fit A·v³ + B/v + D/v⁵ trifft konstruierte Klassen und braucht langsame Punkte', () => {
@@ -99,15 +114,15 @@ test('Polare: Abriss-Fit A·v³ + B/v + D/v⁵ trifft konstruierte Klassen und b
   const mc = PO.mcParabola(f, 46, 90); assert.ok(mc.dev < 0.08, 'Parabel ' + mc.dev);
 });
 
-test('Polare: Polarflug-Log SB-10 (06.11.2026), Ausreisser 98/102 weg, Abriss-Fit mangels langsamer Punkte nicht gültig', () => {
+test('Polare: Polarflug-Log SB-10 (06.11.2026), Ausreisser 78/98/102 weg, Abriss-Fit mangels langsamer Punkte nicht gültig', () => {
   const bs = require('./referenz/polarflug-sb10-klassen.json');
-  const r = PO.polarClean(bs); assert.deepEqual(r.out.map(b => b.v), [98, 102]);
+  // 78: Stechflug in 100 m Höhe (3:45 min), 98/102: Stechflug und Hochziehen (12 min), je über die Hälfte aus einem Stück
+  const r = PO.polarClean(bs); assert.deepEqual(r.out.map(b => b.v), [78, 98, 102]);
   const alt = PO.polarFit(bs), neu = PO.polarFit(r.bs);
-  near(alt.ld, 27.9, 0.1, 'bisher'); near(neu.ld, 29.8, 0.1, 'ohne Ausreisser');
-  // ohne Ausreisser liegt die Kurve im Schnellflug näher an den Klassen
-  for (const k of [74, 78]) { const b = r.bs.find(x => x.v === k); assert.ok(Math.abs(b.m - neu.w(k)) < Math.abs(b.m - alt.w(k)), 'Klasse ' + k); }
+  near(alt.ld, 27.9, 0.1, 'bisher'); near(neu.ld, 28.7, 0.1, 'ohne Ausreisser'); near(neu.vbg, 47.7, 0.5);
+  // nur 98/102 weg (frühere Regel) kippt die Kurve: beste Gleitzahl 29,8 bei 44 km/h, weil 78 allein den Schnellflug bestimmt
+  const nur = PO.polarFit(bs.filter(b => b.v < 90)); near(nur.ld, 29.8, 0.1); near(nur.vbg, 44, 1);
   const f3 = PO.polarFit3(r.bs); assert.equal(f3.ok, false); assert.equal(f3.why, 'langsam');
-  near(f3.ld, 30.5, 0.1); near(f3.vbg, 49, 0.5);
 });
 
 // Gerader Gleitflug mit Fahrt v und Sinken w, eine Zeile alle 0,25 s

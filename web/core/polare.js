@@ -5,12 +5,14 @@
 
   // half: halbes Fenster (s) je Punkt; after: s nach Motor aus; turn: höchste Kursänderung (°/s); acc: höchste Fahrtänderung (m/s²);
   // minV: kleinste Fahrt (m/s); bin: Klassenbreite (km/h); minN: Punkte je Klasse; dev: Abweichung eines Logs (Anteil); skip: s ab Logbeginn
+  // one: stammen mehr als dieser Anteil der Punkte einer Klasse aus einem einzigen Flugstück, ist die Klasse ein Ausreisser;
+  // stGap: liegen zwischen zwei Punkten derselben Klasse mehr als so viele Sekunden, beginnt ein neues Flugstück
   // gap: so viele Klassenbreiten Abstand trennen einen Fahrtbereich ab; outN: abgetrennte Klassen mit weniger als outN·minN Punkten
   // sind Ausreisser (einzelnes Manöver); m3Left/m3N: der Abriss-Fit braucht mindestens m3Left Klassen, die m3Left Klassenbreiten
   // oder mehr unter der Fahrt des geringsten Sinkens liegen, mit zusammen mindestens m3N·minN Punkten; m3Dev: grösste Abweichung
   // dieser Klassen von der Kurve (m/s, oder Anteil des Sinkens, was grösser ist)
   const POLAR = { half: 2.5, after: 15, turn: 8, acc: 0.6, minV: 5, bin: 4, minN: 12, dev: 0.2, skip: 30,
-    gap: 2, outN: 3, m3Left: 2, m3N: 2, m3Dev: 0.1 };
+    gap: 2, outN: 3, m3Left: 2, m3N: 2, m3Dev: 0.1, one: 0.5, stGap: 10 };
   const G = 9.81;
 
   function median(a) { const s = [...a].sort((x, y) => x - y), n = s.length; return n % 2 ? s[(n - 1) / 2] : (s[n / 2 - 1] + s[n / 2]) / 2; }
@@ -58,12 +60,23 @@
     return out;
   }
 
-  // Klassen zu bin km/h; je Klasse Median, Quartile und Anzahl, nur Klassen mit mindestens minN Punkten
+  // Zeit der Gleitpunkte für die Flugstücke: setzt p.tt = offset + Zeit der Logzeile (s) und gibt den Versatz für das
+  // nächste Log zurück, damit Punkte verschiedener Logs nie zum selben Stück gehören. t = Zeit je Logzeile.
+  function polarTimes(pts, t, offset = 0) {
+    let last = 0;
+    for (const p of pts) { last = t[p[2]]; p.tt = offset + last; }
+    return offset + last + 1e5;
+  }
+
+  // Klassen zu bin km/h; je Klasse Median, Quartile und Anzahl, nur Klassen mit mindestens minN Punkten.
+  // Tragen die Punkte eine Zeit (p.tt, polarTimes), kommt one dazu: Anteil der Punkte aus dem grössten Flugstück der Klasse
+  // (Punkte dieser Klasse ohne Pause über stGap s).
   function polarBins(pts, P = POLAR) {
     const b = new Map();
-    for (const [v, w] of pts) { const k = Math.floor(v / P.bin) * P.bin + P.bin / 2; if (!b.has(k)) b.set(k, []); b.get(k).push(w); }
-    return [...b].filter(([, a]) => a.length >= P.minN).sort((x, y) => x[0] - y[0])
-      .map(([k, a]) => ({ v: k, m: median(a), q1: quant(a, .25), q3: quant(a, .75), n: a.length }));
+    for (const p of pts) { const k = Math.floor(p[0] / P.bin) * P.bin + P.bin / 2; if (!b.has(k)) b.set(k, { w: [], tt: [] }); const o = b.get(k); o.w.push(p[1]); if (p.tt != null) o.tt.push(p.tt); }
+    const one = tt => { if (!tt.length) return null; tt.sort((x, y) => x - y); let best = 1, run = 1; for (let i = 1; i < tt.length; i++) { run = tt[i] - tt[i - 1] > P.stGap ? 1 : run + 1; if (run > best) best = run; } return best / tt.length; };
+    return [...b].filter(([, o]) => o.w.length >= P.minN).sort((x, y) => x[0] - y[0])
+      .map(([k, { w: a, tt }]) => { const o = tt.length === a.length ? one(tt) : null; return { v: k, m: median(a), q1: quant(a, .25), q3: quant(a, .75), n: a.length, ...(o != null ? { one: o } : {}) }; });
   }
 
   // Kleinste Quadrate für Sinken = A·v³ + B/v (v in m/s) durch die Klassen-Mediane.
@@ -78,15 +91,17 @@
     return { w, A, B, vms, wms: w(vms), vbg, ld: vbg / 3.6 / w(vbg) };
   }
 
-  // Ausreisser-Klassen: Klassen, die durch eine Lücke von mehr als gap Klassenbreiten vom Fahrtbereich mit den meisten Punkten
-  // getrennt sind und dabei wenig Punkte haben (unter outN·minN). Solche Klassen stammen meist aus einem einzelnen Manöver
-  // (Stechflug, Hochziehen) und ziehen die Kurve A·v³ + B/v weit weg. → { bs: verbleibende Klassen, out: verworfene }
+  // Ausreisser-Klassen, meist aus einem einzelnen Manöver (Stechflug, Hochziehen, Anflug), die die Kurve A·v³ + B/v weit wegziehen:
+  // - mehr als one der Punkte stammen aus einem einzigen Flugstück (b.one, siehe polarBins), oder
+  // - die Klasse ist durch eine Lücke von mehr als gap Klassenbreiten vom Fahrtbereich mit den meisten Punkten getrennt
+  //   und hat wenig Punkte (unter outN·minN).
+  // → { bs: verbleibende Klassen, out: verworfene }
   function polarClean(bs, P = POLAR) {
     if (bs.length < 3) return { bs, out: [] };
     const blocks = [[bs[0]]];
     for (let i = 1; i < bs.length; i++) { if (bs[i].v - bs[i - 1].v > P.gap * P.bin) blocks.push([]); blocks[blocks.length - 1].push(bs[i]); }
     const N = b => b.reduce((s, x) => s + x.n, 0), main = blocks.reduce((a, b) => N(b) > N(a) ? b : a);
-    const out = bs.filter(b => !main.includes(b) && b.n < P.outN * P.minN);
+    const out = bs.filter(b => b.one > P.one || (!main.includes(b) && b.n < P.outN * P.minN));
     return { bs: bs.filter(b => !out.includes(b)), out };
   }
 
@@ -159,7 +174,7 @@
     return { a, b, c, lo, hi, dev, s, vms, vbg, ld: vbg / s(vbg) };
   }
 
-  const api = { POLAR, G, median, quant, motorOn, polarPoints, polarBins, polarClean, polarFit, polarFit3, polarCurve, sinkAt, solve3, mcParabola };
+  const api = { POLAR, G, median, quant, motorOn, polarPoints, polarTimes, polarBins, polarClean, polarFit, polarFit3, polarCurve, sinkAt, solve3, mcParabola };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   else { root.MMFA = root.MMFA || {}; root.MMFA.polare = api; }
 })(typeof self !== 'undefined' ? self : this);
