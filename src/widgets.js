@@ -162,4 +162,13 @@ async function readKorrektur(dir, model) {
   return out;
 }
 
-module.exports = { DEFAULT_REPO, DEFAULT_BRANCH, defaultDir, blobSha, header, listWidgets, fetchRepo, copyToSender, pullSenderData, korrName, readKorrektur };
+// Korrektur aus dem Simulator ins Benutzerverzeichnis schreiben (nur korrektur_*.txt, kleiner Text)
+async function saveKorrektur(dir, name, text) {
+  const n = String(name || ''), s = String(text ?? '');
+  if (!/^korrektur_[A-Za-z0-9\-_]+\.txt$/.test(n) || s.length > 10000) throw new Error('Ungültige Korrektur-Datei');
+  const dest = path.join(dir, 'scripts', 'tekkal', n);
+  await writeAtomic(dest, Buffer.from(s, 'utf8'));
+  return dest;
+}
+
+module.exports = { DEFAULT_REPO, DEFAULT_BRANCH, defaultDir, blobSha, header, listWidgets, fetchRepo, copyToSender, pullSenderData, korrName, readKorrektur, saveKorrektur };

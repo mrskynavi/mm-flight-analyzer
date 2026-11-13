@@ -7899,7 +7899,13 @@ const scr = g('simScr'), sctx = scr.getContext('2d');
 function newSim(){
   sim = new EthosSim({fengari, shim: g('simShim').textContent, w: W, h: H, model: () => SL.model, board: () => W < 600 ? 'X18S' : 'X20S',
     value: val, unit: n => SL.cols[n] ? SL.cols[n].unit : undefined, has: n => !!SL.cols[n] || !!swPos(n), log, tone,
-    epoch: SL?.epoch0 || 0, fs: {get: fsGet, put: (p, s) => { const k = resolve(p); FS[k] = s; log('info', '/scripts/' + k + ' ' + T('geschrieben (nur im Simulator)')); fillSd(); }}});
+    epoch: SL?.epoch0 || 0, fs: {get: fsGet, put: (p, s) => { const k = resolve(p), prev = FS[k]; FS[k] = s;
+      // Korrektur der TEK-Kalibrierung (Meine Widgets): geänderte Werte behalten, auch für die Polare und spätere Läufe
+      const km = /^tekkal\/(korrektur_[^/]+\.txt)$/i.exec(k);
+      if (km && fsTag === 'mine' && DESK?.saveKorrektur && s !== prev){
+        DESK.saveKorrektur(km[1], s).then(() => { for (const m in KORR) delete KORR[m]; log('info', T('Korrektur gespeichert: {f} (gilt auch für die Polare)', {f: km[1]})); }).catch(e => log('fehler', e.message));
+      } else log('info', '/scripts/' + k + ' ' + T('geschrieben (nur im Simulator)'));
+      fillSd(); }}});
   // TEK-Kalibrierung liefert am Sender die Quellen "Fahrt korr." und "TEK korr." für alle Widgets: hier auch
   const tk = cur.dir.toLowerCase() === 'tekkal' ? null : Object.keys(FS).find(k => /^tekkal\/main\.lua$/i.test(k));
   let e = sim.load(code, tk ? FS[tk] : '', tk || '') || sim.create();

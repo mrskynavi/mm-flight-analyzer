@@ -129,6 +129,8 @@ function simWatch(dir) {
 }
 // Korrektur der TEK-Kalibrierung eines Modells (vom Sender geholt, siehe WG.pullSenderData), z. B. für die Polare
 ipcMain.handle('korr:get', (_, model) => WG.readKorrektur(settings.widgetDir, model));
+// im Simulator übernommene Korrektur behalten (Meine Widgets); beim nächsten Anschliessen gilt wieder der Stand des Senders
+ipcMain.handle('korr:save', (_, name, text) => WG.saveKorrektur(settings.widgetDir, name, text));
 ipcMain.handle('scripts:write', (_, rel, text) => {
   if (!simDir) throw new Error('Kein scripts-Ordner gewählt.');
   return S.writeScript(simDir, String(rel), text);

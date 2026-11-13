@@ -76,3 +76,11 @@ test('readKorrektur: Dateiname wie im Widget (Lua, pro Byte), Werte als Zahlen',
   assert.deepStrictEqual(await W.readKorrektur(dir, 'ASW-17'), { tekX: -20, airK: 1045, fieldAlt: 400, air: 'Fluggeschw.' });
   assert.strictEqual(await W.readKorrektur(dir, 'SB-10'), null);
 });
+
+test('saveKorrektur: nur korrektur_*.txt im Ordner tekkal', async () => {
+  const dir = tmp();
+  await W.saveKorrektur(dir, 'korrektur_ASW-17.txt', 'airK=1045\n');
+  assert.strictEqual((await W.readKorrektur(dir, 'ASW-17')).airK, 1045);
+  await assert.rejects(W.saveKorrektur(dir, '../main.lua', 'x'));
+  await assert.rejects(W.saveKorrektur(dir, 'korrektur_a/../b.txt', 'x'));
+});
