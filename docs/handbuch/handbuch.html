@@ -535,6 +535,8 @@ a { color: var(--acc); }
 </table>
 <p>Unter dem Widget zeigen zwei frei wählbare Diagramme beliebige Werte um die aktuelle Stelle (Ausschnitt 1 bis 10 Minuten oder das ganze Log), daneben den Wert jetzt. Als Quellen stehen auch die berechneten Werte der App zur Wahl (ƒ, z. B. TAS, Wind, Vario TEK, Netto-Vario). Am Sender gibt es sie nicht, im Simulator helfen sie beim Vergleichen. Darunter liegen die Reiter <b>Ausgabe</b> (print-Ausgaben und Fehler des Widgets), <b>Quellen</b> (welche Werte das Widget gerade liest), <b>Code</b> und <b>SD-Karte</b> (Dateien, die das Widget liest und schreibt).</p>
 <p>Beim Springen nach vorne oder zurück startet das Widget neu und rechnet ab dem Start bis zur Stelle nach, damit Wind, Mittelwerte und Zähler stimmen. Wer nur schnell schauen will, nimmt das Häkchen „Beim Springen ab Start nachrechnen“ weg.</p>
+<p><b>Schalter von Hand:</b> Liest das Widget einen Schalter, erscheint unter den Knöpfen die Zeile „Schalter von Hand“. Dort stellst Du jeden Schalter auf ↑, – oder ↓; das gilt statt der Stellung im Log, bis Du wieder „Log“ wählst. So gehen zum Beispiel Übernehmen und Neu beginnen der TEK-Kalibrierung auch im Simulator.</p>
+<p><b>Fahrt korr. und TEK korr.:</b> Liegt das Widget TEK-Kalibrierung im scripts-Ordner, läuft sein Quellen-Teil im Simulator neben jedem anderen Widget mit, wie am Sender. Die Quellen „Fahrt korr.“ und „TEK korr.“ stehen in der Konfiguration unter „Lua“ und rechnen mit <code>tekkal/korrektur_(Modellname).txt</code>. Diese Datei holt die App beim Anschliessen des Senders in „Meine Widgets“.</p>
 
 <h2>Wozu der Simulator gut ist</h2>
 <p>Ein Widget für den Sender zu entwickeln oder einzustellen hiess bisher: ändern, auf den Sender kopieren, auf den Platz fahren, fliegen und hoffen, dass man in der Luft etwas erkennt. Der Simulator holt diese Arbeit an den Schreibtisch:</p>
@@ -565,7 +567,7 @@ a { color: var(--acc); }
 <tr><td><b>Thermik</b>, <b>Steigflüge</b></td><td>Balken pro Thermik- bzw. Steigflug-Phase mit Ø Steigen und Höhengewinn, so wie die gleichnamigen Tabs der App.</td></tr>
 <tr><td><b>Wind</b>, <b>GPS Course</b></td><td>Wind, Windrichtung und TAS aus dem GPS bzw. der Kurs aus zwei GPS-Positionen, als Quellen für andere Widgets.</td></tr>
 <tr><td><b>SkyNavigator</b></td><td>Navigation für GPS Triangle mit Start-, Gleit-, Thermik- und Wertungsseite. Die Aufgaben kommen aus dem Tab SkyNavigator.</td></tr>
-<tr><td><b>TEK-Kalibrierung</b></td><td>Für den SM GPS-Logger 3 (Airspeed über die TEK-Düse): bestimmt in einem Flug den Airspeed-Faktor des Loggers (aus Kreisen, Wind wird mitgeschätzt) und wie gut die TEK-Düse kompensiert (aus Fahrtwechseln geradeaus). Die Quelle „TEK korr.“ korrigiert das TEK-Vario elektronisch, ohne die Düse zu ändern.</td></tr>
+<tr><td><b>TEK-Kalibrierung</b></td><td>Für den SM GPS-Logger 3 (Airspeed über die TEK-Düse): bestimmt in einem Flug den Airspeed-Faktor des Loggers (aus Kreisen, Wind wird mitgeschätzt) und wie gut die TEK-Düse kompensiert (aus Fahrtwechseln geradeaus). Die Quellen „Fahrt korr.“ und „TEK korr.“ korrigieren Fahrt und TEK-Vario pro Modell elektronisch, ohne Logger oder Düse zu ändern. Übernehmen und Neu beginnen gehen über Schalter oder automatisch nach der Landung.</td></tr>
 </table>
 <figure class="half"><img src="bilder/28-widgets.png" alt=""><figcaption>⚙ Einstellungen → Eigene Widgets</figcaption></figure>
 <h2>So läuft es ab</h2>

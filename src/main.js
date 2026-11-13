@@ -193,6 +193,8 @@ async function skynavSync(roots) {
 }
 async function afterEthos(roots) {
   const res = settings.widgetAuto === false ? { at: Date.now(), results: [] } : await copyWidgets(roots);
+  // Korrekturen der TEK-Kalibrierung (pro Modell) vom Sender holen: der Simulator rechnet damit wie der Sender
+  try { res.korr = []; for (const r of roots) res.korr.push(...await WG.pullSenderData(r, settings.widgetDir)); } catch (e) { res.korrError = e.message; }
   try { res.skynav = await skynavSync(roots); } catch (e) { res.skynav = { error: e.message }; }
   return res;
 }

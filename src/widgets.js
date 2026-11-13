@@ -12,7 +12,9 @@ const DEFAULT_BRANCH = 'main';
 const WIDGET_EXT = /\.(lua|luac|png|bmp|jpg|wav|txt|json|cfg|ini)$/i;
 // polaren.lua (Tab Polare) und skynav/aufgaben.lua (Tab SkyNavigator) schreibt die App selbst, skynav/feld.lua das Systemtool
 // SkyNav Aufgabe am Sender: nie aus dem Repo
-const SKIP = /^scripts\/(maccready\/polaren|skynav\/aufgaben|skynav\/feld)\.lua$/i;
+// tekkal/korrektur_*.txt und ergebnis_*.txt schreibt die TEK-Kalibrierung am Sender: nie auf den Sender kopieren
+const SKIP = /^scripts\/((maccready\/polaren|skynav\/aufgaben|skynav\/feld)\.lua|tekkal\/(korrektur|ergebnis)_[^/]*\.txt)$/i;
+const SENDER_DATA = /^(korrektur|ergebnis)_[^/]+\.txt$/i;
 
 function defaultDir(home = require('os').homedir()) {
   return path.join(home, 'Documents', 'MM Flight Analyzer', 'Widgets');
@@ -129,4 +131,23 @@ async function copyToSender(dir, senderRoot, off = []) {
   return res;
 }
 
-module.exports = { DEFAULT_REPO, DEFAULT_BRANCH, defaultDir, blobSha, header, listWidgets, fetchRepo, copyToSender };
+// Korrekturen der TEK-Kalibrierung vom Sender ins Benutzerverzeichnis (scripts/tekkal/), damit der Simulator
+// ("Meine Widgets") mit denselben Werten rechnet wie der Sender. Nur geänderte Dateien; liefert die Namen.
+async function pullSenderData(senderRoot, dir) {
+  const src = path.join(senderRoot, 'scripts', 'tekkal'), dst = path.join(dir, 'scripts', 'tekkal');
+  let ents = [];
+  try { ents = await fsp.readdir(src); } catch { return []; }
+  const out = [];
+  for (const name of ents) {
+    if (!SENDER_DATA.test(name)) continue;
+    const buf = await fsp.readFile(path.join(src, name)).catch(() => null);
+    if (!buf || buf.length > 100000) continue;
+    const old = await fsp.readFile(path.join(dst, name)).catch(() => null);
+    if (old && old.equals(buf)) continue;
+    await writeAtomic(path.join(dst, name), buf);
+    out.push(name);
+  }
+  return out;
+}
+
+module.exports = { DEFAULT_REPO, DEFAULT_BRANCH, defaultDir, blobSha, header, listWidgets, fetchRepo, copyToSender, pullSenderData };

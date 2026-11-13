@@ -51,3 +51,20 @@ test('copyToSender kopiert immer, überschreibt ohne Sicherung, lässt Daten und
   assert.strictEqual(fs.readFileSync(path.join(radio, 'scripts', 'polarflug', 'punkte_SB-10.txt'), 'utf8'), 'daten');
   assert.ok(!fs.existsSync(path.join(radio, 'scripts', 'test')));
 });
+
+test('Korrekturen der TEK-Kalibrierung: vom Sender ins Benutzerverzeichnis, nie zurück auf den Sender', async () => {
+  const dir = tmp(), radio = tmp();
+  put(path.join(dir, 'scripts', 'tekkal', 'main.lua'), '-- @version 1.4\n');
+  put(path.join(radio, 'scripts', 'tekkal', 'korrektur_ASW-17.txt'), 'airK=1045\n');
+  put(path.join(radio, 'scripts', 'tekkal', 'ergebnis_ASW-17.txt'), 'Fahrt\n');
+  put(path.join(radio, 'scripts', 'tekkal', 'notiz.txt'), 'x');
+  assert.deepStrictEqual((await W.pullSenderData(radio, dir)).sort(), ['ergebnis_ASW-17.txt', 'korrektur_ASW-17.txt']);
+  assert.strictEqual(fs.readFileSync(path.join(dir, 'scripts', 'tekkal', 'korrektur_ASW-17.txt'), 'utf8'), 'airK=1045\n');
+  assert.ok(!fs.existsSync(path.join(dir, 'scripts', 'tekkal', 'notiz.txt')));
+  assert.deepStrictEqual(await W.pullSenderData(radio, dir), []);   // unverändert: nichts geschrieben
+  // am Sender neuer Stand, lokal alte Kopie: copyToSender überschreibt den Sender nicht
+  put(path.join(radio, 'scripts', 'tekkal', 'korrektur_ASW-17.txt'), 'airK=1050\n');
+  await W.copyToSender(dir, radio);
+  assert.strictEqual(fs.readFileSync(path.join(radio, 'scripts', 'tekkal', 'korrektur_ASW-17.txt'), 'utf8'), 'airK=1050\n');
+  assert.deepStrictEqual(await W.pullSenderData(tmp(), dir), []);   // Sender ohne tekkal
+});
