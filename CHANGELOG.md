@@ -2,6 +2,7 @@
 
 ## Unveröffentlicht
 
+- SkyNavigator ohne PC am Platz: Knopf „QR scannen“ liest den QR-Code einer Aufgabe mit der Kamera (auch Foto wählen, Bild einfügen oder den Text einfügen) und legt die Aufgabe an. Pro Aufgabe zeigt der Kasten „Code für den Sender“ die Buchstaben zum Abtippen im Systemtool „SkyNav Aufgabe“ am Sender (kommt mit den Widgets auf den Sender), dazu das Prüfwort und bei Änderungen im Lauf des Tages einen kurzen Änderungs-Code. Die Richtung gilt jetzt auf 0,1° genau (.rct und Formular).
 - Tab Polare, Kasten „Auf den Sender“: Das Layout bricht nicht mehr. Ein offener „Inhalt der Datei“ mit langen Zeilen hat den Kasten breiter gemacht als die Seite; der Knopf „Auf Sender schreiben“ und „Sender verbunden“ rutschten dabei rechts aus dem Kasten. Lange Zeilen scrollen jetzt im Codefeld.
 - „Auf Sender schreiben“ zeigt, dass es geschrieben hat: Der Knopf meldet kurz „Schreibe …“ und „✓ Geschrieben“, die Zeit steht mit Sekunden da und dazu der Pfad auf dem Sender. Vorher sah ein zweiter Klick in derselben Minute aus, als passiere nichts.
 - Sync ins Archiv in einem Cloud-Ordner (OneDrive, Google Drive): Ein frisch kopiertes Log ist kurz gesperrt, solange der Cloud-Ordner es hochlädt, und macOS meldet beim Lesen einen Fehler. Kopieren, Umbenennen und Lesen versuchen es jetzt ein paar Mal mit Pause nochmals. Eine Kopie mit falscher Grösse wird nicht als fertiges Log abgelegt. Klappt das Lesen trotzdem nicht, steht der Grund in Klartext da, mit Knopf „Nochmals laden“.

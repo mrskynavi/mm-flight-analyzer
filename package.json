@@ -28,7 +28,8 @@
     "chart.js": "4.4.1",
     "electron": "^33.4.11",
     "electron-builder": "^26.0.0",
-    "fengari-web": "0.1.4"
+    "fengari-web": "0.1.4",
+    "jsqr": "1.4.0"
   },
   "repository": {
     "type": "git",
@@ -72,7 +73,10 @@
       "category": "public.app-category.utilities",
       "identity": "-",
       "artifactName": "MM-Flight-Analyzer-${version}.${ext}",
-      "hardenedRuntime": false
+      "hardenedRuntime": false,
+      "extendInfo": {
+        "NSCameraUsageDescription": "Die Kamera liest den QR-Code einer SkyNavigator-Aufgabe."
+      }
     },
     "publish": null,
     "extraResources": [
