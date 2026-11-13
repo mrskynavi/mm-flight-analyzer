@@ -7,6 +7,11 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/fengari-web@0.1.4/dist/fengari-web.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
+<script src="core/wind.js"></script>
+<script src="core/polare.js"></script>
+<script src="core/energie.js"></script>
+<script src="core/atmosphaere.js"></script>
+<script src="core/klappen.js"></script>
 <style>
 /* Layout: Kopfzeile mit Datei-Ablage, Kennzahl-Leiste, Kanal-Chips, gestapelte Diagramme mit gemeinsamer Zeitachse, Statistik-Tabelle */
 :root{
@@ -92,6 +97,7 @@ dialog#renDlg::backdrop,dialog#jetiDlg::backdrop{background:color-mix(in srgb,#0
 .jst{font-size:.78rem;font-weight:600;border-radius:999px;padding:1px 8px;background:var(--line);color:var(--muted)}
 .jst.ok{background:color-mix(in srgb,var(--good) 18%,transparent);color:var(--good)} .jst.chg{background:var(--accent-soft);color:var(--accent)}
 dialog#settingsDlg{border:1px solid var(--line);border-radius:12px;background:var(--panel);color:var(--fg);padding:20px;width:min(560px,calc(100vw - 32px))}
+#setGel{width:100%;box-sizing:border-box;font-family:var(--mono);font-size:12px;background:var(--bg);color:var(--fg);border:1px solid var(--line);border-radius:6px;padding:4px 6px}
 dialog#settingsDlg::backdrop{background:color-mix(in srgb,#000 45%,transparent)}
 .setform{display:grid;gap:14px}
 .setform label{display:grid;gap:4px;font-weight:600;font-size:.92rem}
@@ -247,6 +253,9 @@ section{display:grid;gap:10px}
 .pol-ctrl label{display:inline-flex;gap:6px;align-items:center;cursor:pointer}
 .pol-ctrl input{accent-color:var(--accent)}
 .pol-rng{display:inline-flex;gap:5px;align-items:center}
+.pol-kl input{width:11em!important;text-align:left!important}
+.pol-kl select{font:inherit;color:var(--fg);background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:2px 4px;max-width:20em}
+.pol-kl select.on{border-color:var(--warn);box-shadow:0 0 0 1px var(--warn) inset}
 .pol-rng input{width:3.6em;padding:2px 5px;font:inherit;font-family:var(--mono);color:var(--fg);background:var(--bg);border:1px solid var(--line);border-radius:6px;text-align:right}
 .pol-rng input.on{border-color:var(--warn);box-shadow:0 0 0 1px var(--warn) inset}
 .pol-rng input.bad{border-color:#d33;box-shadow:0 0 0 1px #d33 inset}
@@ -868,6 +877,8 @@ pre.code{background:var(--bg);border:1px solid var(--line);border-radius:8px;pad
       <label>Sprache<select id="setLang"><option value="">Systemsprache</option><option value="de">Deutsch</option><option value="en">English</option></select></label>
       <label>Darstellung<select id="setTheme"><option value="">Wie System</option><option value="light">Hell</option><option value="dark">Dunkel</option></select></label>
       <label>Geschwindigkeit<select id="setSpeed"><option value="km/h">km/h</option><option value="kn">kn</option><option value="m/s">m/s</option><option value="mph">mph</option></select><span class="hint">Alle Geschwindigkeiten werden in diese Einheit umgerechnet, egal in welcher Einheit der Sensor loggt.</span></label>
+      <label>Fluggelände (Luftdichte)<textarea id="setGel" rows="3" spellcheck="false" placeholder="Schmerikon; 47.2006; 8.9617; 410"></textarea><span class="row"><button type="button" class="btn ghost" id="setGelAdd">Startort des offenen Logs hinzufügen</button></span><span class="hint">Eine Zeile pro Gelände: Name; Breite; Länge; Höhe über Meer in m. Startet ein Log innerhalb 5 km davon, rechnen Polare und Netto-Vario mit der Luftdichte dieser Höhe (Normatmosphäre). Auf 1500 m ist die wahre Fahrt rund 8 % höher als auf Meereshöhe.</span></label>
+      <label>Platzhöhe für andere Orte (m ü. M.)<input type="text" id="setPlatz" inputmode="decimal" placeholder="leer = ohne Dichtekorrektur"><span class="hint">Gilt für Logs, deren Startort zu keinem Gelände passt. Leer: Diese Logs rechnen wie bisher ohne Luftdichte.</span></label>
       <label>Luftbild im Ausland (Esri-Schlüssel)<input type="password" id="setEsri" autocomplete="off" spellcheck="false" placeholder="AAPT…"><span class="hint">In der Schweiz kommt das Luftbild von swisstopo, ohne Schlüssel. Für andere Länder einen kostenlosen API-Schlüssel der ArcGIS Location Platform mit der Berechtigung „Grundkarten“ eintragen. Er bleibt auf diesem Gerät.</span></label>
       <label class="deskonly">Log-Ordner auf dem Sender<input type="text" id="setSender" placeholder="Radio/logs" spellcheck="false"><span class="hint">Wird auf jedem angeschlossenen Laufwerk gesucht. Ein vollständiger Pfad wie E:\logs geht auch.</span></label>
       <label class="deskonly">Archiv-Ordner<span class="row"><input type="text" id="setArchive" spellcheck="false"><button type="button" class="btn ghost" id="setPick">Wählen …</button></span><span class="hint">Am besten ein Ordner in Google Drive oder OneDrive, dann sind die Logs auf allen Geräten da. Pro Modell entsteht ein Unterordner.</span></label>
@@ -1035,7 +1046,7 @@ pre.code{background:var(--bg);border:1px solid var(--line);border-radius:8px;pad
   </section>
   </div>
   <div class="pane" role="tabpanel" id="pane-polare" data-tab="polare" aria-labelledby="tab-polare" hidden>
-  <div class="infopop" id="info-polare" hidden><p>Die Polare zeigt, wie schnell das Modell bei welcher Fahrt sinkt. Links stehen alle Logs des gewählten Modells; angehakte Logs fliessen ein.</p><p>Die Polare ist fixiert: Sie ist pro Modell als Version gespeichert (z. B. v3) und ändert sich nicht, wenn neue Logs dazukommen, ein Filter wechselt oder die App neu rechnet. Netto-Vario, MacCready und polaren.lua am Sender nutzen immer die fixierte Version. Mit „Auswahl ändern“ öffnest Du einen Entwurf, hakst Logs an oder ab und siehst die neue Kurve orange gestrichelt neben der fixierten. „Vergleichen &amp; übernehmen“ zeigt alt und neu nebeneinander; erst „Übernehmen und fixieren“ macht daraus die nächste Version. Die letzten 10 Versionen bleiben unter „Versionen“ und lassen sich zurückholen.</p><p>Jeder Punkt ist eine Sekunde Gleitflug: Motor aus (und 15 s danach), geradeaus (Kursänderung unter 8°/s) und ohne starkes Beschleunigen oder Bremsen. Die Fahrt ist die TAS, ohne Wind die GPS-Geschwindigkeit; das Sinken kommt aus der Höhe (Flughöhe, ohne Höhe vom Vario), korrigiert um Fahrtänderungen.</p><p>Die Punkte werden in 4-km/h-Klassen sortiert, pro Klasse zählt der Median (Band = mittlere Hälfte der Punkte). „Physikalisch“ legt durch die Mediane die Kurve Sinken = A·v³ + B/v, die Grundform jeder Polare; sie ist immer glatt und hat genau ein Minimum. „Median“ zeigt die geglätteten Mediane. Die Gerade vom Nullpunkt berührt die Kurve bei der besten Gleitzahl.</p><p>Fahrtfilter („Fahrt für Kurve ab … bis …“): Nur Gleitpunkte in diesem Fahrtbereich zählen für Klassen und Kurve. Im Langsamflug fliegt das Modell oft nicht mehr sauber und sinkt stark; schon wenige solche Klassen ziehen die Kurve A·v³ + B/v hoch, die beste Gleitzahl wird kleiner und rutscht zu schnellerer Fahrt. Punkte ausserhalb bleiben hell sichtbar, ihre Mediane als leere Rauten. Der Fahrtfilter gilt für die Fahrt der Polare (TAS, sonst GPS), gehört zur Version und kommt so in Netto-Vario, MacCready und polaren.lua. Ändern öffnet einen Entwurf.</p><p>„weicht ab“: Die beste Gleitzahl dieses Logs liegt mehr als 20 % neben der Polare der übrigen angehakten Logs, z. B. wegen Thermik im Geradeausflug, Ballast oder anderem Setup. Thermik und Abwind verfälschen einzelne Punkte immer; mehr Logs und ruhige Flüge machen die Polare genauer.</p></div>
+  <div class="infopop" id="info-polare" hidden><p>Die Polare zeigt, wie schnell das Modell bei welcher Fahrt sinkt. Links stehen alle Logs des gewählten Modells; angehakte Logs fliessen ein.</p><p>Die Polare ist fixiert: Sie ist pro Modell als Version gespeichert (z. B. v3) und ändert sich nicht, wenn neue Logs dazukommen, ein Filter wechselt oder die App neu rechnet. Netto-Vario, MacCready und polaren.lua am Sender nutzen immer die fixierte Version. Mit „Auswahl ändern“ öffnest Du einen Entwurf, hakst Logs an oder ab und siehst die neue Kurve orange gestrichelt neben der fixierten. „Vergleichen &amp; übernehmen“ zeigt alt und neu nebeneinander; erst „Übernehmen und fixieren“ macht daraus die nächste Version. Die letzten 10 Versionen bleiben unter „Versionen“ und lassen sich zurückholen.</p><p>Jeder Punkt ist eine Sekunde Gleitflug: Motor aus (und 15 s danach), geradeaus (Kursänderung unter 8°/s) und ohne starkes Beschleunigen oder Bremsen. Die Fahrt ist die TAS (erst ab dem ersten Windfit, davor fehlt der Wind noch), ohne Windfit im ganzen Log die GPS-Geschwindigkeit; das Sinken kommt aus der Höhe (Flughöhe, ohne Höhe vom Vario), korrigiert um Fahrtänderungen.</p><p>Die Punkte werden in 4-km/h-Klassen sortiert, pro Klasse zählt der Median (Band = mittlere Hälfte der Punkte). „Physikalisch“ legt durch die Mediane die Kurve Sinken = A·v³ + B/v, die Grundform jeder Polare; sie ist immer glatt und hat genau ein Minimum. „Median“ zeigt die geglätteten Mediane. Die Gerade vom Nullpunkt berührt die Kurve bei der besten Gleitzahl.</p><p>Fahrtfilter („Fahrt für Kurve ab … bis …“): Nur Gleitpunkte in diesem Fahrtbereich zählen für Klassen und Kurve. Im Langsamflug fliegt das Modell oft nicht mehr sauber und sinkt stark; schon wenige solche Klassen ziehen die Kurve A·v³ + B/v hoch, die beste Gleitzahl wird kleiner und rutscht zu schnellerer Fahrt. Punkte ausserhalb bleiben hell sichtbar, ihre Mediane als leere Rauten. Der Fahrtfilter gilt für die Fahrt der Polare (TAS, sonst GPS), gehört zur Version und kommt so in Netto-Vario, MacCready und polaren.lua. Ändern öffnet einen Entwurf.</p><p>Klappen: Jedes Klappenpaar (links/rechts) zerfällt in Querruder (gegensinnig) und Wölbung (gleichsinnig). Die App erkennt die Paare selbst: Summe oder Differenz der beiden Kanäle folgt dem Querruderknüppel. Weicht das ab, trägst Du die Paare des Modells ein (z. B. K1/K5 K6/K7 K8/K9). In den Logs des Modells sucht die App die geflogenen Klappenstellungen (z. B. Speed, Normal, Thermik) als Wölbung je Paar in % Servoweg. Wählst Du eine Stellung, zählen nur Gleitpunkte innerhalb ± 4 % davon; Butterfly, Übergänge und andere Stellungen fallen weg. Die Stellung gehört zur Version.</p><p>Luftdichte: Ist für den Startort eines Logs eine Platzhöhe bekannt (Einstellungen → Fluggelände), rechnet die App jeden Punkt auf Meereshöhe um (Normatmosphäre, Fahrt und Sinken mal √σ). So passen Flüge aus verschiedenen Höhen zusammen. Netto-Vario rechnet in der Höhe zurück, polaren.lua bekommt dann isa = true.</p><p>„weicht ab“: Die beste Gleitzahl dieses Logs liegt mehr als 20 % neben der Polare der übrigen angehakten Logs, z. B. wegen Thermik im Geradeausflug, Ballast oder anderem Setup. Thermik und Abwind verfälschen einzelne Punkte immer; mehr Logs und ruhige Flüge machen die Polare genauer.</p></div>
   <div class="pol">
     <section class="pol-logs" id="pol-logs-sec">
       <div class="pol-lh"><h2 class="hi">Logs <button type="button" class="iconbtn sm" data-info="info-polare" aria-expanded="false" aria-controls="info-polare" aria-label="So wird die Polare gerechnet">i</button></h2>
@@ -1056,6 +1067,7 @@ pre.code{background:var(--bg);border:1px solid var(--line);border-radius:8px;pad
           <label><input type="checkbox" id="polEach"> Einzel-Logs</label>
           <label title="Nur Einträge, die bei allen Filtern im Tab Diagramme im Bereich liegen, in allen Logs des Modells"><input type="checkbox" id="polFilt"> Filter anwenden</label>
           <span class="pol-rng" title="Fahrtfilter: Nur Gleitpunkte in diesem Fahrtbereich fliessen in die Kurve. Langsame Punkte, in denen das Modell nicht mehr sauber fliegt, verschieben sonst die beste Gleitzahl. Leer = keine Grenze. Gehört zur Version der Polare."><span>Fahrt für Kurve ab</span><input type="text" id="polVmin" inputmode="decimal" placeholder="–" aria-label="Fahrtfilter: kleinste Fahrt"><span>bis</span><input type="text" id="polVmax" inputmode="decimal" placeholder="–" aria-label="Fahrtfilter: grösste Fahrt"><span id="polRngU">km/h</span></span>
+          <span class="pol-rng pol-kl" title="Klappenfilter: Nur Gleitpunkte mit dieser Klappenstellung (Wölbung je Klappenpaar in % Servoweg, ± 4 %) fliessen in die Kurve. Die Stellungen findet die App in den Logs des Modells. Gehört zur Version der Polare."><span>Klappen</span><select id="polKl" aria-label="Klappenstellung für die Polare"></select><input type="text" id="polKlPaare" placeholder="auto" aria-label="Klappenpaare des Modells, z. B. K1/K5 K6/K7" title="Klappenpaare dieses Modells, links/rechts, z. B. K1/K5 K6/K7 K8/K9. Leer = automatisch aus den Logs (das Paar, dessen Summe oder Differenz dem Querruderknüppel folgt)."></span>
         </div>
         <div class="note warn" id="polNote" role="status" hidden></div>
         <div class="pol-cv"><canvas id="polChart" aria-label="Polare: Sinken über Fluggeschwindigkeit"></canvas><div class="pol-empty" id="polEmpty" hidden></div></div>
@@ -4160,6 +4172,7 @@ Object.assign(EN, {"Für MacCready / Lua-Widget": "For MacCready / Lua widget", 
 Object.assign(EN, {"O setzen": "Set O", "Danach in die Karte klicken: dort liegt der Ursprung O": "Then click into the map: origin O goes there", "Karte herauszoomen": "Zoom map out", "Karte hineinzoomen": "Zoom map in", "In der Skizze setzt Du die Aufgabe direkt: Ziehen im Dreieck oder am Punkt O verschiebt es, Ziehen an einer Ecke TP1 bis TP3 dreht es (die Richtung O → TP1 folgt). Eine Zone verschiebst Du durch Ziehen in der Zone, den Kreis vergrösserst Du am Punkt auf dem Rand, beim Rechteck drehst und verlängerst Du am Punkt an der Schmalseite und machst es am Punkt an der Längsseite breiter. Die Felder links gehen mit. Für eine neue Aufgabe schiebst Du die Karte an den Ort, tippst „Neu“ oder „O setzen“ und klickst dann in die Karte: dort liegt der Ursprung O (Esc bricht ab). Ziehen neben der Aufgabe verschiebt die Karte, Mausrad oder zwei Finger zoomen, Doppelklick oder „Alles“ zeigt wieder die ganze Aufgabe. Luftbild in der Schweiz von swisstopo, im Ausland von Esri (dafür unter ⚙ Einstellungen einen Esri-Schlüssel eintragen).": "In the sketch you set the task directly: dragging inside the triangle or at point O moves it, dragging a corner TP1 to TP3 rotates it (the direction O → TP1 follows). Drag inside a zone to move it, drag the point on the edge to resize a circle; for a rectangle the point on the short side rotates and lengthens it, the point on the long side makes it wider. The fields on the left follow. For a new task, move the map to the place, press “New” or “Set O” and then click into the map: that is where origin O goes (Esc cancels). Dragging next to the task pans the map, the mouse wheel or two fingers zoom, double-click or “All” shows the whole task again. Aerial image in Switzerland from swisstopo, elsewhere from Esri (enter an Esri key under ⚙ Settings).", "(Kopie)": "(copy)", "Aktive Aufgabe am Sender": "Active task on the transmitter", "Auf den Sender geschrieben: {p}": "Written to the transmitter: {p}", "Aufgabe „{n}“ löschen?": "Delete task “{n}”?", "Beispiel Sport": "Example Sport", "Bis Höhe": "Up to height", "Breite": "Width", "Die Datei enthält keine Aufgabe (LTSK).": "The file contains no task (LTSK).", "Dreiecke": "Triangles", "Einflug {h} m / {v} km/h": "Entry {h} m / {v} km/h", "Ende: {e}": "End: {e}", "Flugzeit": "Flight time", "Gespeichert. Kein Sender angeschlossen, die Aufgaben gehen beim nächsten Anschliessen hin.": "Saved. No transmitter connected, the tasks will be written the next time you connect it.", "Hinweise": "Notes", "Höhe im Ziel": "Height at finish", "Index": "Index", "geflogen / Schenkel": "flown / legs", "Schalterstellung": "Switch position", "Widget-Einstellungen": "Widget settings", "Vorgaben": "Defaults", "Gelten für alle Aufgaben und gehen mit aufgaben.lua auf den Sender. Am Sender stellst Du nur noch Aufgabe, Sensoren, Schalter und das Startfenster von Hand ein.": "Apply to all tasks and go to the transmitter with aufgaben.lua. On the transmitter you only set the task, sensors, switches and the manual start window.", "Töne": "Sounds", "Ton": "Sound", "Ereignisse immer melden (auch auf anderen Seiten)": "Always announce events (also on other pages)", "Start: Gleitwinkel-Ton": "Start: glide angle tone", "Gleiten: Sollfahrt-Ton": "Glide: speed-to-fly tone", "Gleiten: Kurs-Kommandos": "Glide: course commands", "Thermik: Vario-Ton des Widgets (sonst vom Sender)": "Thermal: widget vario tone (otherwise from the transmitter)", "Kommando ab": "Command from", "Kommando höchstens alle": "Command at most every", "Einflugfenster unter dem Limit": "Entry window below the limit", "Vibration ab Limit minus": "Vibrate from limit minus", "Einflug-Ton": "Entry tone", "Zu tief = hoher Ton": "Too low = high tone", "Zu hoch = hoher Ton": "Too high = high tone", "Weg": "Course", "Wenderadius": "Turn radius", "Gemessen": "Measured", "Fest": "Fixed", "Wenderadius fest / beim Start": "Turn radius fixed / at start", "Reserve im Sektor": "Margin inside the sector", "Wendeton (endet am Wendepunkt, 0 = aus)": "Turn tone (ends at the turn point, 0 = off)", "Vorhalt Kurveneinleitung": "Turn entry lead", "Eckansicht vor dem Wendepunkt": "Corner view before the turn point", "Start-Seite: Karte von der Linie bis zum linken Rand": "Start page: map from the line to the left edge", "Seiten": "Pages", "Seite automatisch, wenn kein Seiten-Schalter ein ist": "Automatic page when no page switch is on", "Sollfahrt": "Speed to fly", "MC (ohne Poti)": "MC (without pot)", "MC Maximum am Poti": "MC maximum on the pot", "Fluggewicht (der Polare)": "Flying weight (of the polar)", "Verschmutzung": "Bugs", "Totzone Sollfahrt": "Speed-to-fly dead band", "IGC": "IGC", "Wettbewerbskennung": "Competition ID", "Kennzeichen": "Registration", "Start": "Start", "IGC herunterladen": "Download IGC", "Im Browser: Datei herunterladen und nach scripts/skynav/ kopieren": "In the browser: download the file and copy it to scripts/skynav/", "Kein Sender angeschlossen": "No transmitter connected", "Keine Sicherheitszonen": "No safety zones", "Keine ganze Runde": "No complete lap", "Kreis": "Circle", "Länge": "Length", "Noch keine Flüge. Das Widget legt sie in scripts/skynav/fluege/ ab, die App holt sie beim Anschliessen.": "No flights yet. The widget saves them in scripts/skynav/fluege/, the app fetches them when you connect the transmitter.", "Rechteck": "Rectangle", "Richtung": "Direction", "Runde": "Lap", "Schnitt": "Average", "Seit Start": "Since start", "Sender angeschlossen": "Transmitter connected", "Speed im Ziel": "Speed at finish", "Strafe": "Penalty", "Umfang {u} m": "Perimeter {u} m", "Von Höhe": "From height", "Zeit": "Time", "Zone löschen": "Delete zone", "Zone {n}": "Zone {n}", "aktiv": "active", "kein gültiger Start": "no valid start", "{n} ist die aktive Aufgabe": "{n} is the active task", "{n} neue Flüge geholt": "{n} new flights fetched", "{n}× in Sicherheitszone": "{n}× in safety zone", "Öffne eine IGC-Datei des Widgets.": "Open an IGC file from the widget.", "über der Maximalhöhe": "above maximum height", "über {t}": "over {t}", "Δ Höhe": "Δ height", "Landung": "Landing", "Arbeitszeit": "Working time", "SkyNavigator: {n} neue Flüge": "SkyNavigator: {n} new flights", "(höchstens 5, Höhen über Platz)": "(up to 5, heights above field)", "+ Kreis": "+ Circle", "+ Rechteck": "+ Rectangle", "Als aktiv markieren": "Mark as active", "Art": "Type", "Auf Sender schreiben": "Write to transmitter", "Auf den Sender": "To the transmitter", "Aufgabe": "Task", "Aufgaben": "Tasks", "Datei": "File", "Die App schreibt die Aufgaben bei jedem Anschliessen des Senders.": "The app writes the tasks every time you connect the transmitter.", "Die Wertung der Flüge rechnet die App aus der IGC-Datei nach: Start beim Überfliegen der Linie aus dem Startsektor (Einflugwerte vom letzten Fix davor), Wendepunkte im Viertelkreis von 1.5 km, Ziel mit Mindestspeed innerhalb der Arbeitszeit. Startfenster gibst Du in Ortszeit ein, das Widget rechnet in UTC.": "The app recalculates the score from the IGC file: start when crossing the line from the start sector (entry values from the last fix before), turn points in the 1.5 km quarter circle, finish with minimum speed within the working time. Enter start windows in local time, the widget works in UTC.", "Duplizieren": "Duplicate", "Flug": "Flight", "Flüge": "Flights", "Hier legst Du die Aufgaben für das Ethos-Widget SkyNavigator an (GPS Triangle nach Triangle Definition V1.7, Klassen Light, Sport und Scale). Die markierte Aufgabe ist am Sender aktiv, im Widget lässt sich auch eine andere wählen. Beim Anschliessen des Senders schreibt die App die Aufgaben nach scripts/skynav/aufgaben.lua und holt die Flüge (IGC) aus scripts/skynav/fluege/ ins Archiv.": "Here you create the tasks for the Ethos widget SkyNavigator (GPS Triangle per Triangle Definition V1.7, classes Light, Sport and Scale). The marked task is active on the transmitter, another one can be chosen in the widget. When you connect the transmitter, the app writes the tasks to scripts/skynav/aufgaben.lua and fetches the flights (IGC) from scripts/skynav/fluege/ into the archive.", "IGC öffnen": "Open IGC", "Inhalt der Datei": "File content", "Klasse": "Class", "Löschen": "Delete", "Max. Einfluggeschwindigkeit": "Max. entry speed", "Max. Einflughöhe": "Max. entry height", "Maximalhöhe": "Maximum height", "Mindestspeed im Ziel": "Minimum speed at finish", "Modell": "Model", "Neu": "New", "Ordner öffnen": "Open folder", "Pilot-ID": "Pilot ID", "Platzhöhe (MSL)": "Field elevation (MSL)", "Richtung / Länge / Breite bzw. Radius (m)": "Direction / length / width or radius (m)", "Richtung O → TP1": "Direction O → TP1", "Schnitt km/h": "Average km/h", "Sicherheitszonen": "Safety zones", "Startfenster": "Start window", "Ursprung O (Breite, Länge)": "Origin O (latitude, longitude)", "Vom Sender holen": "Fetch from transmitter", "Von / bis Höhe (m)": "From / to height (m)", "dTP (Abstand O–Ecke)": "dTP (distance O–corner)", "Beginn": "Start", "Datum": "Date", "Skizze der Aufgabe": "Task sketch", "So funktioniert SkyNavigator": "How SkyNavigator works", "Spur des Flugs": "Flight track", "z. B. Lizenz-Nr.": "e.g. licence no."});
 Object.assign(EN, {"(Kopie)": "(copy)", "Aktive Aufgabe am Sender": "Active task on the transmitter", "Auf den Sender geschrieben: {p}": "Written to the transmitter: {p}", "Aufgabe „{n}“ löschen?": "Delete task “{n}”?", "Beispiel Sport": "Example Sport", "Bis Höhe": "Up to height", "Breite": "Width", "Die Datei enthält keine Aufgabe (LTSK).": "The file contains no task (LTSK).", "Dreiecke": "Triangles", "Einflug {h} m / {v} km/h": "Entry {h} m / {v} km/h", "Ende: {e}": "End: {e}", "Flugzeit": "Flight time", "Gespeichert. Kein Sender angeschlossen, die Aufgaben gehen beim nächsten Anschliessen hin.": "Saved. No transmitter connected, the tasks will be written the next time you connect it.", "Hinweise": "Notes", "Höhe im Ziel": "Height at finish", "Index": "Index", "geflogen / Schenkel": "flown / legs", "Schalterstellung": "Switch position", "Widget-Einstellungen": "Widget settings", "Vorgaben": "Defaults", "Gelten für alle Aufgaben und gehen mit aufgaben.lua auf den Sender. Am Sender stellst Du nur noch Aufgabe, Sensoren, Schalter und das Startfenster von Hand ein.": "Apply to all tasks and go to the transmitter with aufgaben.lua. On the transmitter you only set the task, sensors, switches and the manual start window.", "Töne": "Sounds", "Ton": "Sound", "Ereignisse immer melden (auch auf anderen Seiten)": "Always announce events (also on other pages)", "Start: Gleitwinkel-Ton": "Start: glide angle tone", "Gleiten: Sollfahrt-Ton": "Glide: speed-to-fly tone", "Gleiten: Kurs-Kommandos": "Glide: course commands", "Thermik: Vario-Ton des Widgets (sonst vom Sender)": "Thermal: widget vario tone (otherwise from the transmitter)", "Kommando ab": "Command from", "Kommando höchstens alle": "Command at most every", "Einflugfenster unter dem Limit": "Entry window below the limit", "Vibration ab Limit minus": "Vibrate from limit minus", "Einflug-Ton": "Entry tone", "Zu tief = hoher Ton": "Too low = high tone", "Zu hoch = hoher Ton": "Too high = high tone", "Weg": "Course", "Wenderadius": "Turn radius", "Gemessen": "Measured", "Fest": "Fixed", "Wenderadius fest / beim Start": "Turn radius fixed / at start", "Reserve im Sektor": "Margin inside the sector", "Wendeton (endet am Wendepunkt, 0 = aus)": "Turn tone (ends at the turn point, 0 = off)", "Vorhalt Kurveneinleitung": "Turn entry lead", "Eckansicht vor dem Wendepunkt": "Corner view before the turn point", "Eckansicht nach der Wende": "Corner view after the turn", "Querlage": "Bank angle", "Vorausschau Querlage (0 = aus)": "Bank angle look-ahead (0 = off)", "Nullpunkt im geraden Flug nachtrimmen": "Trim the zero point in straight flight", "Start-Seite: Karte von der Linie bis zum linken Rand": "Start page: map from the line to the left edge", "Seiten": "Pages", "Seite automatisch, wenn kein Seiten-Schalter ein ist": "Automatic page when no page switch is on", "Sollfahrt": "Speed to fly", "MC (ohne Poti)": "MC (without pot)", "MC Maximum am Poti": "MC maximum on the pot", "Fluggewicht (der Polare)": "Flying weight (of the polar)", "Verschmutzung": "Bugs", "Totzone Sollfahrt": "Speed-to-fly dead band", "IGC": "IGC", "Wettbewerbskennung": "Competition ID", "Kennzeichen": "Registration", "Start": "Start", "IGC herunterladen": "Download IGC", "Im Browser: Datei herunterladen und nach scripts/skynav/ kopieren": "In the browser: download the file and copy it to scripts/skynav/", "Kein Sender angeschlossen": "No transmitter connected", "Keine Sicherheitszonen": "No safety zones", "Keine ganze Runde": "No complete lap", "Kreis": "Circle", "Länge": "Length", "Noch keine Flüge. Das Widget legt sie in scripts/skynav/fluege/ ab, die App holt sie beim Anschliessen.": "No flights yet. The widget saves them in scripts/skynav/fluege/, the app fetches them when you connect the transmitter.", "Rechteck": "Rectangle", "Richtung": "Direction", "Runde": "Lap", "Schnitt": "Average", "Seit Start": "Since start", "Sender angeschlossen": "Transmitter connected", "Speed im Ziel": "Speed at finish", "Strafe": "Penalty", "Umfang {u} m": "Perimeter {u} m", "Von Höhe": "From height", "Zeit": "Time", "Zone löschen": "Delete zone", "Zone {n}": "Zone {n}", "aktiv": "active", "kein gültiger Start": "no valid start", "{n} ist die aktive Aufgabe": "{n} is the active task", "{n} neue Flüge geholt": "{n} new flights fetched", "{n}× in Sicherheitszone": "{n}× in safety zone", "Öffne eine IGC-Datei des Widgets.": "Open an IGC file from the widget.", "über der Maximalhöhe": "above maximum height", "über {t}": "over {t}", "Δ Höhe": "Δ height", "Landung": "Landing", "Arbeitszeit": "Working time", "SkyNavigator: {n} neue Flüge": "SkyNavigator: {n} new flights", "(höchstens 5, Höhen über Platz)": "(up to 5, heights above field)", "+ Kreis": "+ Circle", "+ Rechteck": "+ Rectangle", "Als aktiv markieren": "Mark as active", "Art": "Type", "Auf Sender schreiben": "Write to transmitter", "Auf den Sender": "To the transmitter", "Aufgabe": "Task", "Aufgaben": "Tasks", "Datei": "File", "Die App schreibt die Aufgaben bei jedem Anschliessen des Senders.": "The app writes the tasks every time you connect the transmitter.", "Die Wertung der Flüge rechnet die App aus der IGC-Datei nach: Start beim Überfliegen der Linie aus dem Startsektor (Einflugwerte vom letzten Fix davor), Wendepunkte im Viertelkreis von 1.5 km, Ziel mit Mindestspeed innerhalb der Arbeitszeit. Startfenster gibst Du in Ortszeit ein, das Widget rechnet in UTC.": "The app recalculates the score from the IGC file: start when crossing the line from the start sector (entry values from the last fix before), turn points in the 1.5 km quarter circle, finish with minimum speed within the working time. Enter start windows in local time, the widget works in UTC.", "Duplizieren": "Duplicate", "Flug": "Flight", "Flüge": "Flights", "Hier legst Du die Aufgaben für das Ethos-Widget SkyNavigator an (GPS Triangle nach Triangle Definition V1.7, Klassen Light, Sport und Scale). Die markierte Aufgabe ist am Sender aktiv, im Widget lässt sich auch eine andere wählen. Beim Anschliessen des Senders schreibt die App die Aufgaben nach scripts/skynav/aufgaben.lua und holt die Flüge (IGC) aus scripts/skynav/fluege/ ins Archiv.": "Here you create the tasks for the Ethos widget SkyNavigator (GPS Triangle per Triangle Definition V1.7, classes Light, Sport and Scale). The marked task is active on the transmitter, another one can be chosen in the widget. When you connect the transmitter, the app writes the tasks to scripts/skynav/aufgaben.lua and fetches the flights (IGC) from scripts/skynav/fluege/ into the archive.", "IGC öffnen": "Open IGC", "Inhalt der Datei": "File content", "Klasse": "Class", "Löschen": "Delete", "Max. Einfluggeschwindigkeit": "Max. entry speed", "Max. Einflughöhe": "Max. entry height", "Maximalhöhe": "Maximum height", "Mindestspeed im Ziel": "Minimum speed at finish", "Modell": "Model", "Neu": "New", "Ordner öffnen": "Open folder", "Pilot-ID": "Pilot ID", "Platzhöhe (MSL)": "Field elevation (MSL)", "Richtung / Länge / Breite bzw. Radius (m)": "Direction / length / width or radius (m)", "Richtung O → TP1": "Direction O → TP1", "Schnitt km/h": "Average km/h", "Sicherheitszonen": "Safety zones", "Startfenster": "Start window", "Ursprung O (Breite, Länge)": "Origin O (latitude, longitude)", "Vom Sender holen": "Fetch from transmitter", "Von / bis Höhe (m)": "From / to height (m)", "dTP (Abstand O–Ecke)": "dTP (distance O–corner)", "Beginn": "Start", "Datum": "Date", "Skizze der Aufgabe": "Task sketch", "So funktioniert SkyNavigator": "How SkyNavigator works", "Spur des Flugs": "Flight track", "z. B. Lizenz-Nr.": "e.g. licence no.", "Gleiten: Werte unten": "Glide: values at the bottom", "Feld links": "Left field", "Feld Mitte": "Middle field", "Feld rechts": "Right field", "So stehen die Werte unten auf der Seite Gleiten. Auf die Beschriftung tippen, um den Wert zu wählen; die Zahlen sind Beispielwerte.": "This is how the values appear at the bottom of the Glide page. Tap a label to choose the value; the numbers are examples.", "leer": "empty", "Distanz nächster TP": "Distance to next TP", "Wenden in (Zeit bis Kurvenbeginn)": "Turn in (time to turn entry)", "Höhe über Grund": "Height above ground", "Höhe an der Ziellinie (Reserve)": "Height at the finish line (reserve)", "Restzeit": "Remaining time", "Rundenzeit": "Lap time", "Schnitt letzte Runde (km/h)": "Average of last lap (km/h)", "Geschwindigkeit über Grund (km/h)": "Ground speed (km/h)", "Vario Ø 30 s": "Vario avg 30 s", "Gegen-/Rückenwind": "Head/tailwind", "Seitenwind": "Crosswind", "Ablage zur Linie": "Cross-track to the line", "Dreiecke erreichbar in der Restzeit (mit Reserve)": "Triangles reachable in the remaining time (with reserve)", "Zeit-MC (Restzeit-Sollfahrt)": "Time MC (remaining-time speed to fly)", "Endanflug ab Höhe (ohne weiteren Bart)": "Final glide from height (without another thermal)", "Restzeit-Sollfahrt": "Remaining-time speed to fly", "Zeit-MC statt festem MC (so viele Dreiecke wie möglich in der Restzeit)": "Time MC instead of fixed MC (as many triangles as possible in the remaining time)", "Zeitreserve (Anteil der Restzeit, mind. 15 s)": "Time reserve (share of the remaining time, at least 15 s)", "Pilotfaktor (längerer Weg auf den letzten zwei Runden)": "Pilot factor (longer path on the last two laps)", "Tiefste Gleithöhe": "Lowest glide height", "Thermik: Werte": "Thermal: values", "Oben links": "Top left", "Oben rechts": "Top right", "Unten links": "Bottom left", "Unten rechts": "Bottom right", "So stehen die vier Werte links auf der Seite Thermik, darunter der Kasten Endanflug. Auf die Beschriftung tippen, um den Wert zu wählen; die Zahlen sind Beispielwerte.": "This is how the four values appear on the left of the Thermal page, with the final glide box below. Tap a label to choose the value; the numbers are examples.", "ENDANFLUG: NOCH TANKEN": "FINAL GLIDE: KEEP CLIMBING", "ab 309 m · 3 △ · ca. 57 s": "from 309 m · 3 △ · approx. 57 s", "Vario": "Vario", "Steigen Ø im Bart": "Average climb in the thermal", "Höhengewinn im Bart": "Height gained in the thermal", "Netto-Steigen Ø im Bart": "Average net climb in the thermal", "Reserve zur Maximalhöhe": "Margin to maximum height", "Windstärke": "Wind speed"});
 Object.assign(EN, {"Schreibe …": "Writing …", "Geschrieben": "Written", "nach {p}": "to {p}", "Nochmals laden": "Load again"});
+Object.assign(EN, {"Klappen": "Flaps", "alle Stellungen": "all positions", "Klappen {k}": "flaps {k}", "gespeichert: {k}": "saved: {k}", "auto: {p}": "auto: {p}", "auto": "auto", "Klappenstellung für die Polare": "Flap position for the polar", "Klappenpaare des Modells, z. B. K1/K5 K6/K7": "Flap pairs of the model, e.g. K1/K5 K6/K7", "Klappenfilter: Nur Gleitpunkte mit dieser Klappenstellung (Wölbung je Klappenpaar in % Servoweg, ± 4 %) fliessen in die Kurve. Die Stellungen findet die App in den Logs des Modells. Gehört zur Version der Polare.": "Flap filter: only glide points with this flap position (camber per flap pair in % servo travel, ± 4 %) go into the curve. The app finds the positions in the model's logs. Belongs to the polar version.", "Klappenpaare dieses Modells, links/rechts, z. B. K1/K5 K6/K7 K8/K9. Leer = automatisch aus den Logs (das Paar, dessen Summe oder Differenz dem Querruderknüppel folgt).": "Flap pairs of this model, left/right, e.g. K1/K5 K6/K7 K8/K9. Empty = automatic from the logs (the pair whose sum or difference follows the aileron stick).", "Ohne Luftdichte-Korrektur: Für {n} von {m} Logs ist keine Platzhöhe bekannt (Einstellungen → Fluggelände). Die Polare gilt dann für die Höhe, auf der geflogen wurde.": "Without air density correction: no field elevation is known for {n} of {m} logs (Settings → Flying sites). The polar then applies to the altitude where it was flown.", "Luftdichte auf {h} m ü. M.": "air density at {h} m above sea level", "Fluggelände (Luftdichte)": "Flying sites (air density)", "Startort des offenen Logs hinzufügen": "Add start point of the open log", "Eine Zeile pro Gelände: Name; Breite; Länge; Höhe über Meer in m. Startet ein Log innerhalb 5 km davon, rechnen Polare und Netto-Vario mit der Luftdichte dieser Höhe (Normatmosphäre). Auf 1500 m ist die wahre Fahrt rund 8 % höher als auf Meereshöhe.": "One line per site: name; latitude; longitude; elevation above sea level in m. If a log starts within 5 km, polar and netto vario use the air density at this elevation (standard atmosphere). At 1500 m the true airspeed is about 8 % higher than at sea level.", "Platzhöhe für andere Orte (m ü. M.)": "Field elevation for other places (m above sea level)", "leer = ohne Dichtekorrektur": "empty = no density correction", "Gilt für Logs, deren Startort zu keinem Gelände passt. Leer: Diese Logs rechnen wie bisher ohne Luftdichte.": "Applies to logs whose start point matches no site. Empty: these logs are computed without air density as before.", "Kein Log mit GPS offen": "No log with GPS open", "Gelände": "Site"});
 Object.assign(EN, {"Fahrt für Kurve ab": "Speed for curve from", "bis": "to", "Fahrtfilter: Nur Gleitpunkte in diesem Fahrtbereich fliessen in die Kurve. Langsame Punkte, in denen das Modell nicht mehr sauber fliegt, verschieben sonst die beste Gleitzahl. Leer = keine Grenze. Gehört zur Version der Polare.": "Speed filter: only glide points in this speed range go into the curve. Slow points where the model no longer flies cleanly would otherwise shift the best L/D. Empty = no limit. Belongs to the polar version.", "Fahrtfilter: kleinste Fahrt": "Speed filter: lowest speed", "Fahrtfilter: grösste Fahrt": "Speed filter: highest speed", "Fahrtfilter („Fahrt für Kurve ab … bis …“): Nur Gleitpunkte in diesem Fahrtbereich zählen für Klassen und Kurve. Im Langsamflug fliegt das Modell oft nicht mehr sauber und sinkt stark; schon wenige solche Klassen ziehen die Kurve A·v³ + B/v hoch, die beste Gleitzahl wird kleiner und rutscht zu schnellerer Fahrt. Punkte ausserhalb bleiben hell sichtbar, ihre Mediane als leere Rauten. Der Fahrtfilter gilt für die Fahrt der Polare (TAS, sonst GPS), gehört zur Version und kommt so in Netto-Vario, MacCready und polaren.lua. Ändern öffnet einen Entwurf.": "Speed filter (“Speed for curve from … to …”): only glide points in this speed range count for classes and curve. At low speed the model often no longer flies cleanly and sinks a lot; even a few such classes pull the A·v³ + B/v curve up, the best L/D gets smaller and moves to a higher speed. Points outside stay visible in a light colour, their medians as hollow diamonds. The speed filter uses the polar's speed (TAS, otherwise GPS), belongs to the version and so goes into netto vario, MacCready and polaren.lua. Changing it opens a draft.", "ab {v}": "from {v}", "bis {v}": "up to {v}", "Fahrtfilter {r} {u}": "Speed filter {r} {u}", "ausserhalb Fahrtfilter {r} {u}, nicht in der Kurve": "outside speed filter {r} {u}, not in the curve", "Fit {r} {u}": "Fit {r} {u}", "Keine Gleitpunkte im Fahrtfilter {r} {u}. Grenzen anpassen oder leeren.": "No glide points in the speed filter {r} {u}. Adjust or clear the limits.", "Fahrt {r} {u}": "Speed {r} {u}", "Fahrtfilter": "Speed filter", "aus": "off"});
 Object.assign(EN, {"{w} unter dem Fahrtfilter ({r} {u}). Dort ist die Kurve verlängert (dünn gestrichelt), nicht gemessen.": "{w} below the speed filter ({r} {u}). There the curve is extended (thin dashed), not measured.", "Beste Gleitzahl und geringstes Sinken liegen": "Best L/D and minimum sink are", "Das geringste Sinken liegt": "Minimum sink is"});
 Object.assign(EN, {"QR scannen": "Scan QR", "QR-Code der Aufgabe scannen": "Scan the task QR code", "Code für den Sender": "Code for the transmitter", "Prüfwort": "Check word", "{n} Buchstaben": "{n} letters", "Kein Code möglich: {p}": "No code possible: {p}", "Ursprung": "Origin", "Platzhöhe": "Field elevation", "dTP": "dTP", "Limits": "Limits", "Platzhöhe 0 m: stimmt das? Viele QR-Codes enthalten keine Platzhöhe. Dann oben eintragen und „Aktuellen Stand als neue Grundlage“ tippen, bevor Du den Code am Sender abtippst.": "Field elevation 0 m: is that right? Many QR codes contain no field elevation. Enter it above and click “Use current state as new base” before typing the code on the transmitter.", "Grundlage für Änderungs-Codes: dieser Stand (Prüfwort {w}). Änderst Du später Ursprung, Platzhöhe, Richtung, dTP oder Limits, steht hier der kurze Änderungs-Code.": "Base for change codes: this state (check word {w}). If you later change origin, field elevation, direction, dTP or limits, the short change code appears here.", "Änderungs-Code gegenüber dem Stand {w}": "Change code relative to state {w}", "geändert: {l}": "changed: {l}", "Am Sender im Systemtool die Aufgabe wählen, „Änderungs-Code“, eintippen. Danach zeigt der Sender das Prüfwort {w}.": "On the transmitter, choose the task in the system tool, tap “Änderungs-Code” and type it. The transmitter then shows the check word {w}.", "Aktuellen Stand als neue Grundlage": "Use current state as new base", "Für Änderungen im Lauf des Tages merkt sich die App den Stand, den Du am Sender abgetippt hast (nach dem QR-Scan automatisch).": "For changes during the day the app remembers the state you typed on the transmitter (automatically after a QR scan).", "Diesen Stand als Grundlage merken": "Remember this state as base", "QR-Code gelesen, aber keine Aufgabe darin ({e}).": "QR code read, but it contains no task ({e}).", "Aufgabe „{n}“ ist schon da (Prüfwort {w}).": "Task “{n}” already exists (check word {w}).", "Aufgabe „{n}“ übernommen, Prüfwort {w}.": "Task “{n}” added, check word {w}.", "Aufgabe „{n}“ übernommen.": "Task “{n}” added.", "Im Bild keinen QR-Code gefunden.": "No QR code found in the image.", "Bild nicht lesbar: {e}": "Cannot read image: {e}", "Kamera wird gestartet …": "Starting camera …", "QR-Leser nicht geladen.": "QR reader not loaded.", "Die App darf die Kamera nicht benutzen (Systemeinstellungen › Datenschutz › Kamera).": "The app may not use the camera (System Settings › Privacy › Camera).", "Keine Kamera verfügbar.": "No camera available.", "QR-Code vor die Kamera halten.": "Hold the QR code in front of the camera.", "Kamera nicht erlaubt.": "Camera not allowed.", "Keine Kamera gefunden.": "No camera found.", "Bild wählen oder Text einfügen geht auch.": "You can also choose an image or paste the text.", "Erst den Text aus dem QR-Code einfügen.": "Paste the text from the QR code first.", "Bild wählen …": "Choose image …", "Abbrechen": "Cancel", "Text übernehmen": "Use text", "Zone 1 (Kreis)": "Zone 1 (circle)", "Zone 2 (Kreis)": "Zone 2 (circle)", "Zone 3 (Kreis)": "Zone 3 (circle)", "Zone 4 (Kreis)": "Zone 4 (circle)", "Zone 5 (Kreis)": "Zone 5 (circle)", "Zone 1 (Rechteck)": "Zone 1 (rectangle)", "Zone 2 (Rechteck)": "Zone 2 (rectangle)", "Zone 3 (Rechteck)": "Zone 3 (rectangle)", "Zone 4 (Rechteck)": "Zone 4 (rectangle)", "Zone 5 (Rechteck)": "Zone 5 (rectangle)"});
@@ -4441,112 +4454,18 @@ function addPower(log){
   }
 }
 // ---------- Nachbau der Lua-Widgets "GPS Course" (GPSCrs) und "Wind Estimator" (WindSpd/WindDir/TAS) ----------
-const D2R=Math.PI/180, R2D=180/Math.PI;
-function bearingDeg(lat1, lon1, lat2, lon2){
-  const p1=lat1*D2R, p2=lat2*D2R, dl=(lon2-lon1)*D2R;
-  const y=Math.sin(dl)*Math.cos(p2), x=Math.cos(p1)*Math.sin(p2)-Math.sin(p1)*Math.cos(p2)*Math.cos(dl);
-  let b=Math.atan2(y,x)*R2D; if (b<0) b+=360; return b;
-}
-function distanceM(lat1, lon1, lat2, lon2){
-  const dLat=(lat2-lat1)*D2R, dLon=(lon2-lon1)*D2R*Math.cos((lat1+lat2)/2*D2R);
-  return Math.sqrt(dLat*dLat+dLon*dLon)*6371000;
-}
-// GPS Course: Kurs = Azimut zum letzten Fix, erst ab 3 m Abstand.
-// Ethos loggt Breite und Länge als zwei Telemetriewerte, die oft nicht in derselben Zeile neu sind
-// (rund ein Drittel der Fixe). Ein halber Fix liegt neben der Spur und verdreht den Kurs um bis zu 45°.
-// Darum gilt ein Fix erst, wenn beide Werte neu sind, oder HALF_FIX_WAIT s nach der ersten Änderung
-// (genau Nord/Süd oder Ost/West ändert sich nur ein Wert).
-const MIN_FIX_DISTANCE=3.0, HALF_FIX_WAIT=0.8;
-function gpsCourse(log){
-  const n=log.t.length, out=new Array(n).fill(NaN);
-  let lastLat=null, lastLon=null, course=NaN, prev=null, newLat=false, newLon=false, pendT=null;
-  for (let i=0;i<n;i++){
-    const g=log.gps[i];
-    if (g){
-      if (!prev || g[0]!==prev[0]) newLat=true;
-      if (!prev || g[1]!==prev[1]) newLon=true;
-      if ((newLat||newLon) && pendT==null) pendT=log.t[i];
-      prev=g;
-      if (pendT!=null && ((newLat&&newLon) || log.t[i]-pendT>=HALF_FIX_WAIT)){
-        newLat=newLon=false; pendT=null;
-        if (lastLat!=null){ if (distanceM(lastLat,lastLon,g[0],g[1])>=MIN_FIX_DISTANCE){ course=bearingDeg(lastLat,lastLon,g[0],g[1]); lastLat=g[0]; lastLon=g[1]; } }
-        else { lastLat=g[0]; lastLon=g[1]; }
-      }
-    }
-    out[i]=course;
-  }
-  return out;
-}
-// Wind Estimator: Ringpuffer der letzten 40 Bodenvektoren (alle 0,7 s), Kasa-Kreisfit jede Sekunde,
-// nur bei genügend Kursstreuung und plausiblem Ergebnis. Das Log wird in 0,1-s-Schritten "abgespielt",
-// wie Ethos wakeup() aufruft; zwischen zwei Logzeilen gelten die letzten Werte.
-// Sperren gegen falschen Wind: der erste Fit braucht ein volles Fenster (beim Start passt mit wenigen Stützwerten
-// oft ein falscher Kreis), und der Wind ist der Median (Ost und Nord getrennt) der letzten `median` guten Fits,
-// damit einzelne Ausreisser nicht durchschlagen.
-// maxSpreadR 0.3 wie Sollfahrt-Widget 1.2: Fit nur bei echtem Kreisen (~270° Kurswechsel im Fenster). Mit 0.85 reichte
-// eine einzelne 90°-Kurve; dann liegen nur zwei Punktgruppen im Fenster, durch die fast jeder Kreis passt, und der Wind wird zu hoch.
-const WIND = {windowSize:40, sampleInterval:0.7, minSpeed:2 /* km/h */, minSamples:10, fitInterval:1.0, maxSpreadR:0.3, maxTasFactor:2.0, maxWindFactor:1.0, maxResidualFrac:0.25, tick:0.1,
-  median:5};
-const med = a => { const b=[...a].sort((x,y)=>x-y), m=b.length>>1; return b.length%2 ? b[m] : (b[m-1]+b[m])/2; };
-function kasaFit(x, y, n){
-  let sx=0, sy=0; for (let i=0;i<n;i++){ sx+=x[i]; sy+=y[i]; }
-  const mx=sx/n, my=sy/n; let Suu=0,Svv=0,Suv=0,Suuu=0,Svvv=0,Suvv=0,Svuu=0;
-  for (let i=0;i<n;i++){ const u=x[i]-mx, v=y[i]-my, uu=u*u, vv=v*v; Suu+=uu; Svv+=vv; Suv+=u*v; Suuu+=uu*u; Svvv+=vv*v; Suvv+=u*vv; Svuu+=v*uu; }
-  const detA=Suu*Svv-Suv*Suv, scale=Suu+Svv;
-  if (scale<=0 || Math.abs(detA)<1e-6*scale*scale) return null;
-  const rhs1=(Suuu+Suvv)/2, rhs2=(Svvv+Svuu)/2;
-  const uc=(rhs1*Svv-rhs2*Suv)/detA, vc=(Suu*rhs2-Suv*rhs1)/detA;
-  const r2=uc*uc+vc*vc+(Suu+Svv)/n; if (r2<0) return null;
-  return {cx:uc+mx, cy:vc+my, r:Math.sqrt(r2)};
-}
-function courseSpreadOk(x, y, n){
-  let sc=0, ss=0; for (let i=0;i<n;i++){ const m=Math.hypot(x[i],y[i]); if (m>1e-6){ sc+=x[i]/m; ss+=y[i]/m; } }
-  return Math.hypot(sc,ss)/n < WIND.maxSpreadR;
-}
-function fitIsPlausible(f, x, y, n){
-  if (!f || f.r<=1e-3) return false;
-  let maxG=0; for (let i=0;i<n;i++) maxG=Math.max(maxG, Math.hypot(x[i],y[i]));
-  if (maxG<=1e-3 || f.r>WIND.maxTasFactor*maxG || Math.hypot(f.cx,f.cy)>WIND.maxWindFactor*maxG) return false;
-  let sq=0; for (let i=0;i<n;i++){ const d=Math.hypot(x[i]-f.cx,y[i]-f.cy)-f.r; sq+=d*d; }
-  return Math.sqrt(sq/n) <= WIND.maxResidualFrac*f.r;
-}
-function windEstimator(log, speed, course){
-  const t=log.t, n=t.length, W=new Array(n).fill(NaN), D=new Array(n).fill(NaN), TAS=new Array(n).fill(NaN);
-  const bx=[], by=[]; let bufN=0, head=0, lastSample=-Infinity, lastFit=-Infinity;
-  let windSpeed=0, windDirFrom=0, haveFit=false, tas=NaN, fits=0, row=0; const fitList=[];
-  const recent=[];
-  const tEndV=t.filter(x=>!isNaN(x)).pop()||0;
-  const ticks=Math.ceil(tEndV/WIND.tick)+1;
-  for (let k=0; k<=ticks; k++){ const now=k*WIND.tick;
-    while (row<n-1 && !(t[row+1]>now)) row++;           // letzte Logzeile bis "jetzt"
-    const sp=speed[row], cs=course[row], ok=!isNaN(sp)&&!isNaN(cs), minSp=WIND.minSpeed/3.6/speedMs();
-    if (now-lastSample>=WIND.sampleInterval && ok && sp>=minSp){
-      bx[head]=sp*Math.sin(cs*D2R); by[head]=sp*Math.cos(cs*D2R);
-      head=(head+1)%WIND.windowSize; if (bufN<WIND.windowSize) bufN++; lastSample=now;
-    }
-    if (now-lastFit>=WIND.fitInterval && bufN>=(haveFit?WIND.minSamples:WIND.windowSize)){
-      lastFit=now;
-      if (courseSpreadOk(bx,by,bufN)){
-        const f=kasaFit(bx,by,bufN);
-        if (fitIsPlausible(f,bx,by,bufN)){
-          recent.push(f); if (recent.length>WIND.median) recent.shift();
-          const cx=med(recent.map(q=>q.cx)), cy=med(recent.map(q=>q.cy));
-          windSpeed=Math.hypot(cx,cy);
-          let to=Math.atan2(cx,cy)*R2D; if (to<0) to+=360;
-          windDirFrom=(to+180)%360; haveFit=true; fits++; fitList.push({row, w:windSpeed, d:windDirFrom});
-        }
-      }
-    }
-    if (ok){ const gr=cs*D2R, wr=(windDirFrom+180)*D2R;
-      tas=Math.hypot(sp*Math.sin(gr)-windSpeed*Math.sin(wr), sp*Math.cos(gr)-windSpeed*Math.cos(wr)); }
-    // Werte am Ende dieser Logzeile festhalten
-    if (row+1>=n || t[row+1]>now+WIND.tick-1e-9){ W[row]=haveFit?windSpeed:0; D[row]=haveFit?windDirFrom:0; TAS[row]=tas; }
-  }
-  return {W, D, TAS, fits, fitList};
-}
+// Die Rechnungen stehen im Rechenkern web/core/ (wind.js, polare.js, energie.js, atmosphaere.js, klappen.js) und haben dort Tests;
+// hier bleibt nur das Verbinden mit den Spalten des Logs und den Einheiten.
+const {D2R, R2D, bearingDeg, distanceM, WIND} = MMFA.wind;
+const {smoothT, TEK, GLIDE} = MMFA.energie;
+const {POLAR, median, quant, polarBins, polarFit, polarCurve, solve3, mcParabola} = MMFA.polare;
+const gpsCourse = log => MMFA.wind.gpsCourse(log.t, log.gps);
+// Motor an je Zeile (Drehzahl > 300, sonst Strom > 3 A)
+const motorOnLog = (log, ch) => MMFA.polare.motorOn(log.t.length, ch.rpm?.vals, ch.cur?.vals);
+function windEstimator(log, speed, course){ return MMFA.wind.windEstimator(log.t, speed, course, WIND.minSpeed/3.6/speedMs()); }
 function addWind(log, ch){
   if (!log.gps) return;
-  addHome(log, ch);
+  addHome(log, ch); platzFuer(log);
   const crs=gpsCourse(log);
   addCol(log,'gpscrs',T('GPS Kurs (ber.)'),'°',crs,T('Azimut zwischen zwei GPS-Fixes, ab 3 m Abstand (Widget GPS Course)'));
   if (ch.spd){
@@ -4554,7 +4473,7 @@ function addWind(log, ch){
   addCol(log,'wind',T('Windgeschw.'),ch.spd.unit||SPEED,r.W,T('Kasa-Kreisfit über GPS-Geschwindigkeit und GPS Kurs (ber.), Widget Wind Estimator'));
   addCol(log,'winddir',T('Windrichtung'),'°',r.D,T('Richtung, aus der der Wind kommt (Widget Wind Estimator)'));
   addCol(log,'tas','TAS',ch.spd.unit||SPEED,r.TAS,T('Bodenvektor minus Windvektor (Widget Wind Estimator)'));
-  log.windEst=r.fits; log.windFits=r.fitList;
+  log.windEst=r.fits; log.windFits=r.fitList; log.windOk=r.fits ? r.OK : null;
   addNav(log, ch.spd.vals, crs, r);
   }
   addHomeAngle(log, crs);
@@ -4577,15 +4496,7 @@ function addHomeAngle(log, crs){
 // Steuerkurs = Richtung des Luftvektors (Bodenvektor minus Windvektor); Drift = Kurs über Grund minus Steuerkurs;
 // Gegenwind = Windanteil gegen die Flugrichtung (negativ = Rückenwind). Unter 2 km/h ist der Kurs zufällig, dort keine Werte.
 function addNav(log, speed, crs, r){
-  const n=log.t.length, H=new Array(n).fill(NaN), DR=new Array(n).fill(NaN), HW=new Array(n).fill(NaN);
-  for (let i=0;i<n;i++){
-    const sp=speed[i], cs=crs[i], w=r.W[i], d=r.D[i];
-    if (isNaN(sp)||isNaN(cs)||isNaN(w)||sp<WIND.minSpeed/3.6/speedMs()) continue;
-    const wr=(d+180)*D2R, ax=sp*Math.sin(cs*D2R)-w*Math.sin(wr), ay=sp*Math.cos(cs*D2R)-w*Math.cos(wr);
-    if (Math.hypot(ax,ay)<1e-3) continue;
-    const h=(Math.atan2(ax,ay)*R2D+360)%360;
-    H[i]=h; DR[i]=((cs-h+540)%360)-180; HW[i]=w*Math.cos((d-h)*D2R);
-  }
+  const {H, DR, HW}=MMFA.wind.nav(speed, crs, r.W, r.D, WIND.minSpeed/3.6/speedMs());
   const u=log.cols.find(c=>c.key==='wind')?.unit||SPEED;
   addCol(log,'heading',T('Steuerkurs (windkorr.)'),'°',H,T('Richtung, in die die Nase zeigt: GPS Kurs (ber.) korrigiert um den Wind'));
   addCol(log,'drift',T('Drift'),'°',DR,T('Kurs über Grund minus Steuerkurs; positiv = Wind von links, das Modell wird nach rechts versetzt'));
@@ -4602,69 +4513,50 @@ function addHome(log, ch){
   const a=ch.alt.vals, a0=a.find(v=>!isNaN(v));
   addCol(log,'home3d',T('Effektive Distanz'),'m',out.map((d,i)=>isNaN(d)||isNaN(a[i])?NaN:Math.hypot(d,a[i]-a0)),T('Schräge Distanz vom Startpunkt zum Modell: waagrechte Distanz und Höhe über dem Start ({a})',{a:ch.alt.name}));
 }
+// ---------- Luftdichte: Platzhöhe aus den Fluggeländen (Einstellungen) ----------
+// Gelände = Name, Startort und Höhe über Meer; gilt für Logs, die innerhalb 5 km davon starten. Sonst die Standard-Platzhöhe,
+// ist auch die leer, rechnet die App wie bisher ohne Dichtekorrektur (Meereshöhe).
+function gelaendeListe(){ try{ const a=JSON.parse(store.get('gelaende')||'[]'); return Array.isArray(a)?a:[]; }catch(e){ return []; } }
+function platzStd(){ const v=parseFloat(store.get('platz.std')); return isFinite(v) ? v : null; }
+const dichteSig = () => (store.get('gelaende')||'')+'|'+(store.get('platz.std')||'');
+function platzFuer(log){
+  const s=log.homePt, g=s ? MMFA.atmosphaere.gelaende(gelaendeListe(), s[0], s[1]) : null, d=platzStd();
+  log.platz = g ? {elev:g.elev, name:g.name} : d!=null ? {elev:d, name:null} : null;
+  return log.platz;
+}
+// Dichteverhältnis je Zeile (Platzhöhe + Höhe über Start) oder null ohne Platzhöhe
+function sigmaLog(log, ch){
+  if (log.platz===undefined) platzFuer(log);
+  return log.platz ? MMFA.atmosphaere.sigmaReihe(log.platz.elev, ch.alt?.vals, log.t.length) : null;
+}
 // Gleitzahl = waagrecht geflogene Strecke durch Höhenverlust, über ein Fenster von 10 s (±5 s) gerechnet.
 // Strecke aus TAS (durch die Luft), ohne Wind aus der GPS-Geschwindigkeit. Nur im Gleitflug: Motor aus im ganzen Fenster,
 // mindestens 0,2 m/s Sinken und 2 m/s Fahrt; sonst keine Werte (beim Steigen gibt es keine Gleitzahl).
-const GLIDE={half:5, minSink:0.2, minSpeed:2, max:100};
 function addGlide(log, ch){
   if (!ch.alt) return;
   const src=log.cols.find(c=>c.key==='tas') || ch.spd; if (!src) return;
   const f=speedFactor(src.unit)??speedMs();
-  const t=log.t, a=ch.alt.vals, v=src.vals, n=t.length, out=new Array(n).fill(NaN);
-  const motor=t.map((_,i)=> ch.rpm ? ch.rpm.vals[i]>300 : ch.cur ? ch.cur.vals[i]>3 : false);
-  const S=new Array(n).fill(0), M=new Array(n).fill(0);            // aufsummierte Strecke (m) und Motor-Zeilen
-  for (let i=1;i<n;i++){ const dt=t[i]-t[i-1], sp=(v[i]+v[i-1])/2*f;
-    S[i]=S[i-1]+(isNaN(dt)||isNaN(sp)||dt<=0||dt>5?0:sp*dt); M[i]=M[i-1]+(motor[i]?1:0); }
-  let j=0, k=0;
-  for (let i=0;i<n;i++){
-    if (isNaN(t[i])) continue;
-    while (j<i && !(t[j]>=t[i]-GLIDE.half)) j++;
-    if (k<i) k=i; while (k<n-1 && t[k+1]<=t[i]+GLIDE.half) k++;
-    const dt=t[k]-t[j], loss=a[j]-a[k];
-    if (!(dt>=GLIDE.half) || isNaN(loss) || M[k]-M[j]+(motor[j]?1:0)>0) continue;
-    const dist=S[k]-S[j];
-    if (loss/dt<GLIDE.minSink || dist/dt<GLIDE.minSpeed) continue;
-    const gz=dist/loss; if (gz<=GLIDE.max) out[i]=gz;
-  }
+  const out=MMFA.energie.gleitzahl({t:log.t, alt:ch.alt.vals, v:src.vals.map(x=>x*f), motor:motorOnLog(log, ch)});
   addCol(log,'glide',T('Gleitzahl'),'',out,T('Strecke durch Höhenverlust über 10 s, aus {s} und {a}; nur im Gleitflug mit Motor aus',{s:src.name,a:ch.alt.name})).gaps=true;
 }
 // Vario TEK = Vario + Änderung der Bewegungsenergie (TAS²/2g) pro Zeit: Steigen ohne „Knüppelthermik“.
 // Netto-Vario = TEK + Eigensinken aus der Polare des Modells (A·v³ + B/v): zeigt, wie die Luft steigt oder sinkt.
 // Nicht bei Motor an und 15 s danach; Sprünge der Fahrt (GPS) über 4 m/s Energieänderung fallen weg.
-const TEK={tek:1.5, net:5, core:1.5, de:1, after:15, maxDE:4};
-// Mittelwert über ±half Sekunden (Lücken und NaN zählen nicht)
-function smoothT(t, v, half){
-  const n=t.length, o=new Array(n).fill(NaN), ok=i=>!isNaN(t[i])&&!isNaN(v[i]); let j=0, k=0, s=0, c=0;
-  for (let i=0;i<n;i++){ if (isNaN(t[i])) continue;
-    while (k<n && (isNaN(t[k]) || t[k]<=t[i]+half)){ if (ok(k)){ s+=v[k]; c++; } k++; }
-    while (j<k && (isNaN(t[j]) || t[j]<t[i]-half)){ if (ok(j)){ s-=v[j]; c--; } j++; }
-    if (c>0) o[i]=s/c; }
-  return o;
-}
-// Polare des Modells: zuletzt im Tab Polare gerechnet, sonst aus diesem Log
+// Polare des Modells: zuletzt im Tab Polare gerechnet, sonst aus diesem Log. isa = Polare ist auf Meereshöhe umgerechnet.
 function polarAB(log){
   try{ const ab=JSON.parse(store.get(mkey('polar.ab'))||'null'); if (ab && ab.A>0 && ab.B>0) return ab; }catch(e){}
-  const f=polarFit(polarBins(polarPoints(log))); return f ? {A:f.A, B:f.B, own:true} : null;
+  const f=polarFit(polarBins(polarPoints(log))); return f ? {A:f.A, B:f.B, own:true, isa:!!log.platz} : null;
 }
 function addTek(log, ch){
   const tas=log.cols.find(c=>c.key==='tas'); if (!tas || !ch.vario) return;
-  const f=speedFactor(tas.unit)??speedMs(), t=log.t, n=t.length, vs=smoothT(t, tas.vals.map(x=>x*f), TEK.tek), va=smoothT(t, ch.vario.vals, 0.5);
-  const E=vs.map(x=>x*x/(2*9.81)), off=new Uint8Array(n); let lm=-Infinity;
-  // Netto aus der Höhe wie die Polare (polarPoints), damit beide zusammenpassen; TEK bleibt beim Vario
-  const ar=ch.alt ? smoothT(t, ch.alt.vals, 0.5) : null, ra=new Array(n).fill(NaN);
-  for (let i=0;i<n;i++){ if (ch.rpm ? ch.rpm.vals[i]>300 : ch.cur ? ch.cur.vals[i]>3 : false) lm=t[i]; if (t[i]-lm<TEK.after) off[i]=1; }
-  const raw=new Array(n).fill(NaN); let j=0, k=0;
-  for (let i=0;i<n;i++){ if (isNaN(t[i]) || off[i]) continue;
-    while (j<i && !(t[j]>=t[i]-TEK.de)) j++; if (k<i) k=i; while (k<n-1 && t[k+1]<=t[i]+TEK.de) k++;
-    const dt=t[k]-t[j], de=(E[k]-E[j])/dt; if (!(dt>0.5) || isNaN(de) || Math.abs(de)>TEK.maxDE || isNaN(va[i])) continue;
-    raw[i]=va[i]+de; if (ar) ra[i]=(ar[k]-ar[j])/dt+de; }
-  const mask=a=>a.map((x,i)=>off[i]?NaN:x), tek=mask(smoothT(t,raw,TEK.tek));
-  addCol(log,'tek',T('Vario TEK'),'m/s',tek,T('Vario plus Änderung der Fahrt-Energie aus {s}: Steigen ohne Knüppelthermik, 3 s gemittelt; nicht bei Motor und 15 s danach',{s:'TAS'})).gaps=true;
+  const f=speedFactor(tas.unit)??speedMs(), motor=motorOnLog(log, ch), d={t:log.t, tas:tas.vals.map(x=>x*f), vario:ch.vario.vals, alt:ch.alt?.vals, motor};
+  const r0=MMFA.energie.tekNetto(d);
+  addCol(log,'tek',T('Vario TEK'),'m/s',r0.tek,T('Vario plus Änderung der Fahrt-Energie aus {s}: Steigen ohne Knüppelthermik, 3 s gemittelt; nicht bei Motor und 15 s danach',{s:'TAS'})).gaps=true;
   const ab=polarAB(log); if (!ab) return;
-  const sink=x=>{ x=Math.max(x,5); return ab.A*x**3+ab.B/x; }, nr=(ar?ra:raw).map((x,i)=>isNaN(x)||isNaN(vs[i])?NaN:x+sink(vs[i]));
-  const n10=mask(smoothT(t,nr,TEK.net)), n3=mask(smoothT(t,nr,TEK.core));
-  addCol(log,'netto',T('Netto-Vario'),'m/s',n10,T('Steigrate der Höhe plus Fahrt-Energie plus Eigensinken aus der Polare ({p}): zeigt, wie die Luft steigt oder sinkt; 10 s gemittelt',{p:ab.own?T('aus diesem Log'):T('Tab Polare')})).gaps=true;
-  log.net3=n3; log.net10=n10;
+  // Dichte nur, wenn die Polare auf Meereshöhe umgerechnet ist; ältere Versionen gelten so, wie sie geflogen wurden
+  const sig=ab.isa ? sigmaLog(log, ch) : null, r=MMFA.energie.tekNetto({...d, ab, sigma:sig});
+  addCol(log,'netto',T('Netto-Vario'),'m/s',r.net10,T('Steigrate der Höhe plus Fahrt-Energie plus Eigensinken aus der Polare ({p}): zeigt, wie die Luft steigt oder sinkt; 10 s gemittelt',{p:ab.own?T('aus diesem Log'):T('Tab Polare')})+(sig?' · '+T('Luftdichte auf {h} m ü. M.',{h:fmt(log.platz.elev,0)}):'')).gaps=true;
+  log.net3=r.net3; log.net10=r.net10;
 }
 function addDerived(log, ch){ log.cols=log.cols.filter(c=>!c.derived); log.net3=log.net10=null; log._tgeo=null; addPower(log); addWind(log, ch); addGlide(log, ch); addTek(log, ch); }
 const calc = key => LOG?.cols.find(c=>c.key===key);
@@ -6061,75 +5953,50 @@ function revealRawCursor(){
 // Fahrt ändert unter 0,6 m/s². Gerechnet über ±2,5 s. Fahrt = TAS, sonst GPS-Geschwindigkeit.
 // Sinken energiekorrigiert: −(Vario + Δ(v²/2g)/Δt), ohne Vario aus der Höhe.
 // Pro 4-km/h-Klasse (mind. 12 Punkte) der Median; die Kurve Sinken = A·v³ + B/v geht durch die Mediane.
-const POLAR={half:2.5, after:15, turn:8, acc:0.6, minV:5, bin:4, minN:12, dev:0.2, skip:30};
 const POLAR_CACHE=new Map();
 let polarChart=null, polarJob=0, POLAR_LOGS=null;
 const PST={view:store.get('polar.view')||'sink', smooth:store.get('polar.smooth')||'phys',
   pts:store.get('polar.pts')!=='0', band:store.get('polar.band')!=='0', each:store.get('polar.each')==='1', filt:store.get('polar.filt')==='1'};
 // „Filter anwenden“: die Filter aus dem Tab Diagramme gelten über den Parameternamen auch für die Polare, in jedem Log des Modells
 const polFilters = () => PST.filt ? FILTERS.filter(f=>f.wlo!=null||f.whi!=null) : [];
-const polSig = () => JSON.stringify(polFilters().map(f=>[f.k,f.wlo,f.whi]));
+const polSig = () => JSON.stringify(polFilters().map(f=>[f.k,f.wlo,f.whi]))+'|'+dichteSig()+'|'+klText();
 function polarMask(log){
   const fs=polFilters().map(f=>({f, c:log.cols.find(c=>c.raw===f.k)})).filter(x=>x.c); if (!fs.length) return null;
   return log.t.map((_,i)=>fs.every(({f,c})=>{ const v=c.vals[i]; return !isNaN(v) && (f.wlo==null||v>=f.wlo) && (f.whi==null||v<=f.whi); }));
 }
+// Gleitpunkte eines Logs: [Fahrt km/h, Sinken m/s, Zeile, Wölbung je Klappenpaar in % (oder null)].
+// Mit Platzhöhe (Einstellungen → Fluggelände) auf Meereshöhe umgerechnet (Normalpolare), sonst wie geflogen.
 function polarPoints(log){
   const ch=channels(log); if (!log.cols.some(c=>c.derived)) addDerived(log,ch);
-  const mask=polarMask(log);
   const spd=log.cols.find(c=>c.key==='tas')||ch.spd, crs=log.cols.find(c=>c.key==='gpscrs');
   if (!spd || !(ch.vario||ch.alt)) return [];
   const f=speedFactor(spd.unit)??speedMs();
-  const t=log.t, n=t.length, v=spd.vals.map(x=>x*f), out=[];
-  const lastMot=new Array(n); let lm=-Infinity;
-  for (let i=0;i<n;i++){ if (ch.rpm ? ch.rpm.vals[i]>300 : ch.cur ? ch.cur.vals[i]>3 : false) lm=t[i]; lastMot[i]=lm; }
-  let j=0, k=0, lastSec=-1;
-  for (let i=0;i<n;i++){
-    const ti=t[i]; if (isNaN(ti) || ti<POLAR.skip) continue;
-    const sec=Math.floor(ti); if (sec===lastSec) continue;
-    while (j<i && !(t[j]>=ti-POLAR.half)) j++;
-    if (k<i) k=i; while (k<n-1 && t[k+1]<=ti+POLAR.half) k++;
-    const dt=t[k]-t[j]; if (!(dt>=3) || ti-lastMot[k]<POLAR.after) continue;
-    if (mask && !(mask[j] && mask[i] && mask[k])) continue;
-    const v0=v[j], v1=v[k]; if (isNaN(v0)||isNaN(v1) || Math.abs(v1-v0)/dt>POLAR.acc) continue;
-    let sv=0, nv=0, sw=0, nw=0;
-    for (let m=j;m<=k;m++){ if (!isNaN(v[m])){ sv+=v[m]; nv++; } if (ch.vario && !isNaN(ch.vario.vals[m])){ sw+=ch.vario.vals[m]; nw++; } }
-    const vm=sv/nv; if (!(vm>POLAR.minV)) continue;
-    if (crs){ const c0=crs.vals[j], c1=crs.vals[k]; if (isNaN(c0)||isNaN(c1) || Math.abs(((c1-c0+540)%360)-180)/dt>POLAR.turn) continue; }
-    // Sinken aus der Höhe (Flughöhe ≈ GPS-Höhe); das Vario zeigte beim Shark ~20 % zu wenig Sinken
-    const climb = ch.alt ? (ch.alt.vals[k]-ch.alt.vals[j])/dt : (nw ? sw/nw : NaN);
-    const sink=-(climb + (v1*v1-v0*v0)/(2*9.81*dt));
-    if (!(sink>-3 && sink<5)) continue;
-    out.push([vm*3.6, sink]); lastSec=sec;
-  }
-  return out;
+  const pts=MMFA.polare.polarPoints({t:log.t, v:spd.vals.map(x=>x*f), alt:ch.alt?.vals, vario:ch.vario?.vals, motor:motorOnLog(log, ch),
+    crs:crs?.vals, mask:polarMask(log), sigma:sigmaLog(log, ch), tasOk:spd.key==='tas' ? log.windOk : null});
+  const W=klappenWoelbung(log);
+  if (W) pts.forEach(p=>p.push(MMFA.klappen.vektor(W, p[2])));
+  return pts;
 }
-function median(a){ const s=[...a].sort((x,y)=>x-y), n=s.length; return n%2 ? s[(n-1)/2] : (s[n/2-1]+s[n/2])/2; }
-function quant(a,p){ const s=[...a].sort((x,y)=>x-y), i=(s.length-1)*p, lo=Math.floor(i); return s[lo]+(s[Math.ceil(i)]-s[lo])*(i-lo); }
-function polarBins(pts){
-  const b=new Map();
-  for (const [v,w] of pts){ const k=Math.floor(v/POLAR.bin)*POLAR.bin+POLAR.bin/2; if (!b.has(k)) b.set(k,[]); b.get(k).push(w); }
-  return [...b].filter(([,a])=>a.length>=POLAR.minN).sort((x,y)=>x[0]-y[0])
-    .map(([k,a])=>({v:k, m:median(a), q1:quant(a,.25), q3:quant(a,.75), n:a.length}));
+// ---------- Klappen: Paare je Modell, Wölbung je Zeile ----------
+// Gespeichert pro Modell als Text „K1/K5 K6/K7 K8/K9“; leer = aus dem Log vorschlagen (Summe oder Differenz folgt dem Querruderknüppel).
+const klKey = () => mkey('klappen');
+const klText = () => store.get(klKey()) || '';
+function klParse(s){ return (s||'').toUpperCase().split(/[\s,;]+/).map(x=>x.split('/')).filter(p=>p.length===2 && /^K\d+$/.test(p[0]) && /^K\d+$/.test(p[1])).map(([l,r])=>({l,r})); }
+const klPaarTxt = ps => ps.map(p=>p.l+'/'+p.r).join(' ');
+function servoCols(log){ const k={}; for (const c of log.cols) if (!c.derived && /^K\d+$/.test(c.name)) k[c.name]=c.vals; return k; }
+function klappenPaare(log){
+  const k=servoCols(log), qr=log.cols.find(c=>!c.derived && c.name==='QR')?.vals; if (!Object.keys(k).length) return null;
+  const man=klParse(klText());
+  if (!man.length) return qr ? MMFA.klappen.vorschlag(k, qr) : null;
+  // feste Paare: ob Wölbung Summe oder Differenz ist, zeigt der Querruderknüppel (ohne ihn: gespiegelte Servos)
+  return man.filter(p=>k[p.l] && k[p.r]).map(p=>{
+    if (!qr) return {...p, art:'diff'};
+    const d=MMFA.klappen.zerlege(k[p.l],k[p.r],'diff'), cq=Math.abs(MMFA.klappen.corr(d.quer,qr)), cw=Math.abs(MMFA.klappen.corr(d.woelb,qr));
+    return {...p, art: cw>cq ? 'sum' : 'diff'}; });
 }
-// Kleinste Quadrate für Sinken = A·v³ + B/v (v in m/s), jede Klasse mit ihrer Punktzahl gewichtet
-function polarFit(bs){
-  let s11=0,s12=0,s22=0,t1=0,t2=0;
-  for (const b of bs){ const v=b.v/3.6, f1=v**3, f2=1/v; s11+=b.n*f1*f1; s12+=b.n*f1*f2; s22+=b.n*f2*f2; t1+=b.n*f1*b.m; t2+=b.n*f2*b.m; }
-  const det=s11*s22-s12*s12; if (bs.length<3 || !det) return null;
-  const A=(t1*s22-t2*s12)/det, B=(s11*t2-s12*t1)/det; if (A<=0 || B<=0) return null;
-  const w=kmh=>{ const v=kmh/3.6; return A*v**3+B/v; };
-  const vms=Math.pow(B/(3*A),.25)*3.6, vbg=Math.pow(B/A,.25)*3.6;
-  return {w, A, B, vms, wms:w(vms), vbg, ld:vbg/3.6/w(vbg)};
-}
-function polarCurve(bs, mode){
-  if (!bs.length || mode==='off') return null;
-  const lo=bs[0].v-POLAR.bin/2, hi=bs[bs.length-1].v+POLAR.bin/2;
-  if (mode==='phys'){ const f=polarFit(bs); if (!f) return null;
-    const pts=[]; for (let x=lo;x<=hi+.01;x+=1) pts.push({x, y:f.w(x)}); return {pts, ...f}; }
-  const sm=bs.map((b,i)=>{ const a=bs[i-1]||b, c=bs[i+1]||b; return {x:b.v, y:(a.m+2*b.m+c.m)/4}; });
-  let best=null, ld=0, ms=sm[0];
-  for (const p of sm){ const g=p.x/3.6/p.y; if (p.y>0 && g>ld){ ld=g; best=p; } if (p.y<ms.y) ms=p; }
-  return best ? {pts:sm, vms:ms.x, wms:ms.y, vbg:best.x, ld} : null;
+function klappenWoelbung(log){
+  const ps=klappenPaare(log); log.klPaare=ps; if (!ps?.length) return null;
+  return MMFA.klappen.woelbung(log.t, servoCols(log), ps);
 }
 // Kurve wie gezeigt: lässt sich die physikalische Kurve nicht rechnen (zu wenig Klassen, oder die Mediane passen nicht
 // zu A·v³ + B/v, etwa weil der Fahrtbereich zu schmal ist und das Sinken nur ansteigt), kommt die Median-Kurve mit Hinweis
@@ -6144,21 +6011,27 @@ function polarShown(bs, mode){
 async function polarLog(f){
   const key=f.name+'|'+f.size+'|'+polSig(); if (POLAR_CACHE.has(key)) return POLAR_CACHE.get(key);
   let r;
-  try{ if (FILES[CUR]===f && LOG) r={pts:polarPoints(LOG)};
-    else { const txt = f.file ? await readText(f.file) : f.path ? await DESK.readFile(f.path) : f.text; r={pts:polarPoints(parseLog(txt, jetiMap(f)))}; } }
+  const res = log => { const pts=polarPoints(log); return {pts, paare:log.klPaare||null, isa:!!log.platz, platz:log.platz||null}; };
+  try{ if (FILES[CUR]===f && LOG) r=res(LOG);
+    else { const txt = f.file ? await readText(f.file) : f.path ? await DESK.readFile(f.path) : f.text; r=res(parseLog(txt, jetiMap(f))); } }
   catch(e){ r={pts:[], err:e.message||T('Datei konnte nicht gelesen werden.')}; }
   POLAR_CACHE.set(key,r); return r;
 }
 const polarOff=()=>{ try{ return new Set(JSON.parse(mstore.get('polar.off')||'[]')); }catch(e){ return new Set(); } };
-// Fahrtfilter der Polare (km/h, null = keine Grenze): gehört zum Entwurf bzw. zur Version, wirkt vor den Klassen
-const polRng = fx => { const s=fx?.draft || polAct(fx) || {}; return {lo:s.vmin??null, hi:s.vmax??null}; };
-const verRng = v => ({lo:v?.vmin??null, hi:v?.vmax??null});
-const polRngOn = r => r && (r.lo!=null || r.hi!=null);
+// Fahrtfilter der Polare (km/h, null = keine Grenze) und Klappenstellung (kl = {mitte, tol} oder null):
+// gehört zum Entwurf bzw. zur Version, wirkt vor den Klassen
+const polRng = fx => { const s=fx?.draft || polAct(fx) || {}; return {lo:s.vmin??null, hi:s.vmax??null, kl:s.klappe||null}; };
+const verRng = v => ({lo:v?.vmin??null, hi:v?.vmax??null, kl:v?.klappe||null});
+const polRngOn = r => r && (r.lo!=null || r.hi!=null || !!r.kl);
 const polInR = (v,r) => (r.lo==null || v>=r.lo) && (r.hi==null || v<=r.hi);
-const polIn = (pts,r) => polRngOn(r) ? pts.filter(p=>polInR(p[0],r)) : pts;
-const polOut = (pts,r) => polRngOn(r) ? pts.filter(p=>!polInR(p[0],r)) : [];
+const polInP = (p,r) => polInR(p[0],r) && (!r.kl || MMFA.klappen.passt(p[3], r.kl.mitte, r.kl.tol));
+const polIn = (pts,r) => polRngOn(r) ? pts.filter(p=>polInP(p,r)) : pts;
+const polOut = (pts,r) => polRngOn(r) ? pts.filter(p=>!polInP(p,r)) : [];
+const klTxt = kl => kl ? kl.mitte.map(x=>(x>0?'+':'')+fmt(x,0)).join(' / ')+' %' : '';
 // „ab 40“, „bis 90“, „40–90“ in der gewählten Einheit
-const polRngTxt = (r,K) => !polRngOn(r) ? '' : r.lo!=null && r.hi!=null ? `${fmt(r.lo*K,0)}–${fmt(r.hi*K,0)}`
+// mit Einheit und Klappenstellung, z. B. „40–90 km/h, Klappen +6 / −5 / +62 %“
+const polFiltTxt = (r,K) => [polRngTxt(r,K) ? polRngTxt(r,K)+' '+SPEED : '', r?.kl ? T('Klappen {k}',{k:klTxt(r.kl)}) : ''].filter(Boolean).join(', ');
+const polRngTxt = (r,K) => (r.lo==null && r.hi==null) ? '' : r.lo!=null && r.hi!=null ? `${fmt(r.lo*K,0)}–${fmt(r.hi*K,0)}`
   : r.lo!=null ? T('ab {v}',{v:fmt(r.lo*K,0)}) : T('bis {v}',{v:fmt(r.hi*K,0)});
 // ---------- Polare fixieren ----------
 // Pro Modell gespeicherte Versionen (Ergebnis = Klassen-Mediane, dazu Log-Liste, Leergewicht, Bemerkung) und höchstens ein
@@ -6174,7 +6047,7 @@ function polSnap(sel, logs, rg){
   rg=rg||{lo:null, hi:null};
   const all=sel.flatMap(l=>l.pts), pts=polIn(all,rg), bs=polarBins(pts), r=x=>+x.toFixed(4), bo=b=>({v:b.v, m:r(b.m), q1:r(b.q1), q3:r(b.q3), n:b.n});
   // xbins: Klassen ausserhalb des Fahrtfilters, nur zum Anzeigen
-  return {logs:sel.map(l=>l.f.name), seen:logs.map(l=>l.f.name), pts:pts.length, filt:PST.filt, vmin:rg.lo, vmax:rg.hi,
+  return {logs:sel.map(l=>l.f.name), seen:logs.map(l=>l.f.name), pts:pts.length, filt:PST.filt, vmin:rg.lo, vmax:rg.hi, klappe:rg.kl||null, isa:polIsa(sel),
     bins:bs.map(bo), xbins:polarBins(polOut(all,rg)).map(bo)};
 }
 // Alles, was aus den Klassen folgt: Kurve, Kennzahlen, Parabel fürs Widget
@@ -6189,9 +6062,16 @@ const polMass = () => polAct(POLAR_LOGS?.fx)?.mass || null;
 function polFixApply(ver){
   const f=FILES[CUR]; if (!f || POLAR_LOGS?.model!==f.model) return;
   const c=polCalc(ver?.bins, verRng(ver));
-  store.set(mkey('polar.ab'), c.fit ? JSON.stringify({A:c.fit.A, B:c.fit.B}) : 'null');
+  store.set(mkey('polar.ab'), c.fit ? JSON.stringify({A:c.fit.A, B:c.fit.B, isa:!!ver?.isa}) : 'null');
   MC_CUR=c.mc; mcRemember(ver);
 }
+// Klappenstellungen des Modells aus allen Logs (Gleitpunkte mit Wölbungs-Vektor); Paare wie im ersten Log mit Klappen
+function polKlFind(logs){
+  const p=logs.find(l=>l.paare?.length)?.paare, kl=MMFA.klappen.stellungen(logs.flatMap(l=>l.pts.map(q=>q[3]||null)));
+  return {kl, klAuto: p ? klPaarTxt(p) : ''};
+}
+// true, wenn alle Logs auf Meereshöhe umgerechnet sind (Platzhöhe bekannt)
+const polIsa = sel => sel.length>0 && sel.every(l=>l.isa);
 async function renderPolar(){
   if ($('#pane-polare').hidden) return;
   const job=++polarJob, model=FILES[CUR]?.model; if (model==null) return;
@@ -6211,7 +6091,7 @@ async function renderPolar(){
     else fx.draft={on:s.logs};
     polFixSave(fx);
   }
-  POLAR_LOGS={model, logs, fx}; polOnSync(); polFixApply(polAct(fx)); drawPolar();
+  POLAR_LOGS={model, logs, fx, ...polKlFind(logs)}; polOnSync(); polFixApply(polAct(fx)); drawPolar();
 }
 // Häkchen aus dem Entwurf oder aus der aktiven Version
 function polOnSync(){
@@ -6224,8 +6104,13 @@ function savePolarOff(){
   mstore.set('polar.off', JSON.stringify(POLAR_LOGS.logs.filter(l=>!l.on).map(l=>l.f.name)));
 }
 function polDraftStart(){ const fx=POLAR_LOGS?.fx; if (!fx || fx.draft) return; const a=polAct(fx);
-  fx.draft={on:[...(a?.logs||[])], vmin:a?.vmin??null, vmax:a?.vmax??null}; polFixSave(fx); polOnSync(); drawPolar(); }
+  fx.draft={on:[...(a?.logs||[])], vmin:a?.vmin??null, vmax:a?.vmax??null, klappe:a?.klappe||null}; polFixSave(fx); polOnSync(); drawPolar(); }
 // Fahrtfilter ändern: bei fixierter Polare öffnet das einen Entwurf (km/h, null = keine Grenze)
+function polKlSet(kl){
+  const fx=POLAR_LOGS?.fx; if (!fx) return;
+  if (!fx.draft) polDraftStart();
+  fx.draft.klappe=kl; polFixSave(fx); drawPolar();
+}
 function polRngSet(lo, hi){
   const fx=POLAR_LOGS?.fx; if (!fx) return;
   if (!fx.draft) polDraftStart();
@@ -6246,7 +6131,7 @@ function drawPolar(){
   const K=1/3.6/speedMs(), X=v=>v*K, dk=K===1?0:1;   // intern km/h, angezeigt in der gewählten Einheit
   // Fixiert: Kurve und Kennzahlen aus der gespeicherten Version; Entwurf: aus den angehakten Logs, die Version zum Vergleich daneben
   const fx=POLAR_LOGS.fx, act=polAct(fx), draft=!!fx.draft, old=draft && act ? polCalc(act.bins, verRng(act)) : null;
-  const rg=polRng(fx), rgOn=polRngOn(rg), rgTxt=polRngTxt(rg,K);
+  const rg=polRng(fx), rgOn=polRngOn(rg), rgTxt=polFiltTxt(rg,K);
   const logs=POLAR_LOGS.logs, sel=logs.filter(l=>l.on), all=sel.flatMap(l=>l.pts), pts=polIn(all,rg), xpts=polOut(all,rg);
   const bs=draft||!act ? polarBins(pts) : act.bins, xbs=draft||!act ? polarBins(xpts) : (act.xbins||[]);
   polRngUi(rg,K);
@@ -6274,7 +6159,7 @@ function drawPolar(){
         +k(T('Geringstes Sinken'),two(ok&&fmt(-old.kc.wms,2),fmt(-kc.wms,2)),'m/s',esc(T('bei {v} {u}',{v:(ok?fmt(X(old.kc.vms),0)+' → ':'')+fmt(X(kc.vms),0),u:SPEED})))
       : k(T('Beste Gleitzahl'),'–','',T('zu wenig Punkte'))+k(T('Geringstes Sinken'),'–','',T('zu wenig Punkte')))+
     k(T('Gleitpunkte'),two(ok&&act.pts.toLocaleString(LOC),npts.toLocaleString(LOC)),'',esc(T('aus {n} Logs · {k} Klassen',{n:sel.length,k:bs.length})))+
-    k(T('Fahrtbereich'),bs.length?two(ok&&rgf(old.lo,old.hi),rgf(lo,hi)):'–',SPEED,rgOn?esc(T('Fahrtfilter {r} {u}',{r:rgTxt,u:SPEED})):T('mit genug Punkten'),rgOn?' rng':'')+
+    k(T('Fahrtbereich'),bs.length?two(ok&&rgf(old.lo,old.hi),rgf(lo,hi)):'–',SPEED,rgOn?esc(T('Filter {r}',{r:rgTxt})):T('mit genug Punkten'),rgOn?' rng':'')+
     (!act ? k(T('Leergewicht der Polare'),'–','',T('kommt beim Fixieren dazu'),' mass')
       : mass ? k(T('Leergewicht der Polare'),`${fmt(mass,1)} <small>kg</small> <span title="${esc(T('Fest mit dieser Polare verknüpft. Ändern geht nur mit einer neuen Version.'))}">🔒</span>`,'',esc(T('gehört fix zu v{v}',{v:act.v})),' mass')
       : k(T('Leergewicht der Polare'),`<input type="text" id="polMassIn" inputmode="decimal" placeholder="7.2" aria-label="${esc(T('Leergewicht in kg'))}"><small>kg</small>`,'',`${esc(T('einmal eingeben'))}<button type="button" id="polMassSet">${esc(T('Festlegen'))}</button>`,' mass'));
@@ -6289,7 +6174,7 @@ function drawPolar(){
   if (rgOn && xbs.length){
     ds.push({type:'scatter', data:xbs.map(b=>({x:X(b.v),y:tr(b.v,b.m)})).filter(q=>q.y!=null), pointRadius:3.5, pointStyle:'rectRot', backgroundColor:'transparent', borderColor:mu, borderWidth:1.2, order:2});
   }
-  if (rgOn) leg.push(`<span><i style="background:transparent;border:1.2px solid ${mu};width:7px;height:7px;transform:rotate(45deg)"></i>${esc(T('ausserhalb Fahrtfilter {r} {u}, nicht in der Kurve',{r:rgTxt,u:SPEED}))}</span>`);
+  if (rgOn) leg.push(`<span><i style="background:transparent;border:1.2px solid ${mu};width:7px;height:7px;transform:rotate(45deg)"></i>${esc(T('ausserhalb Fahrtfilter {r} {u}, nicht in der Kurve',{r:rgTxt,u:''}))}</span>`);
   if (PST.band && bs.length){
     ds.push({type:'line', data:bs.map(b=>({x:X(b.v),y:tr(b.v,b.q3)})), borderWidth:0, pointRadius:0, fill:false, order:4});
     ds.push({type:'line', data:bs.map(b=>({x:X(b.v),y:tr(b.v,b.q1)})), borderWidth:0, pointRadius:0, fill:'-1', backgroundColor:ac+'26', order:4});
@@ -6323,14 +6208,16 @@ function drawPolar(){
     }
   }
   $('#polLegend').innerHTML=leg.join('')+'<span id="mcLeg" style="display:contents"></span>';
-  $('#polInfo').textContent = `${POLAR_LOGS.model}${act?' · v'+act.v:''}${mass?' · '+fmt(mass,1)+' kg':''} · ${T('{n} Punkte',{n:npts.toLocaleString(LOC)})} · ${shown.mode==='phys'?'A·v³ + B/v':shown.mode==='med'?T('Median je {b} {u}',{b:fmt(X(POLAR.bin),dk),u:SPEED})+(shown.note?' · '+T('A·v³ + B/v nicht möglich'):''):T('ungeglättet')}${rgOn?' · '+T('Fit {r} {u}',{r:rgTxt,u:SPEED}):''}`;
+  $('#polInfo').textContent = `${POLAR_LOGS.model}${act?' · v'+act.v:''}${mass?' · '+fmt(mass,1)+' kg':''} · ${T('{n} Punkte',{n:npts.toLocaleString(LOC)})} · ${shown.mode==='phys'?'A·v³ + B/v':shown.mode==='med'?T('Median je {b} {u}',{b:fmt(X(POLAR.bin),dk),u:SPEED})+(shown.note?' · '+T('A·v³ + B/v nicht möglich'):''):T('ungeglättet')}${rgOn?' · '+T('Fit {r} {u}',{r:rgTxt,u:''}):''}`;
   const none=!pts.length && !(act && !draft && bs.length);
   const xnote = xlo!=null ? T('{w} unter dem Fahrtfilter ({r} {u}). Dort ist die Kurve verlängert (dünn gestrichelt), nicht gemessen.',
-    {w:c.vbg<rg.lo-.5 ? T('Beste Gleitzahl und geringstes Sinken liegen') : T('Das geringste Sinken liegt'), r:rgTxt, u:SPEED}) : '';
-  const note=[shown.note, xnote].filter(Boolean).join(' ');
+    {w:c.vbg<rg.lo-.5 ? T('Beste Gleitzahl und geringstes Sinken liegen') : T('Das geringste Sinken liegt'), r:rgTxt, u:''}) : '';
+  const noIsa=sel.filter(l=>!l.isa && l.pts.length).length;
+  const dnote = noIsa ? T('Ohne Luftdichte-Korrektur: Für {n} von {m} Logs ist keine Platzhöhe bekannt (Einstellungen → Fluggelände). Die Polare gilt dann für die Höhe, auf der geflogen wurde.',{n:noIsa,m:sel.length}) : '';
+  const note=[shown.note, xnote, dnote].filter(Boolean).join(' ');
   $('#polNote').hidden=!note || none; $('#polNote').textContent=note;
   $('#polEmpty').hidden=!none; $('#polChart').hidden=none;
-  $('#polEmpty').textContent = !sel.length ? T('Kein Log ausgewählt. Hake links mindestens ein Log an.') : all.length && rgOn ? T('Keine Gleitpunkte im Fahrtfilter {r} {u}. Grenzen anpassen oder leeren.',{r:rgTxt,u:SPEED}) : T('Keine Gleitpunkte gefunden. Die Polare braucht Fahrt (TAS oder GPS-Geschwindigkeit), Vario oder Höhe und Gleitflug mit Motor aus.');
+  $('#polEmpty').textContent = !sel.length ? T('Kein Log ausgewählt. Hake links mindestens ein Log an.') : all.length && rgOn ? T('Keine Gleitpunkte im Fahrtfilter {r} {u}. Grenzen anpassen oder leeren.',{r:rgTxt,u:''}) : T('Keine Gleitpunkte gefunden. Die Polare braucht Fahrt (TAS oder GPS-Geschwindigkeit), Vario oder Höhe und Gleitflug mit Motor aus.');
   if (polarChart){ polarChart.destroy(); polarChart=null; }
   mcRender();
   if (none) return;
@@ -6354,7 +6241,7 @@ function polStateRender(bs){
   const vb=n ? `<button type="button" class="pol-sbtn" id="polVers">${esc(T('Versionen ({n})',{n}))}</button>` : '';
   if (!fx.draft){
     el.innerHTML=`<span class="pol-pill">🔒 ${esc(T('FIXIERT'))}</span><b>${esc(T('Version {v}',{v:act.v}))}</b>`+
-      `<span class="muted">· ${esc(polWhen(act.at))} · ${esc(T('{n} Logs',{n:act.logs.length}))} · ${esc(T('{n} Gleitpunkte',{n:act.pts.toLocaleString(LOC)}))}${polRngOn(polRng(fx))?' · '+esc(T('Fahrt {r} {u}',{r:polRngTxt(polRng(fx),1/3.6/speedMs()),u:SPEED})):''}${act.note?' · „'+esc(act.note)+'“':''}</span>`+
+      `<span class="muted">· ${esc(polWhen(act.at))} · ${esc(T('{n} Logs',{n:act.logs.length}))} · ${esc(T('{n} Gleitpunkte',{n:act.pts.toLocaleString(LOC)}))}${polRngOn(polRng(fx))?' · '+esc(polFiltTxt(polRng(fx),1/3.6/speedMs())):''}${act.note?' · „'+esc(act.note)+'“':''}</span>`+
       `<span class="sp"></span><button type="button" class="pol-sbtn" id="polEdit">${esc(T('Auswahl ändern'))}</button>${vb}`;
   } else {
     const can=bs.length>0;
@@ -6379,7 +6266,7 @@ function polCmpOpen(a, b, ro){
   h+=row(T('Beste Gleitzahl'),ka?.ld,kb?.ld,x=>fmt(x,1),1,1)+row(T('… bei'),ka?.vbg,kb?.vbg,sp,0,0)
     +row(T('Geringstes Sinken'),ka?-ka.wms:null,kb?-kb.wms:null,x=>fmt(x,2)+' m/s',2,1)+row(T('… bei'),ka?.vms,kb?.vms,sp,0,0)
     +`<tr><td>${esc(T('Fahrtbereich'))}</td><td class="n">${ca?.lo!=null?`${fmt(X(ca.lo),0)}–${fmt(X(ca.hi),0)} ${SPEED}`:'–'}</td><td class="n">${cb.lo!=null?`${fmt(X(cb.lo),0)}–${fmt(X(cb.hi),0)} ${SPEED}`:'–'}</td><td></td></tr>`
-    +`<tr><td>${esc(T('Fahrtfilter'))}</td><td class="n">${a?(polRngOn(ra)?polRngTxt(ra,K)+' '+SPEED:T('aus')):'–'}</td><td class="n">${polRngOn(rb)?polRngTxt(rb,K)+' '+SPEED:T('aus')}</td><td></td></tr>`
+    +`<tr><td>${esc(T('Fahrtfilter'))}</td><td class="n">${a?(polRngOn(ra)?polFiltTxt(ra,K):T('aus')):'–'}</td><td class="n">${polRngOn(rb)?polFiltTxt(rb,K):T('aus')}</td><td></td></tr>`
     +`<tr><td>${esc(T('Logs · Gleitpunkte'))}</td><td class="n">${a?a.logs.length+' · '+a.pts.toLocaleString(LOC):'–'}</td><td class="n">${b.logs.length+' · '+b.pts.toLocaleString(LOC)}</td><td></td></tr>`;
   h+=`<tr class="sub"><td colspan="4">${esc(T('Sollfahrt (MacCready, ruhige Luft)'))}</td></tr>`;
   let warn=false;
@@ -6413,7 +6300,7 @@ function polVerOpen(){
   $('#polVerTab').innerHTML=`<tr><th>${esc(T('Version'))}</th><th>${esc(T('Fixiert am'))}</th><th class="n">${esc(T('Logs'))}</th><th class="n">${esc(T('Beste GZ'))}</th><th class="n">${esc(T('bei'))}</th><th class="n">${esc(T('Fahrtfilter'))}</th><th class="n">${esc(T('Leergewicht'))}</th><th>${esc(T('Bemerkung'))}</th><th></th></tr>`+
     [...fx.vers].sort((x,y)=>y.v-x.v).map(v=>{ const vr=verRng(v), c=polCalc(v.bins,vr).kc, on=v.v===fx.act;
       return `<tr class="${on?'act':''}"><td><b>v${v.v}</b>${on?` <span class="pol-pill">${esc(T('aktiv'))}</span>`:''}</td><td>${esc(polWhen(v.at))}</td><td class="n">${v.logs.length}</td>`+
-        `<td class="n">${c?fmt(c.ld,1):'–'}</td><td class="n">${c?fmt(c.vbg*K,0)+' '+SPEED:'–'}</td><td class="n">${polRngOn(vr)?polRngTxt(vr,K)+' '+SPEED:'–'}</td><td class="n">${v.mass?fmt(v.mass,1)+' kg':'–'}</td><td class="wr">${esc(v.note||'–')}</td>`+
+        `<td class="n">${c?fmt(c.ld,1):'–'}</td><td class="n">${c?fmt(c.vbg*K,0)+' '+SPEED:'–'}</td><td class="n">${polRngOn(vr)?polFiltTxt(vr,K):'–'}</td><td class="n">${v.mass?fmt(v.mass,1)+' kg':'–'}</td><td class="wr">${esc(v.note||'–')}</td>`+
         `<td>${on?'':`<button type="button" class="pol-sbtn" data-cmp="${v.v}">${esc(T('Vergleichen'))}</button> <button type="button" class="pol-sbtn" data-back="${v.v}">${esc(T('Zurückholen'))}</button>`}</td></tr>`; }).join('');
   $('#polVerDlg').showModal();
 }
@@ -6440,25 +6327,6 @@ function polVerOpen(){
 const MCS={mc:0, wind:0, net:0, bal:0, bug:0, unit:store.get('mc.unit')==='kmh'?'kmh':'ms'};
 const MC_FILE='polaren.lua';
 let MC_CUR=null, MC_TX={roots:[], written:null, err:null, at:null};
-function solve3(M, r){
-  const A=M.map((row,i)=>[...row, r[i]]);
-  for (let i=0;i<3;i++){
-    let p=i; for (let k=i+1;k<3;k++) if (Math.abs(A[k][i])>Math.abs(A[p][i])) p=k;
-    [A[i],A[p]]=[A[p],A[i]]; if (!A[i][i]) return null;
-    for (let k=0;k<3;k++){ if (k===i) continue; const f=A[k][i]/A[i][i]; for (let j=i;j<4;j++) A[k][j]-=f*A[i][j]; }
-  }
-  return A.map((row,i)=>row[3]/row[i]);
-}
-// Kleinste Quadrate auf die Kurve A·v³ + B/v, nur im Fahrtbereich mit Gleitpunkten (loK…hiK in km/h)
-function mcParabola(fit, loK, hiK){
-  const lo=loK/3.6, hi=hiK/3.6, S=[0,0,0,0,0], R=[0,0,0], wp=v=>fit.A*v**3+fit.B/v;
-  for (let v=lo; v<=hi+1e-9; v+=0.05){ const w=wp(v); let p=1; for (let i=0;i<5;i++){ S[i]+=p; p*=v; } R[0]+=w; R[1]+=w*v; R[2]+=w*v*v; }
-  const x=solve3([[S[0],S[1],S[2]],[S[1],S[2],S[3]],[S[2],S[3],S[4]]], R); if (!x) return null;
-  const [c,b,a]=x; if (!(a>0) || !(c>0)) return null;
-  const s=v=>a*v*v+b*v+c; let dev=0; for (let v=lo; v<=hi+1e-9; v+=0.05) dev=Math.max(dev, Math.abs(s(v)-wp(v)));
-  const vms=-b/(2*a), vbg=Math.sqrt(c/a);
-  return {a, b, c, lo, hi, dev, s, vms, vbg, ld:vbg/s(vbg)};
-}
 // Polare mit Wind, Netto, Ballast und Verschmutzung; Sollfahrt = Tangente vom Punkt (Gegenwind, −MC) an die Kurve
 function mcEnv(p){
   const m=polMass(), k=m ? Math.sqrt((m+MCS.bal)/m) : 1, f=1+MCS.bug/100, a=f*p.a/k, b=f*p.b, c=f*p.c*k-MCS.net, u=MCS.wind/3.6;
@@ -6480,15 +6348,15 @@ function mcRemember(ver){
   const f=FILES[CUR]; if (!f || f.jeti || f.mid==null || POLAR_LOGS?.model!==f.model) return;
   const all=mcPolars(), p=MC_CUR;
   if (!p || !ver){ if (all[f.mid]){ delete all[f.mid]; store.set('mc.polars', JSON.stringify(all)); } return; }
-  const e={name:f.model, ver:ver.v, fix:polDay(ver.at), a:+mcSig(-p.a), b:+mcSig(-p.b), c:+mcSig(-p.c), vMin:+p.lo.toFixed(1), vMax:+p.hi.toFixed(1), mass:ver.mass||null};
+  const e={name:f.model, ver:ver.v, fix:polDay(ver.at), a:+mcSig(-p.a), b:+mcSig(-p.b), c:+mcSig(-p.c), vMin:+p.lo.toFixed(1), vMax:+p.hi.toFixed(1), mass:ver.mass||null, ...(ver.isa?{isa:true}:{})};
   const o=all[f.mid]; if (o && Object.keys(e).every(k=>o[k]===e[k])) return;
   all[f.mid]={...e, at:Date.now()}; store.set('mc.polars', JSON.stringify(all));
 }
 function mcFileText(extra=[], skip=null){
   const d=new Date(), z=n=>String(n).padStart(2,'0'), ts=`${d.getFullYear()}-${z(d.getMonth()+1)}-${z(d.getDate())} ${z(d.getHours())}:${z(d.getMinutes())}`;
   const rows=Object.entries(mcPolars()).filter(([mid])=>!skip?.has(mid)).sort((x,y)=>x[0].localeCompare(y[0]))
-    .map(([mid,p])=>`  [${JSON.stringify(mid)}] = { ${p.ver?`ver = ${p.ver}, fix = "${p.fix}", `:''}a = ${p.a}, b = ${p.b}, c = ${p.c}, vMin = ${p.vMin.toFixed(1)}, vMax = ${p.vMax.toFixed(1)}${p.mass?`, mass = ${p.mass}`:''} },`);
-  return `-- MM Flight Analyzer: Polaren für das MacCready-Widget, geschrieben ${ts}\n-- Vario (m/s, Sinken negativ) = a*v^2 + b*v + c, v in m/s; vMin/vMax = gültiger Bereich in m/s\n-- ver/fix = fixierte Version der Polare und ihr Datum; mass = Leergewicht der Polare in kg\n-- Wird von der App überschrieben, bitte nicht von Hand ändern.\nreturn {\n${rows.concat(extra).join('\n')}\n}\n`;
+    .map(([mid,p])=>`  [${JSON.stringify(mid)}] = { ${p.ver?`ver = ${p.ver}, fix = "${p.fix}", `:''}a = ${p.a}, b = ${p.b}, c = ${p.c}, vMin = ${p.vMin.toFixed(1)}, vMax = ${p.vMax.toFixed(1)}${p.mass?`, mass = ${p.mass}`:''}${p.isa?', isa = true':''} },`);
+  return `-- MM Flight Analyzer: Polaren für das MacCready-Widget, geschrieben ${ts}\n-- Vario (m/s, Sinken negativ) = a*v^2 + b*v + c, v in m/s; vMin/vMax = gültiger Bereich in m/s\n-- ver/fix = fixierte Version der Polare und ihr Datum; mass = Leergewicht der Polare in kg\n-- isa = true: Polare auf Meereshöhe (Normatmosphäre) umgerechnet; in der Höhe gilt Fahrt und Sinken mal 1/sqrt(sigma)\n-- Wird von der App überschrieben, bitte nicht von Hand ändern.\nreturn {\n${rows.concat(extra).join('\n')}\n}\n`;
 }
 const MC_LUA=`-- Polare des aktiven Modells aus polaren.lua. Der MM Flight Analyzer schreibt die Datei
 -- in den Ordner scripts/maccready auf dem Sender, neben main.lua des Widgets.
@@ -6670,6 +6538,11 @@ async function mcOnSync(s){
     if (Number.isNaN(lo) || Number.isNaN(hi) || (lo!=null && hi!=null && hi<=lo)) return;
     const r=polRng(POLAR_LOGS.fx); if (r.lo===lo && r.hi===hi) return;
     polRngSet(lo, hi); };
+  $('#polKl').addEventListener('change', e=>{ const v=e.target.value, st=POLAR_LOGS?.kl||[];
+    if (v==='x') return; polKlSet(v==='' ? null : {mitte:st[+v].mitte, tol:MMFA.klappen.KLAPPEN.tol}); });
+  $('#polKlPaare').addEventListener('change', e=>{ const ps=klParse(e.target.value), txt=klPaarTxt(ps);
+    e.target.classList.toggle('bad', !!e.target.value.trim() && !ps.length); if (e.target.value.trim() && !ps.length) return;
+    if (txt) store.set(klKey(), txt); else store.del(klKey()); e.target.value=txt; POLAR_CACHE.clear(); renderPolar(); });
   for (const id of ['#polVmin','#polVmax']){ $(id).addEventListener('change',rngIn); $(id).addEventListener('keydown',e=>{ if (e.key==='Enter'){ e.target.blur(); rngIn(); } }); }
   for (const [id,key] of [['#polPts','pts'],['#polBand','band'],['#polEach','each']]){
     $(id).checked=PST[key]; $(id).addEventListener('change',e=>{ PST[key]=e.target.checked; store.set('polar.'+key,PST[key]?'1':'0'); drawPolar(); }); }
@@ -7471,6 +7344,7 @@ function openSettings(){
   $('#setLang').value = LANGS.includes(LANG_PREF) ? LANG_PREF : '';
   $('#setTheme').value = document.documentElement.dataset.theme || '';
   $('#setSpeed').value = SPEED; $('#setEsri').value = esriKey();
+  $('#setGel').value = gelaendeListe().map(g=>[g.name, g.lat, g.lon, g.elev].join('; ')).join('\n'); $('#setPlatz').value = store.get('platz.std')||'';
   if (DESK && SETTINGS){ $('#setSender').value=SETTINGS.senderPath; $('#setArchive').value=SETTINGS.archiveDir;
     $('#setAuto').checked=!!SETTINGS.autoSync; $('#setManual').checked=!!SETTINGS.archiveManual; }
   kiSettingsRow(); mcpSettingsRow(); wgtSettingsRow();
@@ -7485,6 +7359,12 @@ $('#setTheme').addEventListener('change', e=>{ const t=e.target.value;
   if (t) document.documentElement.dataset.theme=t; else delete document.documentElement.dataset.theme;
   try{ t ? localStorage.setItem('ethoslv.theme',t) : localStorage.removeItem('ethoslv.theme'); }catch(err){} });
 $('#setCancel').addEventListener('click', ()=>$('#settingsDlg').close());
+// Fluggelände als Text: „Name; Breite; Länge; Höhe“ je Zeile
+function gelParse(txt){ return txt.split(/\n/).map(l=>l.split(';').map(x=>x.trim())).filter(a=>a.length>=4)
+  .map(([name,lat,lon,elev])=>({name, lat:parseFloat(lat.replace(',','.')), lon:parseFloat(lon.replace(',','.')), elev:parseFloat(elev.replace(',','.'))}))
+  .filter(g=>isFinite(g.lat)&&isFinite(g.lon)&&isFinite(g.elev)); }
+$('#setGelAdd').addEventListener('click', ()=>{ const s=LOG?.homePt; if (!s){ $('#setGelAdd').textContent=T('Kein Log mit GPS offen'); return; }
+  const ta=$('#setGel'); ta.value=(ta.value.trim()?ta.value.trim()+'\n':'')+`${FILES[CUR]?.model||T('Gelände')}; ${s[0].toFixed(4)}; ${s[1].toFixed(4)}; `; ta.focus(); });
 $('#setForm').addEventListener('submit', async e=>{ e.preventDefault();
   if (DESK && SETTINGS){
     SETTINGS = await DESK.setSettings({ senderPath:$('#setSender').value.trim()||'Radio/logs', archiveDir:$('#setArchive').value.trim()||SETTINGS.archiveDir, autoSync:$('#setAuto').checked, archiveManual:$('#setManual').checked });
@@ -7494,6 +7374,10 @@ $('#setForm').addEventListener('submit', async e=>{ e.preventDefault();
   if (lang!==(LANGS.includes(LANG_PREF)?LANG_PREF:'')){ try{ lang ? localStorage.setItem('ethoslv.lang',lang) : localStorage.removeItem('ethoslv.lang'); }catch(err){} location.reload(); return; }
   // andere Geschwindigkeitseinheit: Log neu einlesen, alle Werte und berechneten Grössen in der neuen Einheit
   const ek=$('#setEsri').value.trim(); if (ek!==esriKey()){ if (ek) store.set('esri.key',ek); else store.del('esri.key'); SATT.clear(); detRedraw(); scheduleTrack(); }
+  const gel=JSON.stringify(gelParse($('#setGel').value)), pl=$('#setPlatz').value.trim().replace(',','.');
+  const plv=pl!=='' && isFinite(parseFloat(pl)) ? String(parseFloat(pl)) : '';
+  if (gel!==(store.get('gelaende')||'[]') || plv!==(store.get('platz.std')||'')){ store.set('gelaende',gel); if (plv) store.set('platz.std',plv); else store.del('platz.std');
+    POLAR_CACHE.clear(); if (FILES[CUR]) openLog(CUR); }
   const sp=$('#setSpeed').value;
   if (sp!==SPEED && SPEED_MS[sp]){ SPEED=sp; try{ localStorage.setItem('ethoslv.speed',sp); }catch(err){}
     POLAR_CACHE.clear(); if (FILES[CUR]) openLog(CUR); }
@@ -7690,6 +7574,16 @@ function polRngUi(rg,K){
   for (const [id,v] of [['#polVmin',rg.lo],['#polVmax',rg.hi]]){ const el=$(id);
     if (document.activeElement!==el) el.value = v==null ? '' : fmt(v*K,0);
     el.classList.toggle('on', v!=null); el.classList.remove('bad'); }
+  polKlUi(rg);
+}
+// Auswahl der Klappenstellung: gefundene Stellungen des Modells, dazu die gespeicherte, falls sie nicht mehr dabei ist
+function polKlUi(rg){
+  const sel=$('#polKl'), st=POLAR_LOGS?.kl||[], cur=rg.kl, num=['①','②','③','④','⑤','⑥','⑦','⑧'];
+  const opts=[`<option value="">${esc(T('alle Stellungen'))}</option>`].concat(st.map((s,i)=>`<option value="${i}">${num[i]||i+1} ${esc(klTxt(s))} (${fmt(s.anteil*100,0)} %)</option>`));
+  let val=''; if (cur){ const i=st.findIndex(s=>MMFA.klappen.passt(s.mitte,cur.mitte,0.05)); if (i>=0) val=String(i); else { opts.push(`<option value="x">${esc(T('gespeichert: {k}',{k:klTxt(cur)}))}</option>`); val='x'; } }
+  sel.innerHTML=opts.join(''); sel.value=val; sel.classList.toggle('on', !!cur);
+  sel.disabled=!st.length && !cur;
+  const pe=$('#polKlPaare'); if (document.activeElement!==pe){ pe.value=klText(); pe.placeholder=POLAR_LOGS?.klAuto ? T('auto: {p}',{p:POLAR_LOGS.klAuto}) : T('auto'); }
 }
 function polSegSync(){
   for (const [id,key] of [['#polView','view'],['#polSmooth','smooth']]) $(id).querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.v===PST[key]));
