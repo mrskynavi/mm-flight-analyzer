@@ -97,24 +97,24 @@ test('Polare: Flugstücke je Klasse aus der Zeit der Punkte', () => {
   assert.equal(PO.polarBins(pts.map(p => [p[0], p[1], p[2]]))[0].one, undefined);
 });
 
-test('Polare: Abriss-Fit A·v³ + B/v + D/v⁵ trifft konstruierte Klassen und braucht langsame Punkte', () => {
-  const A = 1.2e-4, B = 2, D = 4e4, w = k => { const v = k / 3.6; return A * v ** 3 + B / v + D / v ** 5; }, bs = [];
+test('Polare: Abriss-Fit A·v³ + B/v + D/v³ trifft konstruierte Klassen und braucht langsame Punkte', () => {
+  const A = 1.2e-4, B = 2, D = 200, w = k => { const v = k / 3.6; return A * v ** 3 + B / v + D / v ** 3; }, bs = [];
   for (let k = 30; k <= 90; k += 4) bs.push({ v: k, m: w(k), n: 40 });
   const f = PO.polarFit3(bs);
-  near(f.A, A, 1e-10); near(f.B, B, 1e-5); near(f.D, D, 0.5); assert.ok(f.ok, f.why);
+  near(f.A, A, 1e-10); near(f.B, B, 1e-5); near(f.D, D, 1e-3); assert.equal(f.p, 3); assert.ok(f.ok, f.why);
   // Kennzahlen: Ableitungen null
   const h = 1e-3; near(w(f.vms + h) - w(f.vms - h), 0, 1e-7, 'geringstes Sinken');
   const g = k => k / w(k); near(g(f.vbg + h) - g(f.vbg - h), 0, 1e-5, 'beste Gleitzahl');
   near(f.ld, f.vbg / 3.6 / w(f.vbg), 1e-9);
   // ohne die langsamen Klassen: Kurve kommt, gilt aber nicht
-  const ohne = PO.polarFit3(bs.filter(b => b.v >= f.vms - 4));
+  const ohne = PO.polarFit3(bs.filter(b => b.v >= f.vms - 6));
   assert.equal(ohne.ok, false); assert.equal(ohne.why, 'langsam');
   // Netto und MacCready rechnen mit D
-  near(PO.sinkAt({ A, B, D }, 12), w(12 * 3.6), 1e-12);
+  near(PO.sinkAt({ A, B, D, p: 3 }, 12), w(12 * 3.6), 1e-12);
   const mc = PO.mcParabola(f, 46, 90); assert.ok(mc.dev < 0.08, 'Parabel ' + mc.dev);
 });
 
-test('Polare: Polarflug-Log SB-10 (06.11.2026), Ausreisser 78/98/102 weg, Abriss-Fit mangels langsamer Punkte nicht gültig', () => {
+test('Polare: Polarflug-Log SB-10 (06.11.2026), Ausreisser 78/98/102 weg, Abriss-Fit trifft die langsamen Klassen', () => {
   const bs = require('./referenz/polarflug-sb10-klassen.json');
   // 78: Stechflug in 100 m Höhe (3:45 min), 98/102: Stechflug und Hochziehen (12 min), je über die Hälfte aus einem Stück
   const r = PO.polarClean(bs); assert.deepEqual(r.out.map(b => b.v), [78, 98, 102]);
@@ -122,7 +122,9 @@ test('Polare: Polarflug-Log SB-10 (06.11.2026), Ausreisser 78/98/102 weg, Abriss
   near(alt.ld, 27.9, 0.1, 'bisher'); near(neu.ld, 28.7, 0.1, 'ohne Ausreisser'); near(neu.vbg, 47.7, 0.5);
   // nur 98/102 weg (frühere Regel) kippt die Kurve: beste Gleitzahl 29,8 bei 44 km/h, weil 78 allein den Schnellflug bestimmt
   const nur = PO.polarFit(bs.filter(b => b.v < 90)); near(nur.ld, 29.8, 0.1); near(nur.vbg, 44, 1);
-  const f3 = PO.polarFit3(r.bs); assert.equal(f3.ok, false); assert.equal(f3.why, 'langsam');
+  // A·v³ + B/v ist bei 38 und 42 km/h zu optimistisch; mit Abriss trifft die Kurve beide Klassen
+  const f3 = PO.polarFit3(r.bs); assert.ok(f3.ok, f3.why); near(f3.ld, 29.5, 0.1); near(f3.vbg, 50, 1);
+  for (const k of [38, 42]) { const b = r.bs.find(x => x.v === k); near(f3.w(k), b.m, 0.03, 'mit Abriss ' + k); assert.ok(b.m - neu.w(k) > 0.04, 'ohne Abriss ' + k); }
 });
 
 // Gerader Gleitflug mit Fahrt v und Sinken w, eine Zeile alle 0,25 s

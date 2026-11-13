@@ -8,11 +8,11 @@
   // one: stammen mehr als dieser Anteil der Punkte einer Klasse aus einem einzigen Flugstück, ist die Klasse ein Ausreisser;
   // stGap: liegen zwischen zwei Punkten derselben Klasse mehr als so viele Sekunden, beginnt ein neues Flugstück
   // gap: so viele Klassenbreiten Abstand trennen einen Fahrtbereich ab; outN: abgetrennte Klassen mit weniger als outN·minN Punkten
-  // sind Ausreisser (einzelnes Manöver); m3Left/m3N: der Abriss-Fit braucht mindestens m3Left Klassen, die m3Left Klassenbreiten
-  // oder mehr unter der Fahrt des geringsten Sinkens liegen, mit zusammen mindestens m3N·minN Punkten; m3Dev: grösste Abweichung
-  // dieser Klassen von der Kurve (m/s, oder Anteil des Sinkens, was grösser ist)
+  // sind Ausreisser (einzelnes Manöver); m3Left/m3N: der Abriss-Fit braucht mindestens m3Left Klassen links vom geringsten Sinken
+  // (mindestens eine halbe Klassenbreite darunter), mit zusammen mindestens m3N·minN Punkten; m3Dev: grösste Abweichung
+  // dieser Klassen von der Kurve (m/s, oder Anteil des Sinkens, was grösser ist); m3Exp: Exponent des Abriss-Teils D/v^m3Exp
   const POLAR = { half: 2.5, after: 15, turn: 8, acc: 0.6, minV: 5, bin: 4, minN: 12, dev: 0.2, skip: 30,
-    gap: 2, outN: 3, m3Left: 2, m3N: 2, m3Dev: 0.1, one: 0.5, stGap: 10 };
+    gap: 2, outN: 3, m3Left: 2, m3N: 2, m3Dev: 0.1, m3Exp: 3, one: 0.5, stGap: 10 };
   const G = 9.81;
 
   function median(a) { const s = [...a].sort((x, y) => x - y), n = s.length; return n % 2 ? s[(n - 1) / 2] : (s[n / 2 - 1] + s[n / 2]) / 2; }
@@ -105,13 +105,14 @@
     return { bs: bs.filter(b => !out.includes(b)), out };
   }
 
-  // Abriss-Fit: Sinken = A·v³ + B/v + D/v⁵ (v in m/s). D/v⁵ ist der Widerstand, der bei grossem Auftriebsbeiwert (cA⁴) kurz vor
-  // dem Abriss steil ansteigt; damit fällt die Gleitzahl im Langsamflug ab, wie bei einer gerechneten Polare. B wird nicht
-  // negativ (induzierter Widerstand); käme B < 0 heraus, gilt B = 0. ok = false mit why, wenn die langsamen Klassen fehlen
-  // ('langsam') oder nicht zur Kurve passen ('abweichung'); die Kurve kommt trotzdem zurück, zum Zeigen.
+  // Abriss-Fit: Sinken = A·v³ + B/v + D/v³ (v in m/s, Exponent m3Exp). D/v³ ist der Profilwiderstand, der bei grossem
+  // Auftriebsbeiwert (mit cA³) ansteigt; damit fällt die Gleitzahl im Langsamflug schneller ab als mit A·v³ + B/v, wie bei einer
+  // gerechneten Polare. (D/v⁵, cA⁴, war beim Polarflug-Log der SB-10 zu steil: 0,58 statt 0,48 m/s bei 38 km/h.)
+  // B wird nicht negativ (induzierter Widerstand); käme B < 0 heraus, gilt B = 0. ok = false mit why, wenn die langsamen Klassen
+  // fehlen ('langsam') oder nicht zur Kurve passen ('abweichung'); die Kurve kommt trotzdem zurück, zum Zeigen.
   function polarFit3(bs, weight = 'n', P = POLAR) {
     if (bs.length < 4) return null;
-    const fs = [v => v ** 3, v => 1 / v, v => v ** -5];
+    const p = P.m3Exp, fs = [v => v ** 3, v => 1 / v, v => v ** -p];
     const ls = idx => {
       const k = idx.length, M = idx.map(() => idx.map(() => 0)), r = idx.map(() => 0);
       for (const b of bs) { const g = weight === 'eq' ? 1 : b.n, v = b.v / 3.6, x = idx.map(j => fs[j](v)); for (let i = 0; i < k; i++) { r[i] += g * x[i] * b.m; for (let j = 0; j < k; j++) M[i][j] += g * x[i] * x[j]; } }
@@ -122,18 +123,18 @@
     let [A, B, D] = c;
     if (!(B >= 0)) { c = ls([0, 2]); if (!c) return null; [A, D] = c; B = 0; }
     if (!(A > 0) || !(D > 0)) return null;
-    const w = kmh => { const v = kmh / 3.6; return A * v ** 3 + B / v + D / v ** 5; };
+    const w = kmh => { const v = kmh / 3.6; return A * v ** 3 + B / v + D / v ** p; };
     // Minimum und beste Gleitzahl: Ableitungen sind monoton, also halbieren (m/s)
     const root = (g, lo, hi) => { for (let i = 0; i < 80; i++) { const m = (lo + hi) / 2; if (g(m) < 0) lo = m; else hi = m; } return (lo + hi) / 2; };
-    const vms = root(v => 3 * A * v ** 2 - B / v ** 2 - 5 * D / v ** 6, 1, 100) * 3.6;   // d(w)/dv = 0
-    const vbg = root(v => 2 * A * v - 2 * B / v ** 3 - 6 * D / v ** 7, 1, 100) * 3.6;    // d(w/v)/dv = 0
-    const slow = bs.filter(b => b.v <= vms - P.m3Left * P.bin), nSlow = slow.reduce((s, b) => s + b.n, 0);
+    const vms = root(v => 3 * A * v ** 2 - B / v ** 2 - p * D / v ** (p + 1), 1, 100) * 3.6;   // d(w)/dv = 0
+    const vbg = root(v => 2 * A * v - 2 * B / v ** 3 - (p + 1) * D / v ** (p + 2), 1, 100) * 3.6;    // d(w/v)/dv = 0
+    const slowMax = vms - P.bin / 2, slow = bs.filter(b => b.v <= slowMax), nSlow = slow.reduce((s, b) => s + b.n, 0);
     const worst = Math.max(0, ...bs.filter(b => b.v < vms).map(b => Math.abs(b.m - w(b.v)) - Math.max(P.m3Dev, P.m3Dev * 2 * b.m)));
     const why = slow.length < P.m3Left || nSlow < P.m3N * P.minN ? 'langsam' : worst > 0 ? 'abweichung' : null;
-    return { w, A, B, D, vms, wms: w(vms), vbg, ld: vbg / 3.6 / w(vbg), ok: !why, why, slowMax: vms - P.m3Left * P.bin };
+    return { w, A, B, D, p, vms, wms: w(vms), vbg, ld: vbg / 3.6 / w(vbg), ok: !why, why, slowMax };
   }
 
-  // Kurve über den Klassen: 'phys' = A·v³ + B/v, 'phys3' = A·v³ + B/v + D/v⁵, 'med' = geglättete Mediane (1-2-1)
+  // Kurve über den Klassen: 'phys' = A·v³ + B/v, 'phys3' = A·v³ + B/v + D/v³, 'med' = geglättete Mediane (1-2-1)
   function polarCurve(bs, mode, P = POLAR) {
     if (!bs.length || mode === 'off') return null;
     const lo = bs[0].v - P.bin / 2, hi = bs[bs.length - 1].v + P.bin / 2;
@@ -147,11 +148,11 @@
     return best ? { pts: sm, vms: ms.x, wms: ms.y, vbg: best.x, ld } : null;
   }
 
-  // Eigensinken (m/s, + = sinkt) bei wahrer Fahrt v (m/s) in der Dichte sigma, aus der Polare {A, B, D?} auf Meereshöhe.
+  // Eigensinken (m/s, + = sinkt) bei wahrer Fahrt v (m/s) in der Dichte sigma, aus der Polare {A, B, D?, p?} auf Meereshöhe.
   // Unter 5 m/s gilt das Sinken bei 5 m/s (die Formel steigt dort steil an).
   function sinkAt(ab, v, sigma = 1) {
     const q = Math.sqrt(sigma), ve = Math.max(v, 5) * q;   // Fahrt auf Meereshöhe
-    return (ab.A * ve ** 3 + ab.B / ve + (ab.D || 0) / ve ** 5) / q;
+    return (ab.A * ve ** 3 + ab.B / ve + (ab.D || 0) / ve ** (ab.p || 3)) / q;
   }
 
   function solve3(M, r) {
@@ -163,9 +164,9 @@
     }
     return A.map((row, i) => row[3] / row[i]);
   }
-  // Kleinste Quadrate einer Parabel s = a·v² + b·v + c auf die Kurve A·v³ + B/v (+ D/v⁵), nur im Fahrtbereich loK…hiK (km/h)
+  // Kleinste Quadrate einer Parabel s = a·v² + b·v + c auf die Kurve A·v³ + B/v (+ D/v^p), nur im Fahrtbereich loK…hiK (km/h)
   function mcParabola(fit, loK, hiK) {
-    const lo = loK / 3.6, hi = hiK / 3.6, S = [0, 0, 0, 0, 0], R = [0, 0, 0], wp = v => fit.A * v ** 3 + fit.B / v + (fit.D || 0) / v ** 5;
+    const lo = loK / 3.6, hi = hiK / 3.6, S = [0, 0, 0, 0, 0], R = [0, 0, 0], wp = v => fit.A * v ** 3 + fit.B / v + (fit.D || 0) / v ** (fit.p || 3);
     for (let v = lo; v <= hi + 1e-9; v += 0.05) { const w = wp(v); let p = 1; for (let i = 0; i < 5; i++) { S[i] += p; p *= v; } R[0] += w; R[1] += w * v; R[2] += w * v * v; }
     const x = solve3([[S[0], S[1], S[2]], [S[1], S[2], S[3]], [S[2], S[3], S[4]]], R); if (!x) return null;
     const [c, b, a] = x; if (!(a > 0) || !(c > 0)) return null;

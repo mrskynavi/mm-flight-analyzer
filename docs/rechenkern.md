@@ -5,7 +5,7 @@ Die Rechnungen des Flight Analyzers ohne Oberfläche. Jede Datei läuft im Brows
 | Datei | Inhalt |
 | --- | --- |
 | `wind.js` | GPS-Kurs (halbe Fixe), Kasa-Kreisfit, Wind Estimator (Nachbau des Widgets, Median der letzten 5 Fits, Kursstreuung 0,3), TAS, Steuerkurs, Drift, Gegenwind |
-| `polare.js` | Gleitpunkte (1 je Sekunde, Motor aus + 15 s, geradeaus, Energiekompensation, optional Dichte und nur ab erstem Windfit), Klassen, Ausreisser-Klassen (polarClean), Fit A·v³ + B/v, Abriss-Fit A·v³ + B/v + D/v⁵ (polarFit3, nur mit langsamen Klassen gültig), Median-Kurve, Eigensinken in der Höhe, Parabel a·v² + b·v + c |
+| `polare.js` | Gleitpunkte (1 je Sekunde, Motor aus + 15 s, geradeaus, Energiekompensation, optional Dichte und nur ab erstem Windfit), Klassen, Ausreisser-Klassen (polarClean), Fit A·v³ + B/v, Abriss-Fit A·v³ + B/v + D/v³ (polarFit3, nur mit langsamen Klassen gültig), Median-Kurve, Eigensinken in der Höhe, Parabel a·v² + b·v + c |
 | `energie.js` | Glättung über Zeit, Vario TEK, Netto-Vario (10 s und 3 s), Gleitzahl |
 | `atmosphaere.js` | Normatmosphäre (σ = ρ/ρ0, mit Temperaturabweichung), σ je Logzeile aus Platzhöhe + Höhe, Fluggelände suchen |
 | `klappen.js` | Klappenpaare erkennen, Wölbung je Paar in % Servoweg, Klappenstellungen finden (Mean-Shift), Zuordnung |
