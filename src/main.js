@@ -239,16 +239,14 @@ async function checkUpdate() {
 ipcMain.handle('update:check', () => checkUpdate());
 ipcMain.handle('app:version', () => app.getVersion());
 ipcMain.handle('update:open', (_, url) => { if (/^https:\/\/github\.com\/mrskynavi\/(ethos-log-viewer|mm-flight-analyzer)\//.test(url)) shell.openExternal(url); });
-ipcMain.handle('file:read', async (_, p) => { if (!allowed(p)) throw new Error('Kein Zugriff'); return S.decodeText(await fs.promises.readFile(p)); });
+// Lesen aus dem Archiv: ein Cloud-Ordner sperrt frisch kopierte Logs kurz, darum mit Wiederholungen
+ipcMain.handle('file:read', async (_, p) => {
+  if (!allowed(p)) throw new Error('Kein Zugriff');
+  try { return S.decodeText(await S.readFileRetry(p)); } catch (e) { throw new Error(S.errText(e)); }
+});
 ipcMain.handle('file:peek', async (_, p, n) => {
   if (!allowed(p)) throw new Error('Kein Zugriff');
-  const fh = await fs.promises.open(p, 'r');
-  try {
-    const { size } = await fh.stat(), len = Math.min(n, size);
-    const head = Buffer.alloc(len), tail = Buffer.alloc(len);
-    await fh.read(head, 0, len, 0); await fh.read(tail, 0, len, Math.max(0, size - len));
-    return { head: S.decodeText(head), tail: S.decodeText(tail), size };
-  } finally { await fh.close(); }
+  return S.peekRetry(p, n);
 });
 
 // ---------- KI-Auswertung: Schlüssel im Schlüsselbund des Systems (safeStorage), Aufruf über das Anthropic-SDK ----------

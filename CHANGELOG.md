@@ -1,5 +1,11 @@
 # Changelog
 
+## Unveröffentlicht
+
+- Tab Polare, Kasten „Auf den Sender“: Das Layout bricht nicht mehr. Ein offener „Inhalt der Datei“ mit langen Zeilen hat den Kasten breiter gemacht als die Seite; der Knopf „Auf Sender schreiben“ und „Sender verbunden“ rutschten dabei rechts aus dem Kasten. Lange Zeilen scrollen jetzt im Codefeld.
+- „Auf Sender schreiben“ zeigt, dass es geschrieben hat: Der Knopf meldet kurz „Schreibe …“ und „✓ Geschrieben“, die Zeit steht mit Sekunden da und dazu der Pfad auf dem Sender. Vorher sah ein zweiter Klick in derselben Minute aus, als passiere nichts.
+- Sync ins Archiv in einem Cloud-Ordner (OneDrive, Google Drive): Ein frisch kopiertes Log ist kurz gesperrt, solange der Cloud-Ordner es hochlädt, und macOS meldet beim Lesen einen Fehler. Kopieren, Umbenennen und Lesen versuchen es jetzt ein paar Mal mit Pause nochmals. Eine Kopie mit falscher Grösse wird nicht als fertiges Log abgelegt. Klappt das Lesen trotzdem nicht, steht der Grund in Klartext da, mit Knopf „Nochmals laden“.
+
 ## 2026.11.0 – 2026-11-09
 
 - Tab Polare: Neuer Fahrtfilter „Fahrt für Kurve ab … bis …“. Nur Gleitpunkte in diesem Fahrtbereich zählen für Klassen und Kurve, z. B. ab 40 km/h, wenn das Modell im Langsamflug nicht mehr sauber fliegt; solche langsamen Klassen zogen die Kurve A·v³ + B/v hoch, die beste Gleitzahl wurde kleiner und lag bei zu hoher Fahrt. Punkte ausserhalb bleiben hell sichtbar, ihre Mediane als leere Rauten. Der Filter wirkt auf die Fahrt der Polare (TAS, sonst GPS), gehört zur fixierten Version (Status, Vergleich und Versionen zeigen ihn) und gilt damit auch für Netto-Vario, MacCready und polaren.lua (vMin beginnt beim Filter). Ändern öffnet einen Entwurf. Liegen beste Gleitzahl oder geringstes Sinken unter dem Filter, ist die Kurve dort dünn gestrichelt verlängert, mit Hinweis. Standard: aus. Die KI kann den Filter mit fahrt_ab und fahrt_bis setzen.
