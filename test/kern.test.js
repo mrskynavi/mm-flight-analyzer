@@ -70,6 +70,46 @@ test('Polare: Fit A·v³ + B/v trifft konstruierte Klassen, Kennzahlen stimmen',
   const mc = PO.mcParabola(f, 30, 90); assert.ok(mc.dev < 0.05, 'Parabel weicht wenig ab'); near(mc.s(15), w(15), 0.05);
 });
 
+test('Polare: Ausreisser-Klassen, abgetrennt und mit wenig Punkten, fallen weg', () => {
+  const w = v => 8e-5 * (v / 3.6) ** 3 + 4.5 / (v / 3.6), bs = [];
+  for (let k = 38; k <= 78; k += 4) bs.push({ v: k, m: w(k), n: 80 });
+  const ganz = [...bs, { v: 98, m: 3.5, n: 12 }, { v: 102, m: 0.9, n: 16 }];
+  const r = PO.polarClean(ganz);
+  assert.deepEqual(r.out.map(b => b.v), [98, 102]); assert.equal(r.bs.length, bs.length);
+  // abgetrennt, aber mit vielen Punkten: bleibt (echter Schnellflug)
+  assert.equal(PO.polarClean([...bs, { v: 98, m: 3.5, n: 60 }]).out.length, 0);
+  // eine fehlende Klasse ist keine Lücke
+  assert.equal(PO.polarClean([...bs, { v: 86, m: w(86), n: 12 }]).out.length, 0);
+});
+
+test('Polare: Abriss-Fit A·v³ + B/v + D/v⁵ trifft konstruierte Klassen und braucht langsame Punkte', () => {
+  const A = 1.2e-4, B = 2, D = 4e4, w = k => { const v = k / 3.6; return A * v ** 3 + B / v + D / v ** 5; }, bs = [];
+  for (let k = 30; k <= 90; k += 4) bs.push({ v: k, m: w(k), n: 40 });
+  const f = PO.polarFit3(bs);
+  near(f.A, A, 1e-10); near(f.B, B, 1e-5); near(f.D, D, 0.5); assert.ok(f.ok, f.why);
+  // Kennzahlen: Ableitungen null
+  const h = 1e-3; near(w(f.vms + h) - w(f.vms - h), 0, 1e-7, 'geringstes Sinken');
+  const g = k => k / w(k); near(g(f.vbg + h) - g(f.vbg - h), 0, 1e-5, 'beste Gleitzahl');
+  near(f.ld, f.vbg / 3.6 / w(f.vbg), 1e-9);
+  // ohne die langsamen Klassen: Kurve kommt, gilt aber nicht
+  const ohne = PO.polarFit3(bs.filter(b => b.v >= f.vms - 4));
+  assert.equal(ohne.ok, false); assert.equal(ohne.why, 'langsam');
+  // Netto und MacCready rechnen mit D
+  near(PO.sinkAt({ A, B, D }, 12), w(12 * 3.6), 1e-12);
+  const mc = PO.mcParabola(f, 46, 90); assert.ok(mc.dev < 0.08, 'Parabel ' + mc.dev);
+});
+
+test('Polare: Polarflug-Log SB-10 (06.11.2026), Ausreisser 98/102 weg, Abriss-Fit mangels langsamer Punkte nicht gültig', () => {
+  const bs = require('./referenz/polarflug-sb10-klassen.json');
+  const r = PO.polarClean(bs); assert.deepEqual(r.out.map(b => b.v), [98, 102]);
+  const alt = PO.polarFit(bs), neu = PO.polarFit(r.bs);
+  near(alt.ld, 27.9, 0.1, 'bisher'); near(neu.ld, 29.8, 0.1, 'ohne Ausreisser');
+  // ohne Ausreisser liegt die Kurve im Schnellflug näher an den Klassen
+  for (const k of [74, 78]) { const b = r.bs.find(x => x.v === k); assert.ok(Math.abs(b.m - neu.w(k)) < Math.abs(b.m - alt.w(k)), 'Klasse ' + k); }
+  const f3 = PO.polarFit3(r.bs); assert.equal(f3.ok, false); assert.equal(f3.why, 'langsam');
+  near(f3.ld, 30.5, 0.1); near(f3.vbg, 49, 0.5);
+});
+
 // Gerader Gleitflug mit Fahrt v und Sinken w, eine Zeile alle 0,25 s
 function gleitflug({ v = 15, w = 0.6, dauer = 200, dt = 0.25, h0 = 300 } = {}) {
   const t = [], vv = [], alt = [], vario = [], crs = [];
