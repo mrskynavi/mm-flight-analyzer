@@ -150,4 +150,16 @@ async function pullSenderData(senderRoot, dir) {
   return out;
 }
 
-module.exports = { DEFAULT_REPO, DEFAULT_BRANCH, defaultDir, blobSha, header, listWidgets, fetchRepo, copyToSender, pullSenderData };
+// Dateiname wie im Widget: Lua ersetzt jedes Byte ausser [A-Za-z0-9-_] durch "_" (Umlaute also zweimal)
+const korrName = model => 'korrektur_' + [...Buffer.from(String(model ?? 'Modell'), 'utf8')]
+  .map(b => /[A-Za-z0-9\-_]/.test(String.fromCharCode(b)) && b < 128 ? String.fromCharCode(b) : '_').join('') + '.txt';
+// korrektur_<Modell>.txt lesen: { airK, tekX, fieldAlt, ... } als Zahlen, null wenn es keine gibt
+async function readKorrektur(dir, model) {
+  let text;
+  try { text = await fsp.readFile(path.join(dir, 'scripts', 'tekkal', korrName(model)), 'utf8'); } catch { return null; }
+  const out = {};
+  for (const m of text.matchAll(/^(\w+)=(.*)$/gm)) { const v = Number(m[2]); out[m[1]] = m[2] !== '' && Number.isFinite(v) ? v : m[2].trim(); }
+  return out;
+}
+
+module.exports = { DEFAULT_REPO, DEFAULT_BRANCH, defaultDir, blobSha, header, listWidgets, fetchRepo, copyToSender, pullSenderData, korrName, readKorrektur };

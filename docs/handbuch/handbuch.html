@@ -479,6 +479,7 @@ a { color: var(--acc); }
 <li><b>Glättung:</b> „Physikalisch“ legt die Kurve Sinken = A·v³ + B/v durch die Mediane, „Median“ zeigt die geglätteten Mediane pro 4-km/h-Klasse, „Aus“ zeichnet keine Kurve.</li>
 <li><b>Punkte</b> zeigt jede gezählte Sekunde, <b>Streuung</b> das Band der mittleren Hälfte der Punkte, <b>Einzel-Logs</b> die Polare jedes Logs zum Vergleich.</li>
 <li><b>Filter anwenden:</b> Es zählen nur Einträge, die bei allen Filtern im Tab Diagramme im Bereich liegen (<a href="#k10">Kapitel 10</a>), und zwar in allen gewählten Logs des Modells. So entsteht z. B. eine Polare nur aus ruhiger Luft oder nur aus einem Höhenbereich. Ändern sich die Filter, rechnet die Polare neu.</li>
+<li><b>Fahrt aus:</b> „Fahrtmesser“ (Vorgabe) nimmt die Fahrt aus dem Fahrtmesser im Log (z. B. Fluggeschw. des SM GPS-Logger 3), mal der Fahrt-Korrektur der TEK-Kalibrierung für dieses Modell, und rechnet sie auf TAS um. Logs ohne Fahrtmesser und „GPS − Wind“ nehmen die TAS aus GPS-Geschwindigkeit minus geschätztem Wind. Die Korrektur holt die App beim Anschliessen des Senders.</li>
 </ul>
 <h2>So wird gerechnet</h2>
 <p>Jeder Punkt ist eine Sekunde Gleitflug: Motor aus (und 15 s danach), geradeaus (Kursänderung unter 8°/s) und ohne starkes Beschleunigen. Die Fahrt ist die TAS, ohne Wind die GPS-Geschwindigkeit; das Sinken kommt vom Vario, korrigiert um Fahrtänderungen. Pro 4-km/h-Klasse zählt der Median. Details stehen im ⓘ neben „Polare“.</p>

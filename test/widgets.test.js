@@ -68,3 +68,11 @@ test('Korrekturen der TEK-Kalibrierung: vom Sender ins Benutzerverzeichnis, nie 
   assert.strictEqual(fs.readFileSync(path.join(radio, 'scripts', 'tekkal', 'korrektur_ASW-17.txt'), 'utf8'), 'airK=1050\n');
   assert.deepStrictEqual(await W.pullSenderData(tmp(), dir), []);   // Sender ohne tekkal
 });
+
+test('readKorrektur: Dateiname wie im Widget (Lua, pro Byte), Werte als Zahlen', async () => {
+  const dir = tmp();
+  assert.strictEqual(W.korrName('Kä 6'), 'korrektur_K___6.txt');
+  put(path.join(dir, 'scripts', 'tekkal', 'korrektur_ASW-17.txt'), 'tekX=-20\nairK=1045\nfieldAlt=400\nair=Fluggeschw.\n');
+  assert.deepStrictEqual(await W.readKorrektur(dir, 'ASW-17'), { tekX: -20, airK: 1045, fieldAlt: 400, air: 'Fluggeschw.' });
+  assert.strictEqual(await W.readKorrektur(dir, 'SB-10'), null);
+});

@@ -127,6 +127,8 @@ function simWatch(dir) {
     w.dir = dir; simWatcher = w;
   } catch { /* Ordner ohne Beobachtung: Änderungen erst nach erneutem Wählen */ }
 }
+// Korrektur der TEK-Kalibrierung eines Modells (vom Sender geholt, siehe WG.pullSenderData), z. B. für die Polare
+ipcMain.handle('korr:get', (_, model) => WG.readKorrektur(settings.widgetDir, model));
 ipcMain.handle('scripts:write', (_, rel, text) => {
   if (!simDir) throw new Error('Kein scripts-Ordner gewählt.');
   return S.writeScript(simDir, String(rel), text);
