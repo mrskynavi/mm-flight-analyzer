@@ -23,6 +23,10 @@ html = html.replace(cdn, '<script src="chart.umd.min.js"></script>');
 const luaCdn = /<script src="https:\/\/cdn\.jsdelivr\.net\/npm\/fengari-web@[^"]+"><\/script>/;
 if (!luaCdn.test(html)) throw new Error('fengari-Einbindung in web/index.html nicht gefunden');
 html = html.replace(luaCdn, '<script src="fengari-web.js"></script>');
+// QR-Leser (Tab SkyNavigator) ebenfalls lokal
+const qrCdn = /<script src="https:\/\/cdn\.jsdelivr\.net\/npm\/jsqr@[^"]+"><\/script>/;
+if (!qrCdn.test(html)) throw new Error('jsQR-Einbindung in web/index.html nicht gefunden');
+html = html.replace(qrCdn, '<script src="jsQR.js"></script>');
 
 const head = `
 <link rel="manifest" href="manifest.webmanifest">
@@ -68,6 +72,11 @@ html = html.trimEnd() + '\n' + tail + od;
 fs.writeFileSync(path.join(out, 'index.html'), html);
 fs.copyFileSync(path.join(root, 'node_modules', 'chart.js', 'dist', 'chart.umd.js'), path.join(out, 'chart.umd.min.js'));
 fs.copyFileSync(path.join(root, 'node_modules', 'fengari-web', 'dist', 'fengari-web.js'), path.join(out, 'fengari-web.js'));
+fs.copyFileSync(path.join(root, 'node_modules', 'jsqr', 'dist', 'jsQR.js'), path.join(out, 'jsQR.js'));
+// Rechenkern (web/core/*.js) neben index.html
+const coreFiles = fs.readdirSync(path.join(root, 'web', 'core')).filter(f => f.endsWith('.js')).sort();
+fs.mkdirSync(path.join(out, 'core'), { recursive: true });
+for (const f of coreFiles) fs.copyFileSync(path.join(root, 'web', 'core', f), path.join(out, 'core', f));
 fs.copyFileSync(path.join(pwa, 'manifest.webmanifest'), path.join(out, 'manifest.webmanifest'));
 if (clientId) {
   fs.copyFileSync(path.join(root, 'node_modules', '@azure', 'msal-browser', 'lib', 'msal-browser.min.js'), path.join(out, 'msal-browser.min.js'));
@@ -89,7 +98,7 @@ if (sample && fs.existsSync(path.join(root, 'web', 'beispiel.csv'))) {
 fs.writeFileSync(path.join(out, '.nojekyll'), '');
 
 // Offline-Grundausstattung; das Beispiel-Log (2,7 MB) wird erst beim ersten Laden gemerkt
-const shell = ['./', 'index.html', 'chart.umd.min.js', 'fengari-web.js', 'manifest.webmanifest', ...icons.map(f => 'icons/' + f),
+const shell = ['./', 'index.html', 'chart.umd.min.js', 'fengari-web.js', 'jsQR.js', ...coreFiles.map(f => 'core/' + f), 'manifest.webmanifest', ...icons.map(f => 'icons/' + f),
   ...(clientId ? ['msal-browser.min.js', 'onedrive.js'] : [])];
 const hash = crypto.createHash('sha256');
 for (const f of shell.slice(1)) hash.update(fs.readFileSync(path.join(out, f)));

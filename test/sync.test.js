@@ -210,3 +210,22 @@ test('Nach dem Log-Sync eines Ethos-Senders kommen die Widgets, einmal pro Ansch
   assert.deepEqual(calls, [[vol.root]]); assert.equal(s.widgets.results.length, 1);
   await w.poll(); assert.equal(calls.length, 1);
 });
+
+test('Gesperrte Datei (Cloud-Ordner lädt hoch): nochmals versuchen statt Fehler', async () => {
+  let n = 0;
+  const r = await S.retry(async () => { if (++n < 3) { const e = new Error('Resource deadlock avoided'); e.code = 'EDEADLK'; throw e; } return 'ok'; }, [1, 1, 1]);
+  assert.equal(r, 'ok'); assert.equal(n, 3);
+  n = 0;
+  await assert.rejects(S.retry(async () => { n++; const e = new Error('nope'); e.code = 'ENOENT'; throw e; }, [1, 1]), /nope/);
+  assert.equal(n, 1);   // dauerhafter Fehler: kein Wiederholen
+  const e = new Error('EDEADLK: resource deadlock avoided, open x'); e.code = 'EDEADLK';
+  assert.match(S.errText(e), /gesperrt/);
+});
+
+test('Log aus dem Archiv lesen und Anfang/Ende für die Liste', async () => {
+  const d = tmp(), p = path.join(d, 'a.csv');
+  put(p, 'Kopf\n' + 'x'.repeat(100) + '\nEnde');
+  assert.equal(String(await S.readFileRetry(p)), fs.readFileSync(p, 'utf8'));
+  const pk = await S.peekRetry(p, 10);
+  assert.equal(pk.head, 'Kopf\nxxxxx'); assert.equal(pk.tail, 'xxxxx\nEnde'); assert.equal(pk.size, fs.statSync(p).size);
+});

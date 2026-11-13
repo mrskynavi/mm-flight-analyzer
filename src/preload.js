@@ -37,4 +37,5 @@ contextBridge.exposeInMainWorld('ethosDesktop', {
   skynavSave: (data, lua, toSender) => ipcRenderer.invoke('skynav:save', data, lua, toSender),
   skynavFetch: () => ipcRenderer.invoke('skynav:fetch'),
   skynavOpen: () => ipcRenderer.invoke('skynav:open'),
+  cameraAsk: () => ipcRenderer.invoke('camera:ask'),
 });

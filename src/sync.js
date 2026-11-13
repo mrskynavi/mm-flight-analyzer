@@ -168,17 +168,53 @@ async function findJetiDirs(vols, force = false) {
   return found;
 }
 
-async function copyOne(f) {
+// Cloud-Ordner (OneDrive, Google Drive, iCloud) sperren eine frisch geschriebene Datei kurz, solange sie
+// hochgeladen wird; macOS meldet dann z. B. EDEADLK ("Resource deadlock avoided") oder EBUSY. Ein Wechselmedium
+// kann kurz EIO melden. Solche Fehler gehen nach einem Moment vorbei: ein paar Mal mit Pause nochmals versuchen.
+const TRANSIENT = new Set(['EDEADLK', 'EBUSY', 'EAGAIN', 'ETIMEDOUT', 'EIO', 'ECANCELED', 'EINTR', 'ENOTCONN', 'ESTALE']);
+const isTransient = e => !!e && TRANSIENT.has(e.code);
+const pause = ms => new Promise(r => setTimeout(r, ms));
+async function retry(fn, waits = [300, 800, 1500, 3000]) {
+  for (let i = 0; ; i++) {
+    try { return await fn(); }
+    catch (e) { if (i >= waits.length || !isTransient(e)) throw e; await pause(waits[i]); }
+  }
+}
+const readFileRetry = (p, waits) => retry(() => fsp.readFile(p), waits);
+// Anfang und Ende einer Datei (für die Liste: Dauer, Sensoren), mit denselben Wiederholungen
+const peekRetry = (p, n, waits) => retry(async () => {
+  const fh = await fsp.open(p, 'r');
+  try {
+    const { size } = await fh.stat(), len = Math.min(n, size);
+    const head = Buffer.alloc(len), tail = Buffer.alloc(len);
+    await fh.read(head, 0, len, 0); await fh.read(tail, 0, len, Math.max(0, size - len));
+    return { head: decodeText(head), tail: decodeText(tail), size };
+  } finally { await fh.close(); }
+}, waits);
+// Fehlermeldung mit verständlichem Grund (der Code bleibt dran, damit man ihn melden kann)
+function errText(e) {
+  const m = String(e && e.message || e);
+  if (!e || !e.code) return m;
+  if (e.code === 'EDEADLK' || e.code === 'EBUSY') return `Datei ist gerade gesperrt, vermutlich lädt der Cloud-Ordner sie hoch. Bitte gleich nochmals versuchen. (${m})`;
+  if (e.code === 'EIO') return `Lesefehler auf dem Laufwerk. (${m})`;
+  if (e.code === 'ENOENT') return `Datei nicht gefunden. (${m})`;
+  return m;
+}
+
+async function copyOne(f, waits) {
   await fsp.mkdir(path.dirname(f.dest), { recursive: true });
   const tmp = f.dest + '.part';
-  try { await fsp.copyFile(f.src, tmp); }
+  try { await retry(() => fsp.copyFile(f.src, tmp), waits); }
   catch (e) { await fsp.unlink(tmp).catch(() => {}); throw e; }
-  await fsp.rename(tmp, f.dest);
+  // Kopie vollständig? Sonst nicht als fertiges Log ablegen (beim nächsten Sync kommt es nochmals)
+  const got = (await fsp.stat(tmp)).size;
+  if (got !== f.size) { await fsp.unlink(tmp).catch(() => {}); throw new Error(`Kopie unvollständig (${got} von ${f.size} Bytes)`); }
+  await retry(() => fsp.rename(tmp, f.dest), waits);
   const t = new Date(f.mtime);
   try { await fsp.utimes(f.dest, t, t); } catch {}
 }
 
-async function syncDir(src, archive, onProgress = () => {}, jeti = false) {
+async function syncDir(src, archive, onProgress = () => {}, jeti = false, opts = {}) {
   const { files, todo, skipped } = await plan(src, archive, jeti);
   const bytes = todo.reduce((a, f) => a + f.size, 0);
   const res = { source: src, total: files.length, skipped, copied: [], errors: [], bytes };
@@ -186,12 +222,12 @@ async function syncDir(src, archive, onProgress = () => {}, jeti = false) {
   onProgress({ state: 'copy', source: src, total: todo.length, done: 0, skipped, bytes, doneBytes });
   for (const f of todo) {
     onProgress({ state: 'copy', source: src, total: todo.length, done: res.copied.length + res.errors.length, skipped, bytes, doneBytes, file: f.name });
-    try { await copyOne(f); res.copied.push({ name: f.name, model: modelOf(f.name), path: f.dest }); }
+    try { await copyOne(f, opts.waits); res.copied.push({ name: f.name, model: modelOf(f.name), path: f.dest }); }
     catch (e) {
       if (isDenied(e)) throw e;
       // Sender während dem Sync abgezogen: kein Fehler pro Datei, sondern abbrechen
       if (!(await isDir(src))) { res.interrupted = true; res.left = todo.length - res.copied.length - res.errors.length; break; }
-      res.errors.push({ name: f.name, error: e.message });
+      res.errors.push({ name: f.name, error: errText(e) });
     }
     doneBytes += f.size;
   }
@@ -364,4 +400,4 @@ class SyncWatcher extends EventEmitter {
   }
 }
 
-module.exports = { denied, modelOf, safeDir, decodeText, volumes, findSenderDirs, findJetiDirs, listCsv, listJeti, syncDir, archiveFile, writePolars, readScripts, writeScript, listArchive, defaultArchive, SyncWatcher };
+module.exports = { retry, isTransient, readFileRetry, peekRetry, errText, denied, modelOf, safeDir, decodeText, volumes, findSenderDirs, findJetiDirs, listCsv, listJeti, syncDir, archiveFile, writePolars, readScripts, writeScript, listArchive, defaultArchive, SyncWatcher };
