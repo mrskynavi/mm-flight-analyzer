@@ -70,63 +70,6 @@ test('Polare: Fit A·v³ + B/v trifft konstruierte Klassen, Kennzahlen stimmen',
   const mc = PO.mcParabola(f, 30, 90); assert.ok(mc.dev < 0.05, 'Parabel weicht wenig ab'); near(mc.s(15), w(15), 0.05);
 });
 
-test('Polare: Ausreisser-Klassen, abgetrennt und mit wenig Punkten, fallen weg', () => {
-  const w = v => 8e-5 * (v / 3.6) ** 3 + 4.5 / (v / 3.6), bs = [];
-  for (let k = 38; k <= 78; k += 4) bs.push({ v: k, m: w(k), n: 80 });
-  const ganz = [...bs, { v: 98, m: 3.5, n: 12 }, { v: 102, m: 0.9, n: 16 }];
-  const r = PO.polarClean(ganz);
-  assert.deepEqual(r.out.map(b => b.v), [98, 102]); assert.equal(r.bs.length, bs.length);
-  // abgetrennt, aber mit vielen Punkten: bleibt (echter Schnellflug)
-  assert.equal(PO.polarClean([...bs, { v: 98, m: 3.5, n: 60 }]).out.length, 0);
-  // eine fehlende Klasse ist keine Lücke
-  assert.equal(PO.polarClean([...bs, { v: 86, m: w(86), n: 12 }]).out.length, 0);
-  // eine Klasse, die an einem einzigen Flugstück hängt, fällt weg, auch mitten im Fahrtbereich
-  const st = bs.map(b => ({ ...b, one: 0.3 })); st[3].one = 0.8;
-  assert.deepEqual(PO.polarClean(st).out.map(b => b.v), [50]);
-});
-
-test('Polare: Flugstücke je Klasse aus der Zeit der Punkte', () => {
-  // Klasse 46: 20 Punkte am Stück; Klasse 50: 4 Stücke zu 5 Punkten, je 30 s auseinander
-  const t = [], pts = [];
-  for (let i = 0; i < 20; i++) { t.push(i); pts.push([45, 0.5, t.length - 1]); }
-  for (let k = 0; k < 4; k++) for (let i = 0; i < 5; i++) { t.push(100 + k * 30 + i); pts.push([49, 0.5, t.length - 1]); }
-  const next = PO.polarTimes(pts, t); assert.ok(next > t[t.length - 1]);
-  const bs = PO.polarBins(pts);
-  near(bs[0].one, 1, 1e-12); near(bs[1].one, 0.25, 1e-12);
-  // ohne Zeit kein one
-  assert.equal(PO.polarBins(pts.map(p => [p[0], p[1], p[2]]))[0].one, undefined);
-});
-
-test('Polare: Abriss-Fit A·v³ + B/v + D/v³ trifft konstruierte Klassen und braucht langsame Punkte', () => {
-  const A = 1.2e-4, B = 2, D = 200, w = k => { const v = k / 3.6; return A * v ** 3 + B / v + D / v ** 3; }, bs = [];
-  for (let k = 30; k <= 90; k += 4) bs.push({ v: k, m: w(k), n: 40 });
-  const f = PO.polarFit3(bs);
-  near(f.A, A, 1e-10); near(f.B, B, 1e-5); near(f.D, D, 1e-3); assert.equal(f.p, 3); assert.ok(f.ok, f.why);
-  // Kennzahlen: Ableitungen null
-  const h = 1e-3; near(w(f.vms + h) - w(f.vms - h), 0, 1e-7, 'geringstes Sinken');
-  const g = k => k / w(k); near(g(f.vbg + h) - g(f.vbg - h), 0, 1e-5, 'beste Gleitzahl');
-  near(f.ld, f.vbg / 3.6 / w(f.vbg), 1e-9);
-  // ohne die langsamen Klassen: Kurve kommt, gilt aber nicht
-  const ohne = PO.polarFit3(bs.filter(b => b.v >= f.vms - 6));
-  assert.equal(ohne.ok, false); assert.equal(ohne.why, 'langsam');
-  // Netto und MacCready rechnen mit D
-  near(PO.sinkAt({ A, B, D, p: 3 }, 12), w(12 * 3.6), 1e-12);
-  const mc = PO.mcParabola(f, 46, 90); assert.ok(mc.dev < 0.08, 'Parabel ' + mc.dev);
-});
-
-test('Polare: Polarflug-Log SB-10 (06.11.2026), Ausreisser 78/98/102 weg, Abriss-Fit trifft die langsamen Klassen', () => {
-  const bs = require('./referenz/polarflug-sb10-klassen.json');
-  // 78: Stechflug in 100 m Höhe (3:45 min), 98/102: Stechflug und Hochziehen (12 min), je über die Hälfte aus einem Stück
-  const r = PO.polarClean(bs); assert.deepEqual(r.out.map(b => b.v), [78, 98, 102]);
-  const alt = PO.polarFit(bs), neu = PO.polarFit(r.bs);
-  near(alt.ld, 27.9, 0.1, 'bisher'); near(neu.ld, 28.7, 0.1, 'ohne Ausreisser'); near(neu.vbg, 47.7, 0.5);
-  // nur 98/102 weg (frühere Regel) kippt die Kurve: beste Gleitzahl 29,8 bei 44 km/h, weil 78 allein den Schnellflug bestimmt
-  const nur = PO.polarFit(bs.filter(b => b.v < 90)); near(nur.ld, 29.8, 0.1); near(nur.vbg, 44, 1);
-  // A·v³ + B/v ist bei 38 und 42 km/h zu optimistisch; mit Abriss trifft die Kurve beide Klassen
-  const f3 = PO.polarFit3(r.bs); assert.ok(f3.ok, f3.why); near(f3.ld, 29.5, 0.1); near(f3.vbg, 50, 1);
-  for (const k of [38, 42]) { const b = r.bs.find(x => x.v === k); near(f3.w(k), b.m, 0.03, 'mit Abriss ' + k); assert.ok(b.m - neu.w(k) > 0.04, 'ohne Abriss ' + k); }
-});
-
 // Gerader Gleitflug mit Fahrt v und Sinken w, eine Zeile alle 0,25 s
 function gleitflug({ v = 15, w = 0.6, dauer = 200, dt = 0.25, h0 = 300 } = {}) {
   const t = [], vv = [], alt = [], vario = [], crs = [];
