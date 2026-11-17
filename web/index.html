@@ -4305,6 +4305,9 @@ function polarAB(log){
 function addTek(log, ch){
   const tas=log.cols.find(c=>c.key==='tas'); if (!tas || !ch.vario) return;
   const f=speedFactor(tas.unit)??speedMs(), motor=motorOnLog(log, ch), d={t:log.t, tas:tas.vals.map(x=>x*f), vario:ch.vario.vals, alt:ch.alt?.vals, motor};
+  // Vario-Eichfaktor aus dem Flug (Höhenrate gegen Vario); ohne sichere Schätzung bleibt er bei 1
+  const vf=ch.alt ? MMFA.energie.varioLernen({t:log.t, vario:ch.vario.vals, alt:ch.alt.vals}) : null;
+  log.varioFaktor=vf?.ok ? vf.faktor : null; if (vf?.ok) d.varioFaktor=vf.faktor;
   const r0=MMFA.energie.tekNetto(d);
   addCol(log,'tek',T('Vario TEK'),'m/s',r0.tek,T('Vario plus Änderung der Fahrt-Energie aus {s}: Steigen ohne Knüppelthermik, 3 s gemittelt; nicht bei Motor und 15 s danach',{s:'TAS'})).gaps=true;
   const ab=polarAB(log); if (!ab) return;
