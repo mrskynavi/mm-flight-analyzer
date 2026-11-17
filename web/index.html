@@ -1466,6 +1466,8 @@ loadfile = function(p, mode, env)
   if env then return realLoad(t, "@" .. p, mode or "t", env) end
   return realLoad(t, "@" .. p, mode or "t")
 end
+-- loadScript wie am Sender: Lua-Datei aus dem SD-Laufwerk als Funktion (z. B. gemeinsame Module)
+loadScript = function(p) local f = loadfile(p) return f end
 local loaded = {}
 require = function(name)
   if loaded[name] ~= nil then return loaded[name] end
