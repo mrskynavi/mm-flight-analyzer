@@ -1043,7 +1043,7 @@ pre.code{background:var(--bg);border:1px solid var(--line);border-radius:8px;pad
           <label><input type="checkbox" id="polEach"> Einzel-Logs</label>
           <label title="Nur Einträge, die bei allen Filtern im Tab Diagramme im Bereich liegen, in allen Logs des Modells"><input type="checkbox" id="polFilt"> Filter anwenden</label>
           <span class="pol-rng" title="Fahrtfilter: Nur Gleitpunkte in diesem Fahrtbereich fliessen in die Kurve. Langsame Punkte, in denen das Modell nicht mehr sauber fliegt, verschieben sonst die beste Gleitzahl. Leer = keine Grenze. Gehört zur Version der Polare."><span>Fahrt für Kurve ab</span><input type="text" id="polVmin" inputmode="decimal" placeholder="–" aria-label="Fahrtfilter: kleinste Fahrt"><span>bis</span><input type="text" id="polVmax" inputmode="decimal" placeholder="–" aria-label="Fahrtfilter: grösste Fahrt"><span id="polRngU">km/h</span></span>
-          <span class="pol-rng pol-kl" title="Klappenfilter: Nur Gleitpunkte mit dieser Klappenstellung (Wölbung je Klappenpaar in % Servoweg, ± 4 %) fliessen in die Kurve. Die Stellungen findet die App in den Logs des Modells. Gehört zur Version der Polare."><span>Klappen</span><select id="polKl" aria-label="Klappenstellung für die Polare"></select><input type="text" id="polKlPaare" placeholder="auto" aria-label="Klappenpaare des Modells, z. B. K1/K5 K6/K7" title="Klappenpaare dieses Modells, links/rechts, z. B. K1/K5 K6/K7 K8/K9. Leer = automatisch aus den Logs (das Paar, dessen Summe oder Differenz dem Querruderknüppel folgt)."></span>
+          <span class="pol-rng pol-kl" title="Klappenfilter: Nur Gleitpunkte mit dieser Klappenstellung (Wölbung je Klappenpaar in % Servoweg, ± 4 %) fliessen in die Kurve. Die Stellungen findet die App in den Logs des Modells. Gehört zur Version der Polare."><span>Klappen</span><select id="polKl" aria-label="Klappenstellung für die Polare"></select><input type="text" id="polKlPaare" placeholder="auto" aria-label="Klappenpaare des Modells, z. B. K1/K5 K6/K7" title="Klappenpaare dieses Modells, links/rechts, z. B. K1/K5 K6/K7 K8/K9. Leer = automatisch aus den Logs (das Paar, dessen Summe oder Differenz dem Querruderknüppel folgt)."><input type="text" id="polKlStrak" placeholder="auto" aria-label="Strak in % Servoweg je Klappenpaar, z. B. +6 / −5 / +61" title="Strak = Gleitstellung der Klappen in % Servoweg je Paar, gleiche Reihenfolge wie die Paare. Leer = die häufigste Stellung in den Logs (Standard: die 81 %-Stellung der SB-10). Null der normierten Anzeige = Strak."><select id="polKlVz" aria-label="Richtung oben" title="Welche Richtung der Servo-Werte oben ist. Normiert wird so, dass oben negativ und unten positiv ist."><option value="1">+ = unten (Standard)</option><option value="-1">+ = oben</option></select></span>
         </div>
         <div class="note warn" id="polNote" role="status" hidden></div>
         <div class="pol-cv"><canvas id="polChart" aria-label="Polare: Sinken über Fluggeschwindigkeit"></canvas><div class="pol-empty" id="polEmpty" hidden></div></div>
@@ -5736,6 +5736,20 @@ function polarPoints(log){
 // Gespeichert pro Modell als Text „K1/K5 K6/K7 K8/K9“; leer = aus dem Log vorschlagen (Summe oder Differenz folgt dem Querruderknüppel).
 const klKey = () => mkey('klappen');
 const klText = () => store.get(klKey()) || '';
+// Strak und Richtung je Modell (nur Anzeige: die Filter arbeiten weiter mit den Rohwerten in % Servoweg)
+const klStrakKey = () => mkey('klappen.strak');
+const klVzKey = () => mkey('klappen.vz');
+function klStrak(){ try{ const a=JSON.parse(store.get(klStrakKey())||'null'); return Array.isArray(a) && a.length ? a : null; }catch(e){ return null; } }
+function klVz(){ return store.get(klVzKey())==='-1' ? -1 : 1; }
+const klStrakParse = s => { const n=(s||'').match(/[+\-−]?\d+(\.\d+)?/g); return n ? n.map(x=>+x.replace('−','-')) : null; };
+// Strak wirksam: gespeichert, sonst die häufigste Stellung der Logs
+const klStrakEff = st => klStrak() || (st && st.length ? MMFA.klappen.strakWahl(st) : null);
+// Normierte Anzeige einer Stellung: 0 = Strak, oben negativ, unten positiv
+function klTxtN(kl, st){
+  const s=klStrakEff(st); if (!kl || !s || s.length!==kl.mitte.length) return klTxt(kl);
+  const v=MMFA.klappen.normiert(kl.mitte, s, kl.mitte.map(()=>klVz()));
+  return v.map(x=>(Math.abs(x)<0.5 ? '0' : (x>0?'+':'−')+fmt(Math.abs(x),0))).join(' / ')+' %';
+}
 function klParse(s){ return (s||'').toUpperCase().split(/[\s,;]+/).map(x=>x.split('/')).filter(p=>p.length===2 && /^K\d+$/.test(p[0]) && /^K\d+$/.test(p[1])).map(([l,r])=>({l,r})); }
 const klPaarTxt = ps => ps.map(p=>p.l+'/'+p.r).join(' ');
 function servoCols(log){ const k={}; for (const c of log.cols) if (!c.derived && /^K\d+$/.test(c.name)) k[c.name]=c.vals; return k; }
@@ -6295,6 +6309,10 @@ async function mcOnSync(s){
   $('#polKlPaare').addEventListener('change', e=>{ const ps=klParse(e.target.value), txt=klPaarTxt(ps);
     e.target.classList.toggle('bad', !!e.target.value.trim() && !ps.length); if (e.target.value.trim() && !ps.length) return;
     if (txt) store.set(klKey(), txt); else store.del(klKey()); e.target.value=txt; POLAR_CACHE.clear(); renderPolar(); });
+  $('#polKlStrak').addEventListener('change', e=>{ const a=klStrakParse(e.target.value);
+    if (a && a.length) store.set(klStrakKey(), JSON.stringify(a)); else store.del(klStrakKey());
+    POLAR_CACHE.clear(); renderPolar(); });
+  $('#polKlVz').addEventListener('change', e=>{ store.set(klVzKey(), e.target.value); POLAR_CACHE.clear(); renderPolar(); });
   for (const id of ['#polVmin','#polVmax']){ $(id).addEventListener('change',rngIn); $(id).addEventListener('keydown',e=>{ if (e.key==='Enter'){ e.target.blur(); rngIn(); } }); }
   for (const [id,key] of [['#polPts','pts'],['#polBand','band'],['#polEach','each']]){
     $(id).checked=PST[key]; $(id).addEventListener('change',e=>{ PST[key]=e.target.checked; store.set('polar.'+key,PST[key]?'1':'0'); drawPolar(); }); }
@@ -7242,11 +7260,14 @@ function polRngUi(rg,K){
 // Auswahl der Klappenstellung: gefundene Stellungen des Modells, dazu die gespeicherte, falls sie nicht mehr dabei ist
 function polKlUi(rg){
   const sel=$('#polKl'), st=POLAR_LOGS?.kl||[], cur=rg.kl, num=['①','②','③','④','⑤','⑥','⑦','⑧'];
-  const opts=[`<option value="">${esc(T('alle Stellungen'))}</option>`].concat(st.map((s,i)=>`<option value="${i}">${num[i]||i+1} ${esc(klTxt(s))} (${fmt(s.anteil*100,0)} %)</option>`));
+  const opts=[`<option value="">${esc(T('alle Stellungen'))}</option>`].concat(st.map((s,i)=>`<option value="${i}">${num[i]||i+1} ${esc(klTxtN(s,st))} (${fmt(s.anteil*100,0)} %)</option>`));
   let val=''; if (cur){ const i=st.findIndex(s=>MMFA.klappen.passt(s.mitte,cur.mitte,0.05)); if (i>=0) val=String(i); else { opts.push(`<option value="x">${esc(T('gespeichert: {k}',{k:klTxt(cur)}))}</option>`); val='x'; } }
   sel.innerHTML=opts.join(''); sel.value=val; sel.classList.toggle('on', !!cur);
   sel.disabled=!st.length && !cur;
   const pe=$('#polKlPaare'); if (document.activeElement!==pe){ pe.value=klText(); pe.placeholder=POLAR_LOGS?.klAuto ? T('auto: {p}',{p:POLAR_LOGS.klAuto}) : T('auto'); }
+  const sk=$('#polKlStrak'), se=klStrakEff(st);
+  if (document.activeElement!==sk){ const a=klStrak(); sk.value=a ? a.map(x=>(x>0?'+':'')+x).join(' / ') : ''; sk.placeholder=se ? 'auto: '+se.map(x=>(x>0?'+':'')+fmt(x,0)).join(' / ') : 'auto'; }
+  $('#polKlVz').value=String(klVz());
 }
 function polSegSync(){
   for (const [id,key] of [['#polView','view'],['#polSmooth','smooth']]) $(id).querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.v===PST[key]));
