@@ -51,3 +51,13 @@ test('copyToSender kopiert immer, überschreibt ohne Sicherung, lässt Daten und
   assert.strictEqual(fs.readFileSync(path.join(radio, 'scripts', 'polarflug', 'punkte_SB-10.txt'), 'utf8'), 'daten');
   assert.ok(!fs.existsSync(path.join(radio, 'scripts', 'test')));
 });
+
+test('copyToSender kopiert scripts/gemeinsam/ immer mit, auch ohne Widget-Ordner', async () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'wdg-'));
+  const radio = fs.mkdtempSync(path.join(os.tmpdir(), 'rad-'));
+  const put = (p, t) => { fs.mkdirSync(path.dirname(p), { recursive: true }); fs.writeFileSync(p, t); };
+  put(path.join(dir, 'scripts', 'gemeinsam', 'vario.lua'), '-- @version 1.0\nM={}');
+  const r = await W.copyToSender(dir, radio, []);
+  assert.strictEqual(fs.readFileSync(path.join(radio, 'scripts', 'gemeinsam', 'vario.lua'), 'utf8'), '-- @version 1.0\nM={}');
+  assert.ok(r.some(x => x.name === 'gemeinsam' && x.files === 1));
+});
