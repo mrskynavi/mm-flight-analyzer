@@ -4309,7 +4309,7 @@ function addTek(log, ch){
   const vf=ch.alt ? MMFA.energie.varioLernen({t:log.t, vario:ch.vario.vals, alt:ch.alt.vals}) : null;
   log.varioFaktor=vf?.ok ? vf.faktor : null; if (vf?.ok) d.varioFaktor=vf.faktor;
   const r0=MMFA.energie.tekNetto(d);
-  addCol(log,'tek',T('Vario TEK'),'m/s',r0.tek,T('Vario plus Änderung der Fahrt-Energie aus {s}: Steigen ohne Knüppelthermik, 3 s gemittelt; nicht bei Motor und 15 s danach',{s:'TAS'})).gaps=true;
+  addCol(log,'tek',T('Vario TEK'),'m/s',r0.tek,T('Vario plus Änderung der Fahrt-Energie aus {s}: Steigen ohne Knüppelthermik, 3 s gemittelt; nicht bei Motor und 15 s danach',{s:'TAS'})+(vf?.ok?' · '+T('Vario-Eichfaktor {f} aus dem Flug gelernt',{f:fmt(vf.faktor,2)}):'')).gaps=true;
   const ab=polarAB(log); if (!ab) return;
   // Dichte nur, wenn die Polare auf Meereshöhe umgerechnet ist; ältere Versionen gelten so, wie sie geflogen wurden
   const sig=ab.isa ? sigmaLog(log, ch) : null, r=MMFA.energie.tekNetto({...d, ab, sigma:sig});
