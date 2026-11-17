@@ -28,11 +28,13 @@
   // Vario TEK = Vario + Änderung der Bewegungsenergie (TAS²/2g) pro Zeit.
   // Netto = Steigrate der Höhe (sonst Vario) + Energieänderung + Eigensinken aus der Polare: zeigt, wie die Luft steigt oder sinkt.
   // d: { t, tas (m/s), vario (m/s), alt (m, optional), motor (0/1 je Zeile), ab ({A, B} der Polare auf Meereshöhe, optional),
-  //      sigma (Dichteverhältnis je Zeile, optional; ohne = Meereshöhe wie bisher) }
+  //      sigma (Dichteverhältnis je Zeile, optional; ohne = Meereshöhe wie bisher), varioFaktor (optional, Standard 1) }
   // Ergebnis: tek (3 s gemittelt), net10, net3 (je NaN bei Motor und `after` s danach)
   function tekNetto(d, P = TEK) {
-    const { t, tas, vario, alt, motor, ab, sigma } = d, n = t.length;
-    const vs = smoothT(t, tas, P.tek), va = smoothT(t, vario, 0.5);
+    const { t, tas, vario, alt, motor, ab, sigma, varioFaktor = 1 } = d, n = t.length;
+    // varioFaktor: Eichfaktor des Vario-Sensors (1 = unverändert). Wirkt nur auf den absoluten Vario-Wert (TEK und Netto ohne Höhe),
+    // nicht auf Vorzeichen oder Zeitanteile.
+    const vs = smoothT(t, tas, P.tek), va = smoothT(t, vario.map(x => x * varioFaktor), 0.5);
     const E = vs.map(x => x * x / (2 * G)), off = new Uint8Array(n); let lm = -Infinity;
     // Netto aus der Höhe wie die Polare (polarPoints), damit beide zusammenpassen; TEK bleibt beim Vario
     const ar = alt ? smoothT(t, alt, 0.5) : null, ra = new Array(n).fill(NaN);

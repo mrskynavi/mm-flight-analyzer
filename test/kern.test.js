@@ -177,3 +177,12 @@ test('Klappen: Strak ist die häufigste Stellung', () => {
   assert.deepEqual(KL.strakWahl(st), [6, -5]);
   assert.equal(KL.strakWahl([]), null);
 });
+
+// Vario-Eichfaktor wirkt nur auf den absoluten Vario-Wert (TEK), nicht auf das Vorzeichen
+test('Energie: Vario-Eichfaktor skaliert TEK, Zeitanteile bleiben', () => {
+  const t = Array.from({ length: 60 }, (_, i) => i * 0.5), tas = t.map(() => 14), vario = t.map(() => 1);
+  const a = EN.tekNetto({ t, tas, vario, alt: null, motor: null });
+  const b = EN.tekNetto({ t, tas, vario, alt: null, motor: null, varioFaktor: 1.18 });
+  const ia = a.tek.findIndex(x => !isNaN(x)), ib = b.tek.findIndex(x => !isNaN(x));
+  assert.ok(Math.abs(b.tek[ib + 10] / a.tek[ia + 10] - 1.18) < 1e-6);
+});
