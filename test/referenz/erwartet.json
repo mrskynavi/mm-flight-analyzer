@@ -1,0 +1,317 @@
+{
+ "SB-10-2026-08-26-15-14-21.csv": {
+  "modell": "SB-10",
+  "zeilen": 3790,
+  "gleitpunkte": 567,
+  "windfits": 826,
+  "wind_kmh": 6.081,
+  "tas_kmh": 50.8807,
+  "gz": 68.1426,
+  "vbg_kmh": 37.2528,
+  "vms_kmh": 28.306,
+  "wmin": 0.1332,
+  "gz_410m": 61.9449,
+  "vbg_410m_kmh": 39.749,
+  "tek_median": 0.0168,
+  "netto_median": 0.2958,
+  "klappenpaare": [
+   "K1/K5:diff",
+   "K6/K7:diff",
+   "K8/K9:diff"
+  ]
+ },
+ "SB-10-2026-10-02-14-39-06.csv": {
+  "modell": "SB-10",
+  "zeilen": 5840,
+  "gleitpunkte": 986,
+  "windfits": 1025,
+  "wind_kmh": 20.0338,
+  "tas_kmh": 52.0805,
+  "gz": 25.5695,
+  "vbg_kmh": 41.0362,
+  "vms_kmh": 31.1808,
+  "wmin": 0.3911,
+  "gz_410m": 28.4602,
+  "vbg_410m_kmh": 36.3661,
+  "tek_median": -0.2535,
+  "netto_median": 0.4409,
+  "klappenpaare": [
+   "K1/K5:diff",
+   "K6/K7:diff",
+   "K8/K9:diff"
+  ]
+ },
+ "SB-10-2026-10-06-16-07-11.csv": {
+  "modell": "SB-10",
+  "zeilen": 7570,
+  "gleitpunkte": 1247,
+  "windfits": 1782,
+  "wind_kmh": 6.4338,
+  "tas_kmh": 50.997,
+  "gz": null,
+  "vbg_kmh": null,
+  "vms_kmh": null,
+  "wmin": null,
+  "gz_410m": null,
+  "vbg_410m_kmh": null,
+  "tek_median": -0.166,
+  "netto_median": null,
+  "klappenpaare": [
+   "K1/K5:diff",
+   "K6/K7:diff",
+   "K8/K9:diff"
+  ]
+ },
+ "SB-10-2026-10-09-15-51-23.csv": {
+  "modell": "SB-10",
+  "zeilen": 4173,
+  "gleitpunkte": 816,
+  "windfits": 550,
+  "wind_kmh": 12.4827,
+  "tas_kmh": 54.7144,
+  "gz": 22.1431,
+  "vbg_kmh": 55.7563,
+  "vms_kmh": 42.3656,
+  "wmin": 0.6137,
+  "gz_410m": 22.6883,
+  "vbg_410m_kmh": 51.3005,
+  "tek_median": -0.3802,
+  "netto_median": 0.3569,
+  "klappenpaare": [
+   "K1/K5:diff",
+   "K6/K7:diff",
+   "K8/K9:diff"
+  ]
+ },
+ "SB-10-2026-10-12-15-20-33.csv": {
+  "modell": "SB-10",
+  "zeilen": 4862,
+  "gleitpunkte": 1055,
+  "windfits": 1015,
+  "wind_kmh": 8.9015,
+  "tas_kmh": 50.259,
+  "gz": null,
+  "vbg_kmh": null,
+  "vms_kmh": null,
+  "wmin": null,
+  "gz_410m": null,
+  "vbg_410m_kmh": null,
+  "tek_median": -0.1311,
+  "netto_median": null,
+  "klappenpaare": [
+   "K1/K5:diff",
+   "K6/K7:diff",
+   "K8/K9:diff"
+  ]
+ },
+ "SB-10-2026-11-06-14-04-42.csv": {
+  "modell": "SB-10",
+  "zeilen": 4118,
+  "gleitpunkte": 1536,
+  "windfits": 188,
+  "wind_kmh": 7.6386,
+  "tas_kmh": 54.2789,
+  "gz": 25.6032,
+  "vbg_kmh": 52.4089,
+  "vms_kmh": 39.8222,
+  "wmin": 0.4989,
+  "gz_410m": 25.4833,
+  "vbg_410m_kmh": 50.8756,
+  "tek_median": -0.5144,
+  "netto_median": -0.0164,
+  "klappenpaare": [
+   "K1/K5:diff",
+   "K6/K7:diff",
+   "K8/K9:diff"
+  ]
+ },
+ "SB-10-2026-11-06-14-55-49.csv": {
+  "modell": "SB-10",
+  "zeilen": 2903,
+  "gleitpunkte": 1059,
+  "windfits": 229,
+  "wind_kmh": 6.7748,
+  "tas_kmh": 53.0095,
+  "gz": 29.7511,
+  "vbg_kmh": 57.3026,
+  "vms_kmh": 43.5406,
+  "wmin": 0.4694,
+  "gz_410m": 28.6664,
+  "vbg_410m_kmh": 49.1596,
+  "tek_median": -0.4268,
+  "netto_median": 0.0022,
+  "klappenpaare": [
+   "K1/K5:diff",
+   "K6/K7:diff",
+   "K8/K9:diff"
+  ]
+ },
+ "Shark-2026-10-12-14-02-56.csv": {
+  "modell": "Shark",
+  "zeilen": 9588,
+  "gleitpunkte": 875,
+  "windfits": 1304,
+  "wind_kmh": 9.4391,
+  "tas_kmh": 56.7683,
+  "gz": null,
+  "vbg_kmh": null,
+  "vms_kmh": null,
+  "wmin": null,
+  "gz_410m": null,
+  "vbg_410m_kmh": null,
+  "tek_median": -0.0534,
+  "netto_median": null,
+  "klappenpaare": [
+   "K1/K5:diff",
+   "K6/K7:diff",
+   "K8/K9:diff"
+  ]
+ },
+ "Shark-2026-10-12-15-53-29.csv": {
+  "modell": "Shark",
+  "zeilen": 5343,
+  "gleitpunkte": 639,
+  "windfits": 200,
+  "wind_kmh": 9.635,
+  "tas_kmh": 66.0997,
+  "gz": 27.5196,
+  "vbg_kmh": 66.7456,
+  "vms_kmh": 50.7157,
+  "wmin": 0.5911,
+  "gz_410m": 26.4224,
+  "vbg_410m_kmh": 64.9504,
+  "tek_median": -0.583,
+  "netto_median": 0.0823,
+  "klappenpaare": [
+   "K1/K5:diff",
+   "K6/K7:diff",
+   "K8/K9:diff"
+  ]
+ },
+ "Shark-2026-10-13-14-22-28.csv": {
+  "modell": "Shark",
+  "zeilen": 5444,
+  "gleitpunkte": 1080,
+  "windfits": 139,
+  "wind_kmh": 4.9678,
+  "tas_kmh": 57.1916,
+  "gz": 27.73,
+  "vbg_kmh": 57.7058,
+  "vms_kmh": 43.8469,
+  "wmin": 0.5072,
+  "gz_410m": 27.7573,
+  "vbg_410m_kmh": 57.9884,
+  "tek_median": -0.4952,
+  "netto_median": -0.0048,
+  "klappenpaare": [
+   "K1/K5:diff",
+   "K6/K7:diff",
+   "K8/K9:diff"
+  ]
+ },
+ "Shark-2026-10-13-15-10-28.csv": {
+  "modell": "Shark",
+  "zeilen": 4555,
+  "gleitpunkte": 885,
+  "windfits": 48,
+  "wind_kmh": 11.796,
+  "tas_kmh": 61.7783,
+  "gz": 28.3053,
+  "vbg_kmh": 60.5571,
+  "vms_kmh": 46.0134,
+  "wmin": 0.5214,
+  "gz_410m": 29.0325,
+  "vbg_410m_kmh": 57.9194,
+  "tek_median": -0.581,
+  "netto_median": -0.0041,
+  "klappenpaare": [
+   "K1/K5:diff",
+   "K6/K7:diff",
+   "K8/K9:diff"
+  ]
+ },
+ "Shark-2026-10-14-14-24-54.csv": {
+  "modell": "Shark",
+  "zeilen": 7490,
+  "gleitpunkte": 1275,
+  "windfits": 678,
+  "wind_kmh": 8.1287,
+  "tas_kmh": 52.6292,
+  "gz": 27.9739,
+  "vbg_kmh": 50.9196,
+  "vms_kmh": 38.6905,
+  "wmin": 0.4436,
+  "gz_410m": 27.8145,
+  "vbg_410m_kmh": 49.0743,
+  "tek_median": -0.3444,
+  "netto_median": 0.1797,
+  "klappenpaare": [
+   "K1/K5:diff",
+   "K6/K7:diff",
+   "K8/K9:diff"
+  ]
+ },
+ "Shark-2026-10-14-15-23-04.csv": {
+  "modell": "Shark",
+  "zeilen": 6935,
+  "gleitpunkte": 1191,
+  "windfits": 369,
+  "wind_kmh": 5.5777,
+  "tas_kmh": 52.2792,
+  "gz": 26.3717,
+  "vbg_kmh": 61.2364,
+  "vms_kmh": 46.5296,
+  "wmin": 0.5659,
+  "gz_410m": 25.8393,
+  "vbg_410m_kmh": 58.509,
+  "tek_median": -0.3978,
+  "netto_median": 0.0499,
+  "klappenpaare": [
+   "K1/K5:diff",
+   "K6/K7:diff",
+   "K8/K9:diff"
+  ]
+ },
+ "Shark-2026-10-16-14-17-23.csv": {
+  "modell": "Shark",
+  "zeilen": 6018,
+  "gleitpunkte": 1460,
+  "windfits": 48,
+  "wind_kmh": 5.5654,
+  "tas_kmh": 53.8964,
+  "gz": 31.0503,
+  "vbg_kmh": 64.492,
+  "vms_kmh": 49.0033,
+  "wmin": 0.5062,
+  "gz_410m": 31.425,
+  "vbg_410m_kmh": 64.4458,
+  "tek_median": -0.4168,
+  "netto_median": 0.0009,
+  "klappenpaare": [
+   "K1/K5:diff",
+   "K6/K7:diff",
+   "K8/K9:diff"
+  ]
+ },
+ "Shark-2026-10-16-14-57-46.csv": {
+  "modell": "Shark",
+  "zeilen": 5733,
+  "gleitpunkte": 1343,
+  "windfits": 13,
+  "wind_kmh": 7.7185,
+  "tas_kmh": 52.615,
+  "gz": 30.6272,
+  "vbg_kmh": 56.0263,
+  "vms_kmh": 42.5707,
+  "wmin": 0.4458,
+  "gz_410m": 30.1601,
+  "vbg_410m_kmh": 53.9441,
+  "tek_median": -0.4174,
+  "netto_median": -0.0184,
+  "klappenpaare": [
+   "K1/K5:diff",
+   "K6/K7:diff",
+   "K8/K9:diff"
+  ]
+ }
+}

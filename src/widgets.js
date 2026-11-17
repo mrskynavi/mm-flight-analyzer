@@ -12,6 +12,8 @@ const DEFAULT_BRANCH = 'main';
 const WIDGET_EXT = /\.(lua|luac|png|bmp|jpg|wav|txt|json|cfg|ini)$/i;
 // polaren.lua (Tab Polare) und skynav/aufgaben.lua (Tab SkyNavigator) schreibt die App selbst, nie aus dem Repo
 const SKIP = /^scripts\/(maccready\/polaren|skynav\/aufgaben)\.lua$/i;
+// Gemeinsame Module ohne main.lua: kein eigenes Widget, aber auf dem Sender nötig
+const SHARED_DIRS = ['gemeinsam'];
 
 function defaultDir(home = require('os').homedir()) {
   return path.join(home, 'Documents', 'MM Flight Analyzer', 'Widgets');
@@ -107,6 +109,20 @@ async function copyToSender(dir, senderRoot, off = []) {
   const src = path.join(dir, 'scripts'), dst = path.join(senderRoot, 'scripts');
   const skip = new Set(off);
   const res = [];
+  // Gemeinsame Module (scripts/gemeinsam/) gehen immer mit: alle Widgets rechnen mit derselben Datei
+  for (const sh of SHARED_DIRS) {
+    const r = { name: sh, title: 'gemeinsam: ' + sh, version: '', before: null, state: 'gemeinsam', files: 0 };
+    try {
+      for (const rel of await widgetFiles(path.join(src, sh))) {
+        await writeAtomic(path.join(dst, sh, ...rel.split('/')), await fsp.readFile(path.join(src, sh, ...rel.split('/'))));
+        r.files++;
+      }
+    } catch (e) {
+      if (e && (e.code === 'EPERM' || e.code === 'EACCES')) throw e;
+      r.state = 'fehler'; r.error = e.message;
+    }
+    if (r.files) res.push(r);
+  }
   for (const w of await listWidgets(src)) {
     if (skip.has(w.name)) continue;
     const onSender = path.join(dst, w.name, 'main.lua');
