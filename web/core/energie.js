@@ -75,7 +75,31 @@
     return out;
   }
 
-  const api = { TEK, GLIDE, smoothT, tekNetto, gleitzahl };
+  // Vario-Eichfaktor lernen: im ruhigen Geradeausflug ohne Motor entspricht die Höhenrate dem wahren Steigen/Sinken.
+  // Gesucht ist f mit f·Vario ≈ Höhenrate (Kleinste Quadrate durch den Nullpunkt). Nur Zeitpunkte mit fast konstanter Fahrt
+  // und merklichem Vario zählen. Ergebnis: { faktor, n, ok }; ok = genug Punkte und plausibel (0,6 … 1,6).
+  // d: { t, vario (m/s), alt (m), tas (m/s), motor (0/1 je Zeile) }.
+  function varioLernen(d, { half = 2, minN = 60, minAbs = 0.3, maxDV = 0.2 } = {}) {
+    const { t, vario, alt, tas, motor } = d, n = t.length;
+    const va = smoothT(t, vario, half), ar = smoothT(t, alt, half), vs = smoothT(t, tas, half);
+    let lm = -Infinity, sxy = 0, sxx = 0, cnt = 0;
+    for (let i = 0; i < n; i++) {
+      if (motor && motor[i]) lm = t[i];
+      if (t[i] - lm < 15 || isNaN(va[i]) || isNaN(ar[i]) || isNaN(vs[i])) continue;
+      if (Math.abs(va[i]) < minAbs) continue;
+      let j = i; while (j > 0 && t[j - 1] >= t[i] - 4) j--;
+      let k = i; while (k < n - 1 && t[k + 1] <= t[i] + 4) k++;
+      const dt = t[k] - t[j]; if (!(dt >= 6) || isNaN(vs[j]) || isNaN(vs[k])) continue;
+      if (Math.abs(vs[k] - vs[j]) / dt > maxDV) continue;
+      const rate = (ar[k] - ar[j]) / dt; if (isNaN(rate)) continue;
+      sxy += rate * va[i]; sxx += va[i] * va[i]; cnt++;
+    }
+    if (!(sxx > 0) || cnt < minN) return { faktor: null, n: cnt, ok: false };
+    const f = sxy / sxx;
+    return { faktor: +f.toFixed(3), n: cnt, ok: f >= 0.6 && f <= 1.6 };
+  }
+
+  const api = { TEK, GLIDE, smoothT, tekNetto, gleitzahl, varioLernen };
   if (isNode) module.exports = api;
   else { root.MMFA = root.MMFA || {}; root.MMFA.energie = api; }
 })(typeof self !== 'undefined' ? self : this);

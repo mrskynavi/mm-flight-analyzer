@@ -186,3 +186,15 @@ test('Energie: Vario-Eichfaktor skaliert TEK, Zeitanteile bleiben', () => {
   const ia = a.tek.findIndex(x => !isNaN(x)), ib = b.tek.findIndex(x => !isNaN(x));
   assert.ok(Math.abs(b.tek[ib + 10] / a.tek[ia + 10] - 1.18) < 1e-6);
 });
+
+// Vario-Eichfaktor lernen: Höhenrate = 1,18 × Vario im ruhigen Gleitflug
+test('Energie: Vario-Eichfaktor wird aus dem Flug gelernt', () => {
+  const t = Array.from({ length: 600 }, (_, i) => i * 0.5);
+  const vario = t.map((x, i) => -0.8 + 0.4 * Math.sin(i / 25));
+  const alt = [];
+  let h = 400; t.forEach((x, i) => { if (i) h += vario[i] * 1.18 * 0.5; alt.push(h); });
+  const tas = t.map(() => 13), motor = t.map(() => 0);
+  const r = EN.varioLernen({ t, vario, alt, tas, motor });
+  assert.equal(r.ok, true);
+  assert.ok(Math.abs(r.faktor - 1.18) < 0.03, 'faktor ' + r.faktor);
+});
