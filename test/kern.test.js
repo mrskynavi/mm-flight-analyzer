@@ -165,3 +165,15 @@ test('Klappen: gleich eingebaute Servos (Wölbung = Summe)', () => {
   assert.deepStrictEqual(p.map(x => x.art), ['sum']);
   near(KL.woelbung(L.t, k, p)[0][500], 50 * KL.PCT, 1e-9);
 });
+
+// Normierte Klappenstellung: 0 = Strak, negativ oben, positiv unten (Vorzeichen je Paar)
+test('Klappen: normiert auf Strak mit Vorzeichen je Paar', () => {
+  assert.deepEqual(KL.normiert([10, -5, 30], [4, -5, 30], [1, 1, -1]), [6, 0, -0]);
+  assert.deepEqual(KL.normiert([10], [4], [-1]), [-6]);
+  assert.deepEqual(KL.normiert([10], [4]), [6]);
+});
+test('Klappen: Strak ist die häufigste Stellung', () => {
+  const st = [{ mitte: [17, -16], anteil: 0.19 }, { mitte: [6, -5], anteil: 0.81 }];
+  assert.deepEqual(KL.strakWahl(st), [6, -5]);
+  assert.equal(KL.strakWahl([]), null);
+});

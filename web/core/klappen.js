@@ -119,7 +119,20 @@
   // Gehört der Vektor zur Stellung (Mitte ± tol)?
   const passt = (v, mitte, tol = KLAPPEN.tol) => !!v && v.length === mitte.length && abst(v, mitte) <= tol;
 
-  const api = { KLAPPEN, PCT, corr, std, zerlege, vorschlag, woelbung, vektor, stellungen, stellungVon, passt };
+  // Normierte Klappenstellung: 0 = Strak (Gleitstellung), negativ = Klappe nach oben, positiv = nach unten.
+  // Wölbung und Strak in % Servoweg je Paar (Vektoren gleicher Länge), vorzeichen je Paar +1 oder −1
+  // (welche Servorichtung „unten“ ist). Ergebnis in derselben Einheit wie die Eingabe, Anteile am Servoweg.
+  function normiert(woelb, strak, vorzeichen) {
+    return woelb.map((w, i) => (vorzeichen && vorzeichen[i] === -1 ? -1 : 1) * (w - strak[i]));
+  }
+
+  // Strak aus den Stellungen: die häufigste Stellung (größter Zeitanteil) gilt als Gleitstellung. Ohne Stellungen null.
+  function strakWahl(st) {
+    if (!st || !st.length) return null;
+    return st.reduce((best, s) => (s.anteil > best.anteil ? s : best)).mitte;
+  }
+
+  const api = { KLAPPEN, PCT, corr, std, zerlege, vorschlag, woelbung, vektor, stellungen, stellungVon, passt, normiert, strakWahl };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   else { root.MMFA = root.MMFA || {}; root.MMFA.klappen = api; }
 })(typeof self !== 'undefined' ? self : this);
