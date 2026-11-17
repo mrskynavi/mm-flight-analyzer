@@ -4313,7 +4313,18 @@ function addTek(log, ch){
   addCol(log,'netto',T('Netto-Vario'),'m/s',r.net10,T('Steigrate der Höhe plus Fahrt-Energie plus Eigensinken aus der Polare ({p}): zeigt, wie die Luft steigt oder sinkt; 10 s gemittelt',{p:ab.own?T('aus diesem Log'):T('Tab Polare')})+(sig?' · '+T('Luftdichte auf {h} m ü. M.',{h:fmt(log.platz.elev,0)}):'')).gaps=true;
   log.net3=r.net3; log.net10=r.net10;
 }
-function addDerived(log, ch){ log.cols=log.cols.filter(c=>!c.derived); log.net3=log.net10=null; log._tgeo=null; addPower(log); addWind(log, ch); addGlide(log, ch); addTek(log, ch); }
+// Klappenstellung je Paar als Diagrammwert, normiert: 0 = Strak, oben negativ. Strak und Richtung kommen aus den
+// Modelleinstellungen (Tab Polare), sonst ist der Strak die häufigste Stellung dieses Logs.
+function addFlap(log){
+  const W=klappenWoelbung(log), ps=log.klPaare; if (!W || !ps?.length) return;
+  const vz=klVz(), vec=log.t.map((_,i)=>MMFA.klappen.vektor(W,i));
+  const st=MMFA.klappen.stellungen(vec), s=klStrak()||MMFA.klappen.strakWahl(st);
+  ps.forEach((p,j)=>{
+    if (!W[j]) return; const sj=s&&s.length===ps.length ? s[j] : 0;
+    addCol(log, 'flap'+j, T('Klappe')+' '+p.l+'/'+p.r, '%', W[j].map(x=>vz*(x-sj)), T('Wölbung des Paares {l}/{r} in % Servoweg, 0 = Strak, oben negativ',{l:p.l,r:p.r}));
+  });
+}
+function addDerived(log, ch){ log.cols=log.cols.filter(c=>!c.derived); log.net3=log.net10=null; log._tgeo=null; addPower(log); addWind(log, ch); addGlide(log, ch); addTek(log, ch); addFlap(log); }
 const calc = key => LOG?.cols.find(c=>c.key===key);
 function flightTime(log, ch){
   if (!ch.alt) return null;
