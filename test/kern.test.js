@@ -193,8 +193,7 @@ test('Energie: Vario-Eichfaktor wird aus dem Flug gelernt', () => {
   const vario = t.map((x, i) => -0.8 + 0.4 * Math.sin(i / 25));
   const alt = [];
   let h = 400; t.forEach((x, i) => { if (i) h += vario[i] * 1.18 * 0.5; alt.push(h); });
-  const tas = t.map(() => 13), motor = t.map(() => 0);
-  const r = EN.varioLernen({ t, vario, alt, tas, motor });
+  const r = EN.varioLernen({ t, vario, alt });
   assert.equal(r.ok, true);
   assert.ok(Math.abs(r.faktor - 1.18) < 0.03, 'faktor ' + r.faktor);
 });

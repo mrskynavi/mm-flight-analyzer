@@ -75,27 +75,25 @@
     return out;
   }
 
-  // Vario-Eichfaktor lernen: im ruhigen Geradeausflug ohne Motor entspricht die Höhenrate dem wahren Steigen/Sinken.
-  // Gesucht ist f mit f·Vario ≈ Höhenrate (Kleinste Quadrate durch den Nullpunkt). Nur Zeitpunkte mit fast konstanter Fahrt
-  // und merklichem Vario zählen. Ergebnis: { faktor, n, ok }; ok = genug Punkte und plausibel (0,6 … 1,6).
-  // d: { t, vario (m/s), alt (m), tas (m/s), motor (0/1 je Zeile) }.
-  function varioLernen(d, { half = 2, minN = 60, minAbs = 0.3, maxDV = 0.2 } = {}) {
-    const { t, vario, alt, tas, motor } = d, n = t.length;
-    const va = smoothT(t, vario, half), ar = smoothT(t, alt, half), vs = smoothT(t, tas, half);
-    let lm = -Infinity, sxy = 0, sxx = 0, cnt = 0;
+  // Vario-Eichfaktor lernen: Vario und Höhenänderung messen dieselbe Bewegung, darum ist der Motor für die Eichung egal.
+  // Je Fenster W s: Höhenänderung Δh geteilt durch Zeit (Rate) gegen das mittlere Vario. Gesucht ist f mit f·Vario ≈ Rate
+  // (Kleinste Quadrate durch den Nullpunkt). Nur Fenster mit merklichem Steigen oder Sinken (|Vario| ≥ minAbs) zählen.
+  // Ergebnis: { faktor, n, ok }; ok = genug Fenster und plausibel (0,6 … 1,6).
+  // d: { t, vario (m/s), alt (m) }
+  function varioLernen(d, { W = 10, minN = 60, minAbs = 0.4 } = {}) {
+    const { t, vario, alt } = d, n = t.length;
+    let num = 0, den = 0, cnt = 0, j = 0;
     for (let i = 0; i < n; i++) {
-      if (motor && motor[i]) lm = t[i];
-      if (t[i] - lm < 15 || isNaN(va[i]) || isNaN(ar[i]) || isNaN(vs[i])) continue;
-      if (Math.abs(va[i]) < minAbs) continue;
-      let j = i; while (j > 0 && t[j - 1] >= t[i] - 4) j--;
-      let k = i; while (k < n - 1 && t[k + 1] <= t[i] + 4) k++;
-      const dt = t[k] - t[j]; if (!(dt >= 6) || isNaN(vs[j]) || isNaN(vs[k])) continue;
-      if (Math.abs(vs[k] - vs[j]) / dt > maxDV) continue;
-      const rate = (ar[k] - ar[j]) / dt; if (isNaN(rate)) continue;
-      sxy += rate * va[i]; sxx += va[i] * va[i]; cnt++;
+      if (isNaN(t[i]) || isNaN(alt[i])) continue;
+      while (j < i && t[j] < t[i] - W) j++;
+      const dt = t[i] - t[j]; if (dt < 0.9 * W || isNaN(alt[j])) continue;
+      let sv = 0, c = 0; for (let m = j; m <= i; m++) if (!isNaN(vario[m])) { sv += vario[m]; c++; }
+      if (c < 5) continue;
+      const vm = sv / c; if (Math.abs(vm) < minAbs) continue;
+      num += ((alt[i] - alt[j]) / dt) * vm; den += vm * vm; cnt++;
     }
-    if (!(sxx > 0) || cnt < minN) return { faktor: null, n: cnt, ok: false };
-    const f = sxy / sxx;
+    if (!(den > 0) || cnt < minN) return { faktor: null, n: cnt, ok: false };
+    const f = num / den;
     return { faktor: +f.toFixed(3), n: cnt, ok: f >= 0.6 && f <= 1.6 };
   }
 
