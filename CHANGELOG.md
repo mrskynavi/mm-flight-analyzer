@@ -2,6 +2,7 @@
 
 ## Unveröffentlicht
 
+- SkyNavigator, Restzeit-Sollfahrt: neue Einstellung „Index am Anfang“ (Standard 120 %). Mit diesem Index rechnet das Widget, bis zwei Runden konstant tiefer geflogen sind.
 - Neuer Tab SkyNavigator für GPS Triangle mit dem gleichnamigen Ethos-Widget: Aufgaben anlegen und verwalten (Klassen Light, Sport und Scale mit den Werten aus dem Reglement, Ursprung, Richtung, dTP, Einflug-Limits, Arbeitszeit, Maximalhöhe, Startfenster in Ortszeit, bis 5 Sicherheitszonen als Kreis oder Rechteck), mit Skizze von Dreieck, Sektoren, Startlinie und Zonen; Import und Export als .rct (Triangle Definition V1.7). Eine Aufgabe ist als aktiv markiert, am Sender lässt sich auch eine andere wählen.
 - Die Desktop-App schreibt die Aufgaben bei jedem Anschliessen des Senders nach scripts/skynav/aufgaben.lua (auf Knopfdruck auch sofort) und holt die Flüge des Widgets (IGC aus scripts/skynav/fluege/) ins Archiv unter SkyNavigator/Fluege. Die Web-Version speichert die Aufgaben im Browser und lädt aufgaben.lua als Datei herunter.
 - Flüge im gleichen Tab: Liste mit Dreiecken, Schnitt, Zeit und Strafe; pro Flug Kennzahlen, Spur über der Aufgabe, Tabelle je Runde und Download der IGC-Datei. Die Wertung rechnet die App aus der IGC-Datei nach (Aufgabe aus den LTSK-Zeilen), auch für eine geöffnete IGC-Datei.
