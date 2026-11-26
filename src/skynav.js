@@ -11,8 +11,10 @@ const SUB = 'SkyNavigator';
 const SENDER_DIR = ['scripts', 'skynav'];
 const IGC = /\.igc$/i;
 
-const baseDir = archive => path.join(archive, SUB);
-const flightDir = archive => path.join(archive, SUB, 'Fluege');
+const HG = require('./hangar');
+// Im MM-Hangar: skynav/ und skynav/fluege (wie die SkyNavigator-App), im alten Archiv SkyNavigator/ und Fluege
+const baseDir = archive => HG.isHangar(archive) ? path.join(archive, 'skynav') : path.join(archive, SUB);
+const flightDir = archive => HG.isHangar(archive) ? path.join(archive, 'skynav', 'fluege') : path.join(archive, SUB, 'Fluege');
 
 async function writeAtomic(dest, data) {
   await fsp.mkdir(path.dirname(dest), { recursive: true });
@@ -69,6 +71,7 @@ async function copyFlights(root, archive) {
       try {
         const st = await fsp.stat(from);
         if (!st.size) continue;   // Datei, die das Widget gerade erst angelegt hat
+        if (fs.existsSync(path.join(dst, HG.DELETED, e.name))) { out.same++; continue; }   // in einer App gelöscht
         try { if ((await fsp.stat(to)).size === st.size) { out.same++; continue; } } catch {}
         await writeAtomic(to, await fsp.readFile(from));
         out.copied.push(e.name);

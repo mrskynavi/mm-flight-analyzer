@@ -6,6 +6,7 @@ const path = require('path');
 const os = require('os');
 const { execFile } = require('child_process');
 const { EventEmitter } = require('events');
+const HG = require('./hangar');
 
 const NAME_RE = /^(.*?)-(\d{4}-\d{2}-\d{2})-(\d{2})-(\d{2})-(\d{2})\.(csv|log)$/i;
 // Jeti: Log/JJJJMMTT/hh-mm-ss.log; im Archiv heisst er Jeti-JJJJ-MM-TT-hh-mm-ss.log (Ordner "Jeti", das Modell erkennt die App am Inhalt)
@@ -143,11 +144,17 @@ async function listJeti(dir, strict = false) {
 }
 
 // Ein Log gilt als vorhanden, wenn es im Modell-Ordner mit gleicher Grösse liegt
+// Zielordner eines Logs: im MM-Hangar modelle/<Modell-ID>/fluege, im alten Archiv ein Ordner pro Modell
+function logDir(archive, name, hangar = HG.isHangar(archive)) {
+  return hangar ? path.join(archive, 'modelle', HG.modelId(modelOf(name)), 'fluege') : path.join(archive, safeDir(modelOf(name)));
+}
+
 async function plan(src, archive, jeti = false) {
   const files = jeti ? await listJeti(src, true) : await listCsv(src, true), todo = [];
   let skipped = 0;
+  const hangar = HG.isHangar(archive);
   for (const f of files) {
-    const dest = path.join(archive, safeDir(modelOf(f.name)), f.name);
+    const dest = path.join(logDir(archive, f.name, hangar), f.name);
     let same = false;
     try { same = (await fsp.stat(dest)).size === f.size; } catch {}
     if (same) skipped++; else todo.push({ ...f, src: f.src || path.join(src, f.name), dest });
@@ -200,7 +207,7 @@ async function syncDir(src, archive, onProgress = () => {}, jeti = false) {
 
 // Ein Log ins Archiv legen (manuell eingelesen). Liegt es schon dort, passiert nichts.
 async function archiveFile(archive, name, data) {
-  const dest = path.join(archive, safeDir(modelOf(name)), path.basename(name));
+  const dest = path.join(logDir(archive, path.basename(name)), path.basename(name));
   try { if ((await fsp.stat(dest)).size === data.length) return { path: dest, existed: true }; } catch {}
   await fsp.mkdir(path.dirname(dest), { recursive: true });
   await fsp.writeFile(dest + '.part', data);
@@ -332,6 +339,12 @@ class SyncWatcher extends EventEmitter {
       }
       const todo = force ? dirs : dirs.filter(d => !this.synced.has(d));
       if (!todo.length) return this.status;
+      // MM-Hangar: nur eine App holt gleichzeitig vom Sender (Sperrdatei wie hangar-sync)
+      if (HG.isHangar(st.archiveDir)) {
+        const lk = await HG.acquireLock(st.archiveDir);
+        if (!lk.acquired) { this.set({ state: 'locked', lockedBy: lk.lockedBy }); return this.status; }
+        this.locked = st.archiveDir;
+      }
       const all = { state: 'done', connected: true, archive: st.archiveDir, sources: [], copied: [], errors: [], skipped: 0, total: 0, interrupted: false, left: 0, at: Date.now() };
       for (const d of todo) {
         this.set({ state: 'copy', source: d, total: 0, done: 0 });
@@ -360,8 +373,11 @@ class SyncWatcher extends EventEmitter {
     } catch (e) {
       this.set({ state: 'error', error: e.message });
       return this.status;
-    } finally { this.busy = false; }
+    } finally {
+      if (this.locked) { await HG.releaseLock(this.locked); this.locked = null; }
+      this.busy = false;
+    }
   }
 }
 
-module.exports = { denied, modelOf, safeDir, decodeText, volumes, findSenderDirs, findJetiDirs, listCsv, listJeti, syncDir, archiveFile, writePolars, readScripts, writeScript, listArchive, defaultArchive, SyncWatcher };
+module.exports = { denied, logDir, modelOf, safeDir, decodeText, volumes, findSenderDirs, findJetiDirs, listCsv, listJeti, syncDir, archiveFile, writePolars, readScripts, writeScript, listArchive, defaultArchive, SyncWatcher };

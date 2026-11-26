@@ -10,6 +10,7 @@ const AI = require('./ai');
 const MG = require('./migrate');
 const WG = require('./widgets');
 const SN = require('./skynav');
+const HG = require('./hangar');
 
 // Daten aus dem Ordner der früheren App „Ethos Log Viewer“ übernehmen, bevor irgendetwas den neuen Ordner benutzt
 const MIGRATED = MG.migrate(path.join(app.getPath('appData'), MG.OLD_NAME), app.getPath('userData'));
@@ -224,6 +225,24 @@ ipcMain.handle('camera:ask', async () => {
 });
 ipcMain.handle('skynav:open', () => { const d = SN.flightDir(settings.archiveDir); fs.mkdirSync(d, { recursive: true }); return shell.openPath(d); });
 
+// Einmalig: Archiv in den MM-Hangar (Google Drive „Meine Ablage/MM-Hangar“) kopieren und ab dann dort arbeiten.
+// Das alte Archiv bleibt unverändert liegen (Entscheid Christoph 2026-11-26, F11/F12).
+async function setupHangar() {
+  if (settings.hangarSetup) return;
+  const old = settings.archiveDir;
+  if (HG.isHangar(old)) { saveSettings({ hangarSetup: { at: Date.now(), dir: old } }); return; }
+  const dir = HG.defaultHangar();
+  watcher.set({ state: 'hangar', dir });
+  try {
+    const rep = fs.existsSync(old) ? await HG.migrateArchive(old, dir, { modelOf: S.modelOf, listArchive: S.listArchive }) : null;
+    await HG.ensureIndex(dir);
+    saveSettings({ archiveDir: dir, oldArchiveDir: old, hangarSetup: { at: Date.now(), dir, from: old, rep } });
+    watcher.set({ state: 'idle', hangar: { dir, from: old, rep } });
+  } catch (e) {
+    watcher.set({ state: 'error', error: `MM-Hangar einrichten: ${e.message}` });
+  }
+}
+
 let lastUpdate = null;
 async function checkUpdate() {
   let u = await U.check(app.getVersion(), netJson);
@@ -297,7 +316,7 @@ app.whenReady().then(() => {
   fetchWidgets();
   watcher.on('status', s => win && !win.isDestroyed() && win.webContents.send('sync:status', s));
   createWindow();
-  watcher.start();
+  setupHangar().finally(() => watcher.start());
   // alle 6 Stunden nach einer neuen Version schauen, und wenn das Fenster nach mehr als einer Stunde wieder nach vorne kommt
   setInterval(checkUpdate, 6 * 3600 * 1000);
   app.on('browser-window-focus', () => { if (!lastUpdate || Date.now() - lastUpdate.at > 3600 * 1000) checkUpdate(); });
