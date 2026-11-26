@@ -205,3 +205,25 @@ test('Sync: Aufgaben auf den Sender, Flüge ins Archiv (gleich grosse übersprin
   assert.deepStrictEqual(fl.map(f => f.name), ['2026-10-15-XSN-SKYNAV-01.IGC']);
   assert.ok(fl[0].path.startsWith(path.join(archive, 'SkyNavigator', 'Fluege')));
 });
+
+test('IGC der Widgets bis 1.52: Wertung mit Druckhöhe, relative GPS-Höhe verschoben, 0/0 und falsche Zeiten verworfen', () => {
+  const L = ['AXSNSKYNAV', 'HFDTEDATE:071205,01', 'I013637SUS', 'LTSK:V:02.0', 'LTSK:T:Test,47.200000,8.960000,400,0,350,400,120,20,30'];
+  const B = (s, latMin, p, g, sus) => {
+    const hh = String(Math.floor(s / 3600)).padStart(2, '0'), mm = String(Math.floor(s / 60) % 60).padStart(2, '0'), ss = String(s % 60).padStart(2, '0');
+    L.push(`B${hh}${mm}${ss}47${String(latMin).padStart(5, '0')}N00857600EA${String(p).padStart(5, '0')}${String(g).padStart(5, '0')}${String(sus).padStart(2, '0')}`);
+  };
+  B(16 * 3600, 12000, 400, 0, 0);                       // einzelner Fix mit falscher Senderzeit
+  for (let i = 0; i < 30; i++) B(5 * 3600 + i, 12000 + i * 10, 400 + i * 5, i * 5 + (i % 2), (i * 37) % 100);
+  L.push('B0503000000000N00000000EA0050000100' + '00');     // 0/0
+  const igc = SKY.parseIgc(L.join('\r\n'));
+  assert.strictEqual(igc.fixes.length, 30);
+  assert.strictEqual(igc.cleaned.zeroPos, 1);
+  assert.strictEqual(igc.cleaned.timeOutliers, 1);
+  assert.strictEqual(igc.altInfo.source, 'baro');
+  assert.strictEqual(igc.altInfo.gpsRelative, true);
+  assert.strictEqual(igc.dateSuspect, true);
+  for (let i = 1; i < igc.fixes.length; i++) assert.ok(igc.fixes[i].t > igc.fixes[i - 1].t);
+  const t = SKY.taskOfIgc(igc);
+  assert.strictEqual(SKY.fixAgl(igc, t, igc.fixes[0]), 0);
+  assert.ok(Math.abs(SKY.fixAgl(igc, t, igc.fixes[29], 'gps') - 145) < 3);
+});
